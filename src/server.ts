@@ -1,33 +1,13 @@
 import fastify from 'fastify'
-import crypto from 'node:crypto'
-import { knex } from './database'
 import { env } from './env'
+
+import { transactionsRoutes } from './routes/transactions'
 
 const app = fastify()
 
-app.get('/listTransaction', async () => {
-  const transaction = knex('transactions')
-    .select('*')
-    .where('amount', 1000)
+app.register(transactionsRoutes)
 
-  return transaction
-})
 
-app.get('/listTransactions', async () => {
-  const transactions = knex('transactions').select('*')
-
-  return transactions
-})
-
-app.get('/newTransaction', async () => {
-  const transaction = knex('transactions').insert({
-    id: crypto.randomUUID(),
-    title: 'Transaction test',
-    amount: 1000,
-  }).returning('*')
-
-  return transaction
-})
 
 app
   .listen({
