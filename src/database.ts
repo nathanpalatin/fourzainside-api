@@ -4,7 +4,7 @@ import { configDotenv } from 'dotenv'
 
 configDotenv()
 
-export const knex = setupKnex({
+export const config = {
   client: 'pg',
   connection: {
     host: process.env.HOST,
@@ -12,5 +12,7 @@ export const knex = setupKnex({
     user: process.env.USER,
     password: process.env.PASSWORD,
     database: process.env.DB_NAME
-  },
-})
+  }
+}
+
+export const knex = setupKnex(config)
