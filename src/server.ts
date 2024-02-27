@@ -7,8 +7,6 @@ const app = fastify()
 
 app.register(transactionsRoutes)
 
-
-
 app
   .listen({
     port: env.PORT,

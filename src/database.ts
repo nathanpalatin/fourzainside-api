@@ -10,11 +10,6 @@ if (!process.env.DATABASE_URL) {
 export const config: Knex.Config = {
   client: 'sqlite',
   connection: {
-    host: env.HOST,
-    port: env.PORT,
-    user: env.USER,
-    password: env.PASSWORD,
-    database: env.DB_NAME,
     filename: env.DATABASE_URL
   },
   migrations: {
