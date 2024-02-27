@@ -10,7 +10,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     return { transactions }
   })
 
-  app.get('/transactions/:id', async (request) => {
+  app.get('/:id', async (request) => {
 
     const getTransactionParamsSchema = z.object({
       id: z.string().uuid(),
@@ -25,7 +25,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     return { transaction }
   })
 
-  app.post('/newTransaction', async (request, reply) => {
+  app.post('/', async (request, reply) => {
 
     const createTransactionBodySchema = z.object({
       title: z.string(),
@@ -47,13 +47,13 @@ export async function transactionsRoutes(app: FastifyInstance) {
     return reply.status(201).send('Transaction created successfully!')
   })
 
-  app.delete('/deleteTransactions', async (_request, reply) => {
+  app.delete('/', async (_request, reply) => {
     await knex('transactions').delete()
 
     return reply.status(204).send('Transactions deleted successfully')
   })
 
-  app.delete('/deleteTransaction/:id', async (request, reply) => {
+  app.delete('/:id', async (request, reply) => {
     const getTransactionParamsSchema = z.object({
       id: z.string().uuid(),
     })
