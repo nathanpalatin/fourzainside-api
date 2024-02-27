@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
+import { randomUUID } from 'node:crypto'
 import { knex } from '../database'
 
 export async function transactionsRoutes(app: FastifyInstance) {
@@ -9,16 +10,15 @@ export async function transactionsRoutes(app: FastifyInstance) {
     return { transactions }
   })
 
-  app.get('/transaction/:id', async (request) => {
+  app.get('/transactions/:id', async (request) => {
 
     const getTransactionParamsSchema = z.object({
-      id: z.string().uuid()
+      id: z.string().uuid(),
     })
 
-    const { id } = getTransactionParamsSchema(request.params)
+    const { id } = getTransactionParamsSchema.parse(request.params)
 
     const transaction = await knex('transactions')
-      .select('*')
       .where('id', id)
       .first()
 
@@ -39,7 +39,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
 
     await knex('transactions').insert({
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       title,
       amount: type === 'credit' ? amount : amount * -1,
     })
@@ -48,13 +48,22 @@ export async function transactionsRoutes(app: FastifyInstance) {
   })
 
   app.delete('/deleteTransactions', async (_request, reply) => {
-    await knex('transactions').delete('*')
+    await knex('transactions').delete()
 
     return reply.status(204).send('Transactions deleted successfully')
   })
 
-  app.delete('/deleteTransaction/:id', async (_request, reply) => {
-    await knex('transactions').delete('*').where('id', '=')
+  app.delete('/deleteTransaction/:id', async (request, reply) => {
+    const getTransactionParamsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { id } = getTransactionParamsSchema.parse(request.params)
+
+
+    await knex('transactions')
+      .delete()
+      .where('id', id)
 
     return reply.status(204).send('Transaction deleted successfully')
   })
