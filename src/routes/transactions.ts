@@ -35,7 +35,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
     const transaction = await knex('transactions')
       .where({
         id,
-        sesssion_id: sessionId
+        session_id: sessionId
       })
       .first()
 
@@ -111,9 +111,9 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
   app.delete('/', {
     preHandler: [checkSessionIdExists],
-  }, async (reply) => {
+  }, async (request, reply) => {
     const { sessionId } = request.cookies
-    await knex('transactions').delete().where('session_id', sessionId).delete
+    await knex('transactions').delete().where('session_id', sessionId)
 
     return reply.status(204).send('All transactions deleted successfully')
   })
