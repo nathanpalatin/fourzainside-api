@@ -47,12 +47,16 @@ export async function transactionsRoutes(app: FastifyInstance) {
     return reply.status(201).send('Transaction created successfully!')
   })
 
-  app.put('/', async (request, reply) => {
+  app.put('/:id', async (request, reply) => {
+
+    const getTransactionParamsSchema = z.object({
+      id: z.string().uuid(),
+    })
 
     const createTransactionBodySchema = z.object({
       title: z.string(),
       amount: z.number(),
-      type: 'debit',
+      type: z.enum(['credit', 'debit']),
     })
 
     const { id } = getTransactionParamsSchema.parse(request.params)
