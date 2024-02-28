@@ -47,6 +47,29 @@ export async function transactionsRoutes(app: FastifyInstance) {
     return reply.status(201).send('Transaction created successfully!')
   })
 
+  app.put('/', async (request, reply) => {
+
+    const createTransactionBodySchema = z.object({
+      title: z.string(),
+      amount: z.number(),
+      type: 'debit',
+    })
+
+    const { id } = getTransactionParamsSchema.parse(request.params)
+
+    const { title, amount, type } = createTransactionBodySchema.parse(
+      request.body,
+    )
+
+
+    await knex('transactions').update({
+      title,
+      amount: type === 'credit' ? amount : amount * -1,
+    }).where('id', id)
+
+    return reply.status(204).send('Transaction updated successfully!')
+  })
+
   app.delete('/', async (_request, reply) => {
     await knex('transactions').delete()
 
