@@ -76,10 +76,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
     return reply.status(204).send('Transaction updated successfully!')
   })
 
-  app.delete('/', async (_request, reply) => {
+  app.delete('/', async (reply) => {
     await knex('transactions').delete()
 
-    return reply.status(204).send('Transactions deleted successfully')
+    return reply.status(204).send('All transactions deleted successfully')
   })
 
   app.delete('/:id', async (request, reply) => {
