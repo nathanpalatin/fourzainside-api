@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
 
 import { randomUUID } from 'node:crypto'
+import bcrypt from 'bcrypt'
 import { z } from 'zod'
 
 export async function usersRoutes(app: FastifyInstance) {
@@ -32,11 +33,13 @@ export async function usersRoutes(app: FastifyInstance) {
       })
     }
 
+    const hashedPassword = bcrypt.hash(password, 10)
+
     await knex('users').insert({
       id: randomUUID(),
       name,
       nickname,
-      password,
+      password: hashedPassword,
       avatar,
       email,
       cpf
