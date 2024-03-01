@@ -7,13 +7,13 @@ import { z } from 'zod'
 
 export async function usersRoutes(app: FastifyInstance) {
 
-  app.post('/users', async (request, reply) => {
+  app.post('/', async (request, reply) => {
 
     const createUserSchemaBody = z.object({
-      id: uuid(),
       name: z.string(),
       nickname: z.string(),
       avatar: z.string(),
+      password: z.string(),
       email: z.string(),
       cpf: z.string(),
     })
@@ -33,7 +33,7 @@ export async function usersRoutes(app: FastifyInstance) {
       })
     }
 
-    const hashedPassword = bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10)
 
     await knex('users').insert({
       id: randomUUID(),
