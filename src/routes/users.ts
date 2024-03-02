@@ -53,7 +53,26 @@ export async function usersRoutes(app: FastifyInstance) {
 		const { credential, password } = createLoginSchemaBody.parse(request.body)
 
 		if (!credential || !password) {
-			return reply.status(404).send('Invalid credentials or password')
+			return reply.status(500).send('Invalid credentials or password')
+		}
+
+		const user = await knex('users')
+			.where({
+				email: credential
+			})
+			.orWhere({
+				nickname: credential
+			})
+			.first()
+
+		if (!user) {
+			return reply.status(404).send('User not found')
+		}
+
+		const isValidPassword = await bcrypt.compare(password, user.password)
+
+		if (!isValidPassword) {
+			return reply.status(403).send('Invalid credentials or password')
 		}
 
 		return reply.status(200).send('Login successful')
