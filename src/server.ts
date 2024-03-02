@@ -9,19 +9,18 @@ const app = fastify()
 
 app.register(cookie)
 
-
 app.register(usersRoutes, {
-  prefix: 'users',
+	prefix: 'users'
 })
 
 app.register(transactionsRoutes, {
-  prefix: 'transactions',
+	prefix: 'transactions'
 })
 
 app
-  .listen({
-    port: env.PORT,
-  })
-  .then(() => {
-    console.log('Servidor iniciado na porta:', env.PORT)
-  })
+	.listen({
+		port: env.PORT
+	})
+	.then(() => {
+		console.log('Servidor iniciado na porta:', env.PORT)
+	})

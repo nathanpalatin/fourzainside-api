@@ -6,136 +6,145 @@ import { z } from 'zod'
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function transactionsRoutes(app: FastifyInstance) {
+	app.get(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async request => {
+			const { sessionId } = request.cookies
 
-  app.get('/',
-    {
-      preHandler: [checkSessionIdExists],
-    },
-    async (request) => {
+			const transactions = await knex('transactions').where('session_id', sessionId).select()
+			return { transactions }
+		}
+	)
 
-      const { sessionId } = request.cookies
+	app.get(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async request => {
+			const getTransactionParamsSchema = z.object({
+				id: z.string().uuid()
+			})
+			const { sessionId } = request.cookies
 
-      const transactions = await knex('transactions')
-        .where('session_id', sessionId)
-        .select()
-      return { transactions }
-    })
+			const { id } = getTransactionParamsSchema.parse(request.params)
 
-  app.get('/:id', {
-    preHandler: [checkSessionIdExists],
-  }, async (request) => {
+			const transaction = await knex('transactions')
+				.where({
+					id,
+					session_id: sessionId
+				})
+				.first()
 
-    const getTransactionParamsSchema = z.object({
-      id: z.string().uuid(),
-    })
-    const { sessionId } = request.cookies
+			return { transaction }
+		}
+	)
 
-    const { id } = getTransactionParamsSchema.parse(request.params)
+	app.post(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const createTransactionBodySchema = z.object({
+				title: z.string(),
+				amount: z.number(),
+				type: z.enum(['credit', 'debit'])
+			})
 
-    const transaction = await knex('transactions')
-      .where({
-        id,
-        session_id: sessionId
-      })
-      .first()
+			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
 
-    return { transaction }
-  })
+			let sessionId = request.cookies.sessionId
 
-  app.post('/', {
-    preHandler: [checkSessionIdExists],
-  }, async (request, reply) => {
+			if (!sessionId) {
+				sessionId = randomUUID()
 
-    const createTransactionBodySchema = z.object({
-      title: z.string(),
-      amount: z.number(),
-      type: z.enum(['credit', 'debit']),
-    })
+				reply.cookie('sessionId', sessionId, {
+					path: '/',
+					maxAge: 60 * 60 * 24 * 7 // 7 days
+				})
+			}
 
-    const { title, amount, type } = createTransactionBodySchema.parse(
-      request.body,
-    )
+			await knex('transactions').insert({
+				id: randomUUID(),
+				title,
+				amount: type === 'credit' ? amount : amount * -1,
+				session_id: sessionId
+			})
 
-    let sessionId = request.cookies.sessionId
+			return reply.status(201).send('Transaction created successfully!')
+		}
+	)
 
-    if (!sessionId) {
-      sessionId = randomUUID()
+	app.put(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getTransactionParamsSchema = z.object({
+				id: z.string().uuid()
+			})
 
-      reply.cookie('sessionId', sessionId, {
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7 // 7 days
-      })
-    }
+			const createTransactionBodySchema = z.object({
+				title: z.string(),
+				amount: z.number(),
+				type: z.enum(['credit', 'debit'])
+			})
+			const { sessionId } = request.cookies
+			const { id } = getTransactionParamsSchema.parse(request.params)
 
-    await knex('transactions').insert({
-      id: randomUUID(),
-      title,
-      amount: type === 'credit' ? amount : amount * -1,
-      session_id: sessionId
-    })
+			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
 
-    return reply.status(201).send('Transaction created successfully!')
-  })
+			await knex('transactions')
+				.update({
+					title,
+					amount: type === 'credit' ? amount : amount * -1
+				})
+				.where({
+					id,
+					session_id: sessionId
+				})
 
-  app.put('/:id', {
-    preHandler: [checkSessionIdExists],
-  }, async (request, reply) => {
+			return reply.status(204).send('Transaction updated successfully!')
+		}
+	)
 
-    const getTransactionParamsSchema = z.object({
-      id: z.string().uuid(),
-    })
+	app.delete(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const { sessionId } = request.cookies
+			await knex('transactions').delete().where('session_id', sessionId)
 
-    const createTransactionBodySchema = z.object({
-      title: z.string(),
-      amount: z.number(),
-      type: z.enum(['credit', 'debit']),
-    })
-    const { sessionId } = request.cookies
-    const { id } = getTransactionParamsSchema.parse(request.params)
+			return reply.status(204).send('All transactions deleted successfully')
+		}
+	)
 
-    const { title, amount, type } = createTransactionBodySchema.parse(
-      request.body,
-    )
+	app.delete(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getTransactionParamsSchema = z.object({
+				id: z.string().uuid()
+			})
 
+			const { sessionId } = request.cookies
+			const { id } = getTransactionParamsSchema.parse(request.params)
 
-    await knex('transactions').update({
-      title,
-      amount: type === 'credit' ? amount : amount * -1,
-    }).where({
-      id,
-      session_id: sessionId
-    })
+			await knex('transactions').delete().where({
+				id,
+				session_id: sessionId
+			})
 
-    return reply.status(204).send('Transaction updated successfully!')
-  })
-
-  app.delete('/', {
-    preHandler: [checkSessionIdExists],
-  }, async (request, reply) => {
-    const { sessionId } = request.cookies
-    await knex('transactions').delete().where('session_id', sessionId)
-
-    return reply.status(204).send('All transactions deleted successfully')
-  })
-
-  app.delete('/:id', {
-    preHandler: [checkSessionIdExists],
-  }, async (request, reply) => {
-    const getTransactionParamsSchema = z.object({
-      id: z.string().uuid(),
-    })
-
-    const { sessionId } = request.cookies
-    const { id } = getTransactionParamsSchema.parse(request.params)
-
-    await knex('transactions')
-      .delete()
-      .where({
-        id,
-        session_id: sessionId
-      })
-
-    return reply.status(204).send('Transaction deleted successfully')
-  })
-
+			return reply.status(204).send('Transaction deleted successfully')
+		}
+	)
 }

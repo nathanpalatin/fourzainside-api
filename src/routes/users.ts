@@ -6,46 +6,56 @@ import bcrypt from 'bcrypt'
 import { z } from 'zod'
 
 export async function usersRoutes(app: FastifyInstance) {
+	app.post('/', async (request, reply) => {
+		const createUserSchemaBody = z.object({
+			name: z.string(),
+			nickname: z.string(),
+			avatar: z.string(),
+			password: z.string(),
+			email: z.string(),
+			cpf: z.string()
+		})
 
-  app.post('/', async (request, reply) => {
+		const { name, nickname, avatar, email, cpf, password } = createUserSchemaBody.parse(request.body)
 
-    const createUserSchemaBody = z.object({
-      name: z.string(),
-      nickname: z.string(),
-      avatar: z.string(),
-      password: z.string(),
-      email: z.string(),
-      cpf: z.string(),
-    })
+		let sessionId = request.cookies.sessionId
 
-    const { name, nickname, avatar, email, cpf, password } = createUserSchemaBody.parse(
-      request.body,
-    )
+		if (!sessionId) {
+			sessionId = randomUUID()
 
-    let sessionId = request.cookies.sessionId
+			reply.cookie('sessionId', sessionId, {
+				path: '/',
+				maxAge: 60 * 60 * 24 * 7 // 7 days
+			})
+		}
 
-    if (!sessionId) {
-      sessionId = randomUUID()
+		const hashedPassword = await bcrypt.hash(password, 10)
 
-      reply.cookie('sessionId', sessionId, {
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7 // 7 days
-      })
-    }
+		await knex('users').insert({
+			id: randomUUID(),
+			name,
+			nickname,
+			password: hashedPassword,
+			avatar,
+			email,
+			cpf
+		})
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+		return reply.status(201).send('User created successfully!')
+	})
 
-    await knex('users').insert({
-      id: randomUUID(),
-      name,
-      nickname,
-      password: hashedPassword,
-      avatar,
-      email,
-      cpf
-    })
+	app.post('/login', async (request, reply) => {
+		const createLoginSchemaBody = z.object({
+			credential: z.string(),
+			password: z.string()
+		})
 
-    return reply.status(201).send('User created successfully!')
+		const { credential, password } = createLoginSchemaBody.parse(request.body)
 
-  })
+		if (!credential || !password) {
+			return reply.status(404).send('Invalid credentials or password')
+		}
+
+		return reply.status(200).send('Login successful')
+	})
 }
