@@ -8,7 +8,7 @@ if (!process.env.DATABASE_URL) {
 }
 
 export const config: Knex.Config = {
-	client: 'sqlite',
+	client: 'pg',
 	connection: {
 		filename: env.DATABASE_URL
 	},
