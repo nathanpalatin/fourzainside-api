@@ -18,6 +18,12 @@
   "plugins": [
     "@typescript-eslint/eslint-plugin"
   ],
+  "prettier/prettier": [
+    "error",
+    {
+      "endOfLine": "auto"
+    }
+  ],
   "root": true,
   "rules": {
     "@typescript-eslint/interface-name-prefix": "off",
