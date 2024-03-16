@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Knex } from 'knex'
 
 declare module 'knex/types/tables' {
