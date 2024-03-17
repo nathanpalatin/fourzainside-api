@@ -9,14 +9,14 @@ export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
 		const createUserSchemaBody = z.object({
 			name: z.string(),
-			nickname: z.string(),
+			username: z.string(),
 			avatar: z.string(),
 			password: z.string(),
 			email: z.string(),
-			cpf: z.string()
+			phone: z.string(),
 		})
 
-		const { name, nickname, avatar, email, cpf, password } = createUserSchemaBody.parse(request.body)
+		const { name, username, avatar, email, password, phone } = createUserSchemaBody.parse(request.body)
 
 		let sessionId = request.cookies.sessionId
 
@@ -31,15 +31,19 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 
-		await knex('users').insert({
+		await knex('User').insert({
 			id: randomUUID(),
 			name,
-			nickname,
+			username,
+			createdAt: new Date(),
+			updatedAt: new Date(),
 			password: hashedPassword,
 			avatar,
 			email,
-			cpf
+			phone
 		})
+
+		console.log(reply)
 
 		return reply.status(201).send('User created successfully!')
 	})
@@ -56,12 +60,12 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		const user = await knex('users')
+		const user = await knex('User')
 			.where({
 				email: credential
 			})
 			.orWhere({
-				nickname: credential
+				username: credential
 			})
 			.first()
 
@@ -77,4 +81,10 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		return reply.status(200).send('Login successful')
 	})
+
+	app.get('/', async () => {
+			const users = await knex('User').select()
+			return { users }
+		}
+	)
 }
