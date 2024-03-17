@@ -8,7 +8,7 @@ declare module 'knex/types/tables' {
 			amount: number
 			created_at: string
 			session_id?: string
-		}
+		},
 		User: {
 			id: string
 			name: string
@@ -19,6 +19,15 @@ declare module 'knex/types/tables' {
 			createdAt: Date
 			updatedAt: Date
 			phone: string
+		},
+		Products: {
+			id: string
+      title: string
+      slug: string
+      price: number
+      image: string
+      description: string
+      featured: boolean
 		}
 	}
 }

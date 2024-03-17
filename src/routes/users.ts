@@ -1,4 +1,4 @@
-import { FastifyInstance } from 'fastify'
+import { FastifyInstance, FastifyRequest } from 'fastify'
 import { knex } from '../database'
 
 import { randomUUID } from 'node:crypto'
@@ -43,10 +43,9 @@ export async function usersRoutes(app: FastifyInstance) {
 			phone
 		})
 
-		console.log(reply)
-
 		return reply.status(201).send('User created successfully!')
 	})
+
 
 	app.post('/login', async (request, reply) => {
 		const createLoginSchemaBody = z.object({
