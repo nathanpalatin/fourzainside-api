@@ -1,23 +1,25 @@
 import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
 
-import { randomUUID } from 'node:crypto'
 import { z } from 'zod'
+import { randomUUID } from 'node:crypto'
+
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function productsRoutes(app: FastifyInstance) {
+
 	app.get('/', async () => {
 			const products = await knex('Products').select()
 			return  { products } 
 		}
 	)
 
-	app.get('/:slug',async request => {
-			const getTransactionParamsSchema = z.object({
+	app.get('/:slug', async request => {
+			const getProductsParamsSchema = z.object({
 				slug: z.string()
 			})
 
-			const { slug } = getTransactionParamsSchema.parse(request.params)
+			const { slug } = getProductsParamsSchema.parse(request.params)
 
 			const product = await knex('Products')
 				.where({
@@ -25,12 +27,12 @@ export async function productsRoutes(app: FastifyInstance) {
 				})
 				.first()
 
-			return  {product}
+			return { product }
 		}
 	)
 
 	app.post('/', async (request, reply) => {
-		const createTransactionBodySchema = z.object({
+		const createProductsBodySchema = z.object({
 			title: z.string(),
 			slug: z.string(),
 			description: z.string(),
@@ -39,7 +41,7 @@ export async function productsRoutes(app: FastifyInstance) {
 			featured: z.boolean(),
 		})
 
-		const { title, slug, price, image, description, featured } = createTransactionBodySchema.parse(request.body)
+		const { title, slug, price, image, description, featured } = createProductsBodySchema.parse(request.body)
 
 		await knex('Products').insert({
 			id: randomUUID(),
@@ -60,31 +62,36 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionParamsSchema = z.object({
+			const getProductsParamsSchema = z.object({
 				id: z.string().uuid()
 			})
 
-			const createTransactionBodySchema = z.object({
+			const createProductsBodySchema = z.object({
 				title: z.string(),
-				amount: z.number(),
-				type: z.enum(['credit', 'debit'])
+				slug: z.string(),
+				price: z.number(),
+				description: z.string(),
+				image: z.string(),
+				featured: z.boolean()
 			})
-			const { sessionId } = request.cookies
-			const { id } = getTransactionParamsSchema.parse(request.params)
+			const { id } = getProductsParamsSchema.parse(request.params)
 
-			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
+			const { title, price, slug, description, image, featured } = createProductsBodySchema.parse(request.body)
 
-			await knex('transactions')
+			await knex('Products')
 				.update({
 					title,
-					amount: type === 'credit' ? amount : amount * -1
+					slug,
+					price,
+					description,
+					image,
+					featured
 				})
 				.where({
-					id,
-					session_id: sessionId
+					id
 				})
 
-			return reply.status(204).send('Transaction updated successfully!')
+			return reply.status(204).send('Product updated successfully!')
 		}
 	)
 
@@ -95,31 +102,28 @@ export async function productsRoutes(app: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const { sessionId } = request.cookies
-			await knex('transactions').delete().where('session_id', sessionId)
+			await knex('Products').delete().where('session_id', sessionId)
 
-			return reply.status(204).send('All transactions deleted successfully')
+			return reply.status(204).send('All products deleted successfully')
 		}
 	)
 
-	app.delete(
-		'/:id',
-		{
-			preHandler: [checkSessionIdExists]
-		},
-		async (request, reply) => {
-			const getTransactionParamsSchema = z.object({
+	app.delete('/:id',
+	{
+		preHandler: [checkSessionIdExists]
+	}, async (request, reply) => {
+			const getProductsParamsSchema = z.object({
 				id: z.string().uuid()
 			})
 
-			const { sessionId } = request.cookies
-			const { id } = getTransactionParamsSchema.parse(request.params)
+			const { id } = getProductsParamsSchema.parse(request.params)
 
-			await knex('transactions').delete().where({
+			await knex('Products').delete().where({
 				id,
-				session_id: sessionId
 			})
 
-			return reply.status(204).send('Transaction deleted successfully')
+			return reply.status(204).send('Product deleted successfully')
 		}
 	)
+	
 }
