@@ -12,27 +12,20 @@ export async function productsRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.get(
-		'/:id',
-		{
-			preHandler: [checkSessionIdExists]
-		},
-		async request => {
+	app.get('/:slug',async request => {
 			const getTransactionParamsSchema = z.object({
-				id: z.string().uuid()
+				slug: z.string()
 			})
-			const { sessionId } = request.cookies
 
-			const { id } = getTransactionParamsSchema.parse(request.params)
+			const { slug } = getTransactionParamsSchema.parse(request.params)
 
-			const transaction = await knex('transactions')
+			const product = await knex('Products')
 				.where({
-					id,
-					session_id: sessionId
+					slug
 				})
 				.first()
 
-			return { transaction }
+			return  {product}
 		}
 	)
 
