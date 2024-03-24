@@ -14,7 +14,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 		async request => {
 			const { sessionId } = request.cookies
 
-			const transactions = await knex('transactions').where('session_id', sessionId).select()
+			const transactions = await knex('Transactions').where('session_id', sessionId).select()
 			return { transactions }
 		}
 	)
@@ -47,10 +47,11 @@ export async function transactionsRoutes(app: FastifyInstance) {
 		const createTransactionBodySchema = z.object({
 			title: z.string(),
 			amount: z.number(),
-			type: z.enum(['credit', 'debit'])
+			type: z.enum(['credit', 'debit']),
+			userId: z.string(),
 		})
 
-		const { title, amount, type } = createTransactionBodySchema.parse(request.body)
+		const { title, userId, amount, type } = createTransactionBodySchema.parse(request.body)
 
 		let sessionId = request.cookies.sessionId
 
@@ -63,11 +64,15 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			})
 		}
 
-		await knex('transactions').insert({
+		await knex('Transactions').insert({
 			id: randomUUID(),
 			title,
+			userId,
 			amount: type === 'credit' ? amount : amount * -1,
-			session_id: sessionId
+			session_id: sessionId,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			type
 		})
 
 		return reply.status(201).send('Transaction created successfully!')

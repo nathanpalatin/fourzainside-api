@@ -8,7 +8,7 @@ import { checkSessionIdExists } from '../middlewares/check-session-id'
 export async function productsRoutes(app: FastifyInstance) {
 	app.get('/', async () => {
 			const products = await knex('Products').select()
-			return { products }
+			return  { products } 
 		}
 	)
 
@@ -39,31 +39,26 @@ export async function productsRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
 		const createTransactionBodySchema = z.object({
 			title: z.string(),
-			amount: z.number(),
-			type: z.enum(['credit', 'debit'])
+			slug: z.string(),
+			description: z.string(),
+			price: z.number(),
+			image: z.string(),
+			featured: z.boolean(),
 		})
 
-		const { title, amount, type } = createTransactionBodySchema.parse(request.body)
+		const { title, slug, price, image, description, featured } = createTransactionBodySchema.parse(request.body)
 
-		let sessionId = request.cookies.sessionId
-
-		if (!sessionId) {
-			sessionId = randomUUID()
-
-			reply.cookie('sessionId', sessionId, {
-				path: '/',
-				maxAge: 60 * 60 * 24 * 7 // 7 days
-			})
-		}
-
-		await knex('transactions').insert({
+		await knex('Products').insert({
 			id: randomUUID(),
 			title,
-			amount: type === 'credit' ? amount : amount * -1,
-			session_id: sessionId
+			slug,
+			description,
+			price,
+			image,
+			featured
 		})
 
-		return reply.status(201).send('Transaction created successfully!')
+		return reply.status(201).send('Product created successfully!')
 	})
 
 	app.put(

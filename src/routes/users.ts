@@ -31,7 +31,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 
-		await knex('User').insert({
+		await knex('Users').insert({
 			id: randomUUID(),
 			name,
 			username,
@@ -59,7 +59,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		const user = await knex('User')
+		const user = await knex('Users')
 			.where({
 				email: credential
 			})
@@ -82,7 +82,7 @@ export async function usersRoutes(app: FastifyInstance) {
 	})
 
 	app.get('/', async () => {
-			const users = await knex('User').select()
+			const users = await knex('Users').select()
 			return { users }
 		}
 	)
