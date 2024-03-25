@@ -14,7 +14,6 @@
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "@types/fastify-multipart": "^0.7.0",
     "@types/node": "^20.11.20",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
