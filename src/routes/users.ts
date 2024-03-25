@@ -1,9 +1,13 @@
-import { FastifyInstance, FastifyRequest } from 'fastify'
+import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
 
 import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
+
+import util from 'node:util'
+import { pipeline } from 'node:stream'
+import fs from 'node:fs'
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
@@ -13,7 +17,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			avatar: z.string(),
 			password: z.string(),
 			email: z.string(),
-			phone: z.string(),
+			phone: z.string()
 		})
 
 		const { name, username, avatar, email, password, phone } = createUserSchemaBody.parse(request.body)
@@ -45,7 +49,6 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		return reply.status(201).send('User created successfully!')
 	})
-
 
 	app.post('/login', async (request, reply) => {
 		const createLoginSchemaBody = z.object({
@@ -81,9 +84,30 @@ export async function usersRoutes(app: FastifyInstance) {
 		return reply.status(200).send('Login successful')
 	})
 
-	app.get('/', async () => {
-			const users = await knex('Users').select()
-			return { users }
+	app.post('/upload', async function (req, reply) {
+		try {
+			const parts = req.files()
+			const pump = util.promisify(pipeline)
+			const uploadedFiles = []
+
+			for await (const part of parts) {
+				const filename = part.filename
+				const filePath = `./uploads/${filename}`
+
+				await pump(part.file, fs.createWriteStream(filePath))
+
+				uploadedFiles.push(filePath)
+			}
+
+			return reply.status(200).send(uploadedFiles)
+		} catch (err) {
+			console.error('Erro durante o upload:', err)
+			return reply.status(500).send('Erro durante o upload.')
 		}
-	)
+	})
+
+	app.get('/', async () => {
+		const users = await knex('Users').select()
+		return { users }
+	})
 }
