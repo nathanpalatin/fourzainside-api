@@ -85,25 +85,20 @@ export async function usersRoutes(app: FastifyInstance) {
 	})
 
 	app.post('/upload', async function (req, reply) {
-		try {
-			const parts = req.files()
-			const pump = util.promisify(pipeline)
-			const uploadedFiles = []
+		const parts = req.files()
+		const pump = util.promisify(pipeline)
+		const uploadedFiles = []
 
-			for await (const part of parts) {
-				const filename = part.filename
-				const filePath = `./uploads/${filename}`
+		for await (const part of parts) {
+			const filename = part.filename
+			const filePath = `./uploads/${filename}`
 
-				await pump(part.file, fs.createWriteStream(filePath))
+			await pump(part.file, fs.createWriteStream(filePath))
 
-				uploadedFiles.push(filePath)
-			}
-
-			return reply.status(200).send(uploadedFiles)
-		} catch (err) {
-			console.error('Erro durante o upload:', err)
-			return reply.status(500).send('Erro durante o upload.')
+			uploadedFiles.push(filePath)
 		}
+
+		return reply.status(200).send(uploadedFiles)
 	})
 
 	app.get('/', async () => {
