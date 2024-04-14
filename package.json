@@ -3,14 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.ts",
-  "engines": {
-    "node": "18"
-  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "knex": "node --import tsx ./node_modules/knex/bin/cli.js",
     "lint": "eslint \"src/**/*.ts\" --fix",
-    "build": "tsup src",
     "test": "vitest"
   },
   "keywords": [],
@@ -37,6 +33,7 @@
   },
   "dependencies": {
     "@fastify/cookie": "^9.3.1",
+    "@fastify/multipart": "^8.2.0",
     "@prisma/client": "5.11.0",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
