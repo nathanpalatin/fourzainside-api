@@ -11,7 +11,7 @@ declare module 'knex/types/tables' {
 			createdAt: Date
 			updatedAt: Date
 			session_id?: string
-		},
+		}
 		Users: {
 			id: string
 			name: string
@@ -22,15 +22,16 @@ declare module 'knex/types/tables' {
 			createdAt: Date
 			updatedAt: Date
 			phone: string
-		},
+		}
 		Products: {
 			id: string
-      title: string
-      slug: string
-      price: number
-      image: string
-      description: string
-      featured: boolean
+			title: string
+			slug: string
+			price: number
+			image: string
+			description: string
+			featured: boolean
+			session_id?: string
 		}
 	}
 }

@@ -7,54 +7,69 @@ import { randomUUID } from 'node:crypto'
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function productsRoutes(app: FastifyInstance) {
-
 	app.get('/', async () => {
-			const products = await knex('Products').select()
-			return  { products } 
-		}
-	)
+		const products = await knex('Products').select()
+		return { products }
+	})
 
 	app.get('/:slug', async request => {
-			const getProductsParamsSchema = z.object({
-				slug: z.string()
+		const getProductsParamsSchema = z.object({
+			slug: z.string()
+		})
+
+		const { slug } = getProductsParamsSchema.parse(request.params)
+
+		const product = await knex('Products')
+			.where({
+				slug
+			})
+			.first()
+
+		return { product }
+	})
+
+	app.post(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const createProductsBodySchema = z.object({
+				title: z.string(),
+				slug: z.string(),
+				description: z.string(),
+				price: z.number(),
+				image: z.string(),
+				featured: z.boolean()
 			})
 
-			const { slug } = getProductsParamsSchema.parse(request.params)
+			const { title, slug, price, image, description, featured } = createProductsBodySchema.parse(request.body)
 
-			const product = await knex('Products')
-				.where({
-					slug
+			let sessionId = request.cookies.sessionId
+
+			if (!sessionId) {
+				sessionId = randomUUID()
+
+				reply.cookie('sessionId', sessionId, {
+					path: '/',
+					maxAge: 60 * 60 * 24 * 7 // 7 days
 				})
-				.first()
+			}
 
-			return { product }
+			await knex('Products').insert({
+				id: randomUUID(),
+				title,
+				slug,
+				description,
+				price,
+				image,
+				featured,
+				session_id: sessionId
+			})
+
+			return reply.status(201).send('Product created successfully!')
 		}
 	)
-
-	app.post('/', async (request, reply) => {
-		const createProductsBodySchema = z.object({
-			title: z.string(),
-			slug: z.string(),
-			description: z.string(),
-			price: z.number(),
-			image: z.string(),
-			featured: z.boolean(),
-		})
-
-		const { title, slug, price, image, description, featured } = createProductsBodySchema.parse(request.body)
-
-		await knex('Products').insert({
-			id: randomUUID(),
-			title,
-			slug,
-			description,
-			price,
-			image,
-			featured
-		})
-
-		return reply.status(201).send('Product created successfully!')
-	})
 
 	app.put(
 		'/:id',
@@ -104,14 +119,16 @@ export async function productsRoutes(app: FastifyInstance) {
 			const { sessionId } = request.cookies
 			await knex('Products').delete().where('session_id', sessionId)
 
-			return reply.status(204).send('All products deleted successfully')
+			return reply.status(204).send('All your products deleted successfully')
 		}
 	)
 
-	app.delete('/:id',
-	{
-		preHandler: [checkSessionIdExists]
-	}, async (request, reply) => {
+	app.delete(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
 			const getProductsParamsSchema = z.object({
 				id: z.string().uuid()
 			})
@@ -119,11 +136,10 @@ export async function productsRoutes(app: FastifyInstance) {
 			const { id } = getProductsParamsSchema.parse(request.params)
 
 			await knex('Products').delete().where({
-				id,
+				id
 			})
 
 			return reply.status(204).send('Product deleted successfully')
 		}
 	)
-	
 }
