@@ -17,7 +17,13 @@ export async function productsRoutes(app: FastifyInstance) {
 			return { products }
 		}
 	)
+	app.get('/featured', async _request => {
+		const productsFeatured = await knex('Products').where({
+			featured: true
+		})
 
+		return { productsFeatured }
+	})
 	app.get('/:slug', async request => {
 		const getProductsParamsSchema = z.object({
 			slug: z.string()
