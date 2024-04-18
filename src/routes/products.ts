@@ -7,10 +7,16 @@ import { randomUUID } from 'node:crypto'
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function productsRoutes(app: FastifyInstance) {
-	app.get('/', async () => {
-		const products = await knex('Products').select()
-		return { products }
-	})
+	app.get(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async () => {
+			const products = await knex('Products').select()
+			return { products }
+		}
+	)
 
 	app.get('/:slug', async request => {
 		const getProductsParamsSchema = z.object({

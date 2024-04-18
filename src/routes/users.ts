@@ -8,6 +8,7 @@ import { z } from 'zod'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
 import fs from 'node:fs'
+import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
@@ -101,8 +102,14 @@ export async function usersRoutes(app: FastifyInstance) {
 		return reply.status(200).send(uploadedFiles)
 	})
 
-	app.get('/', async () => {
-		const users = await knex('Users').select()
-		return { users }
-	})
+	app.get(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async () => {
+			const users = await knex('Users').select()
+			return { users }
+		}
+	)
 }
