@@ -34,6 +34,18 @@ export async function productsRoutes(app: FastifyInstance) {
 		return { product }
 	})
 
+	app.get('/search/:slug', async request => {
+		const getProductsParamsSchema = z.object({
+			slug: z.string()
+		})
+
+		const { slug } = getProductsParamsSchema.parse(request.params)
+
+		const products = await knex('Products').whereILike('slug', `%${slug}%`)
+
+		return { products }
+	})
+
 	app.post(
 		'/',
 		{
