@@ -82,7 +82,18 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		return { user }
+		let sessionId = request.cookies.sessionId
+
+		if (!sessionId) {
+			sessionId = randomUUID()
+
+			reply.cookie('sessionId', sessionId, {
+				path: '/',
+				maxAge: 60 * 60 * 24 * 7 // 7 days
+			})
+		}
+
+		return { message: 'Authenticated' }
 	})
 
 	app.post('/upload', async function (req, reply) {
