@@ -82,7 +82,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		return reply.status(200).send('Login successful')
+		return { user }
 	})
 
 	app.post('/upload', async function (req, reply) {
