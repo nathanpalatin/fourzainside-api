@@ -93,7 +93,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			})
 		}
 
-		return { message: 'Authenticated' }
+		return { user }
 	})
 
 	app.post('/upload', async function (req, reply) {
