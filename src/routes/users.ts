@@ -103,7 +103,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		for await (const part of parts) {
 			const filename = part.filename
-			const folder = 'uploads/users/'
+			const folder = 'uploads/users'
 
 			if (!fs.existsSync(folder)) {
 				fs.mkdirSync(folder, { recursive: true })
@@ -113,7 +113,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			const extension = filename.split('.').pop()
 			const newFilename = `${timestamp}.${extension}`
 
-			const filePath = `${folder}${newFilename}`
+			const filePath = `${folder}/${newFilename}`
 
 			await pump(part.file, fs.createWriteStream(filePath))
 
