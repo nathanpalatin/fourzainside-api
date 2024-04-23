@@ -8,7 +8,8 @@ export const config: Knex.Config = {
 			? {
 					filename: env.DATABASE_URL
 				}
-			: env.DATABASE_URL
+			: env.DATABASE_URL,
+	useNullAsDefault: true
 }
 
 export const knex = setupKnex(config)

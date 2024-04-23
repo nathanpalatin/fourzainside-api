@@ -6,18 +6,10 @@ import { z } from 'zod'
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function transactionsRoutes(app: FastifyInstance) {
-	app.get(
-		'/',
-		{
-			preHandler: [checkSessionIdExists]
-		},
-		async request => {
-			const { sessionId } = request.cookies
-
-			const transactions = await knex('Transactions').where('session_id', sessionId).select()
-			return { transactions }
-		}
-	)
+	app.get('/', async request => {
+		const transactions = await knex('Transactions').select()
+		return { transactions }
+	})
 
 	app.get(
 		'/:id',
@@ -48,7 +40,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			title: z.string(),
 			amount: z.number(),
 			type: z.enum(['credit', 'debit']),
-			userId: z.string(),
+			userId: z.string()
 		})
 
 		const { title, userId, amount, type } = createTransactionBodySchema.parse(request.body)
