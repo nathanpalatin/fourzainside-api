@@ -90,7 +90,7 @@ export async function usersRoutes(app: FastifyInstance) {
 					id
 				})
 
-			return reply.status(201).send('User updated successfully!')
+			return reply.status(204).send('User updated successfully!')
 		}
 	)
 
@@ -174,6 +174,24 @@ export async function usersRoutes(app: FastifyInstance) {
 		async () => {
 			const users = await knex('Users').select()
 			return { users }
+		}
+	)
+
+	app.delete(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getUserParamsSchema = z.object({
+				id: z.string().uuid()
+			})
+
+			const { id } = getUserParamsSchema.parse(request.params)
+
+			await knex('Users').delete().where({ id })
+
+			reply.status(204).send({ message: 'User deleted' })
 		}
 	)
 }
