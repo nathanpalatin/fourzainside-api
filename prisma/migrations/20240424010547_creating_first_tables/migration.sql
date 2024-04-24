@@ -58,6 +58,7 @@ CREATE TABLE "Products" (
     "image" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "featured" BOOLEAN NOT NULL,
+    "session_id" TEXT NOT NULL,
 
     CONSTRAINT "Products_pkey" PRIMARY KEY ("id")
 );
