@@ -189,7 +189,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { id } = getUserParamsSchema.parse(request.params)
 
-			await knex('Users').delete().where({ id })
+			await knex('Users').delete().where({ id }).first()
 
 			reply.status(204).send({ message: 'User deleted' })
 		}
@@ -207,9 +207,30 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { username } = getUserParamsSchema.parse(request.params)
 
-			const user = await knex('Users').select().where({ username })
+			const user = await knex('Users').select().where({ username }).first()
 
 			return { user }
 		}
 	)
+
+	app.post('/password', async (request, reply) => {
+		const getUserParamsSchema = z.object({
+			credential: z.string()
+		})
+
+		const { credential } = getUserParamsSchema.parse(request.body)
+
+		const user = await knex('Users')
+			.select('email')
+			.where({
+				username: credential
+			})
+			.orWhere({
+				email: credential
+			})
+
+		// FAZER INTEGRACAO DE API PARA ENVIO DE E-MAIL PARA REDEFINIÇÃO DE SENHA
+
+		return user
+	})
 }
