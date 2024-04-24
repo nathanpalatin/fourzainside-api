@@ -194,4 +194,22 @@ export async function usersRoutes(app: FastifyInstance) {
 			reply.status(204).send({ message: 'User deleted' })
 		}
 	)
+
+	app.get(
+		'/:username',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, _reply) => {
+			const getUserParamsSchema = z.object({
+				username: z.string()
+			})
+
+			const { username } = getUserParamsSchema.parse(request.params)
+
+			const user = await knex('Users').select().where({ username })
+
+			return { user }
+		}
+	)
 }
