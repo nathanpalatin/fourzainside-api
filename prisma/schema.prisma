@@ -35,7 +35,7 @@ model Products {
   featured    Boolean
   userId      String
 
-  user Users @relation(fields: [userId], references: [id])
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }
@@ -49,7 +49,7 @@ model Transactions {
   updatedAt DateTime @updatedAt
   type      String
 
-  user Users @relation(fields: [userId], references: [id])
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
 }
@@ -62,7 +62,7 @@ model Posts {
   updatedAt DateTime @updatedAt
   userId    String
 
-  user Users @relation(fields: [userId], references: [id])
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("posts")
 }
