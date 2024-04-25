@@ -6,5 +6,5 @@ app
 		port: env.PORT
 	})
 	.then(() => {
-		console.log('Servidor iniciado na porta:', env.PORT)
+		console.log('Server is running!')
 	})

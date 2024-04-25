@@ -23,12 +23,12 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const { name, username, avatar, email, password, phone } = createUserSchemaBody.parse(request.body)
 
-		let sessionId = request.cookies.sessionId
+		let token = request.cookies.token
 
-		if (!sessionId) {
-			sessionId = randomUUID()
+		if (!token) {
+			token = randomUUID()
 
-			reply.cookie('sessionId', sessionId, {
+			reply.cookie('token', token, {
 				path: '/',
 				maxAge: 60 * 60 * 24 * 7 // 7 days
 			})
@@ -125,12 +125,12 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		let sessionId = request.cookies.sessionId
+		let token = request.cookies.token
 
-		if (!sessionId) {
-			sessionId = randomUUID()
+		if (!token) {
+			token = randomUUID()
 
-			reply.cookie('sessionId', sessionId, {
+			reply.cookie('token', token, {
 				path: '/',
 				maxAge: 60 * 60 * 24 * 7 // 7 days
 			})
@@ -163,7 +163,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			uploadedFiles.push(filePath)
 		}
 
-		return reply.status(200).send(uploadedFiles)
+		return reply.status(200).send({ message: 'Uploaded files successfully' })
 	})
 
 	app.get(
@@ -172,17 +172,17 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async () => {
-			const users = await knex('Users').select()
+			const users = await knex('Users').select('username', 'avatar', 'name', 'id')
 			return { users }
 		}
 	)
 
 	app.patch('/avatar', async (request, reply) => {
 		const userSchemaBody = z.object({
-			sessionId: z.string().uuid()
+			token: z.string().uuid()
 		})
 
-		const { sessionId } = userSchemaBody.parse(request.cookies)
+		const { token: id } = userSchemaBody.parse(request.cookies)
 
 		const part = await request.file()
 
@@ -194,7 +194,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		const timestamp = new Date().getTime()
 		const extension = part.filename.split('.').pop()
 		const newFilename = `${timestamp}.${extension}`
-		const folder = `uploads/users/${sessionId}`
+		const folder = `uploads/users/${id}`
 		const filePath = `${folder}/${newFilename}`
 
 		if (!fs.existsSync(folder)) {
@@ -208,10 +208,10 @@ export async function usersRoutes(app: FastifyInstance) {
 				avatar: filePath
 			})
 			.where({
-				id: sessionId
+				id
 			})
 
-		reply.status(201).send({ sessionId, uploadedFile: filePath })
+		reply.status(201).send({ id, uploadedFile: filePath })
 	})
 
 	app.delete(
@@ -270,7 +270,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			})
 
 		// FAZER INTEGRACAO DE API PARA ENVIO DE E-MAIL PARA REDEFINIÇÃO DE SENHA
-
-		return user
+		reply.status(200).send({ user })
 	})
 }

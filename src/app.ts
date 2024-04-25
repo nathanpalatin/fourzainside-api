@@ -23,7 +23,7 @@ app.route({
 		}
 	},
 	handler: (_request, reply) => {
-		reply.send({ error: 'Your request is empty' })
+		reply.send({ message: 'Your request is empty' })
 	}
 })
 

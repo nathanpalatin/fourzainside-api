@@ -11,6 +11,7 @@ export async function productsRoutes(app: FastifyInstance) {
 		const products = await knex('Products').select()
 		return { products }
 	})
+
 	app.get('/featured', async _request => {
 		const productsFeatured = await knex('Products').where({
 			featured: true
@@ -18,6 +19,7 @@ export async function productsRoutes(app: FastifyInstance) {
 
 		return { productsFeatured }
 	})
+
 	app.get('/:slug', async request => {
 		const getProductsParamsSchema = z.object({
 			slug: z.string()
@@ -63,12 +65,12 @@ export async function productsRoutes(app: FastifyInstance) {
 
 			const { title, slug, price, image, description, featured } = createProductsBodySchema.parse(request.body)
 
-			let sessionId = request.cookies.sessionId
+			let token = request.cookies.token
 
-			if (!sessionId) {
-				sessionId = randomUUID()
+			if (!token) {
+				token = randomUUID()
 
-				reply.cookie('sessionId', sessionId, {
+				reply.cookie('token', token, {
 					path: '/',
 					maxAge: 60 * 60 * 24 * 7 // 7 days
 				})
@@ -82,7 +84,7 @@ export async function productsRoutes(app: FastifyInstance) {
 				price,
 				image,
 				featured,
-				session_id: sessionId
+				session_id: token
 			})
 
 			return reply.status(201).send('Product created successfully!')
