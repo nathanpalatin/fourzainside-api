@@ -40,5 +40,11 @@ declare module 'knex/types/tables' {
 			createdAt: Date
 			updatedAt: Date
 		}
+		medias: {
+			id: string
+			type: string
+			source: string
+			userId: string
+		}
 	}
 }
