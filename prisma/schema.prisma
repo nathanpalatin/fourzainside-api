@@ -21,6 +21,7 @@ model Users {
   Transactions  Transactions[]
   Products      Products[]
   Posts         Posts[]
+  Medias        Medias[]
 
   @@map("users")
 }
@@ -65,4 +66,15 @@ model Posts {
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("posts")
+}
+
+model Medias {
+  id     String @id @default(uuid())
+  type   String @default("FILE")
+  source String
+  userId String
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("medias")
 }
