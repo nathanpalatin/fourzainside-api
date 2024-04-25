@@ -4,11 +4,15 @@ import { knex } from '../database'
 import { z } from 'zod'
 import { randomUUID } from 'node:crypto'
 
+import util from 'node:util'
+import { pipeline } from 'node:stream'
+import fs from 'node:fs'
+
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function productsRoutes(app: FastifyInstance) {
 	app.get('/', async () => {
-		const products = await knex('Products').select()
+		const products = await knex('products').select('*')
 		return { products }
 	})
 
@@ -19,6 +23,37 @@ export async function productsRoutes(app: FastifyInstance) {
 
 		return { productsFeatured }
 	})
+
+	app.post(
+		'/upload',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const parts = request.files()
+			const pump = util.promisify(pipeline)
+			const uploadedFiles = []
+
+			const folder = 'uploads/products/'
+
+			if (!fs.existsSync(folder)) {
+				fs.mkdirSync(folder, { recursive: true })
+			}
+			for await (const part of parts) {
+				const timestamp = new Date().getTime()
+				const extension = part.filename.split('.').pop()
+				const newFilename = `${timestamp}.${extension}`
+
+				const filePath = `${folder}/${newFilename}`
+
+				await pump(part.file, fs.createWriteStream(filePath))
+
+				uploadedFiles.push(filePath)
+			}
+
+			return reply.status(200).send({ message: 'Uploaded files successfully' })
+		}
+	)
 
 	app.get('/:slug', async request => {
 		const getProductsParamsSchema = z.object({

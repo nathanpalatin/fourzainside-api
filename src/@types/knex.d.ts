@@ -2,7 +2,7 @@ import { Knex } from 'knex'
 
 declare module 'knex/types/tables' {
 	export interface Tables {
-		Transactions: {
+		transactions: {
 			id: string
 			title: string
 			userId: string
@@ -10,9 +10,8 @@ declare module 'knex/types/tables' {
 			type: string
 			createdAt: Date
 			updatedAt: Date
-			session_id?: string
 		}
-		Users: {
+		users: {
 			id: string
 			name: string
 			username: string
@@ -23,7 +22,7 @@ declare module 'knex/types/tables' {
 			updatedAt: Date
 			phone: string
 		}
-		Products: {
+		products: {
 			id: string
 			title: string
 			slug: string
@@ -31,7 +30,7 @@ declare module 'knex/types/tables' {
 			image: string
 			description: string
 			featured: boolean
-			session_id?: string
+			userId: string
 		}
 	}
 }

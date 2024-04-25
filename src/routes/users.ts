@@ -8,6 +8,7 @@ import { z } from 'zod'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
 import fs from 'node:fs'
+
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function usersRoutes(app: FastifyInstance) {
@@ -15,37 +16,31 @@ export async function usersRoutes(app: FastifyInstance) {
 		const createUserSchemaBody = z.object({
 			name: z.string(),
 			username: z.string(),
-			avatar: z.string(),
 			password: z.string(),
 			email: z.string(),
 			phone: z.string()
 		})
 
-		const { name, username, avatar, email, password, phone } = createUserSchemaBody.parse(request.body)
-
-		let token = request.cookies.token
-
-		if (!token) {
-			token = randomUUID()
-
-			reply.cookie('token', token, {
-				path: '/',
-				maxAge: 60 * 60 * 24 * 7 // 7 days
-			})
-		}
+		const { name, username, email, password, phone } = createUserSchemaBody.parse(request.body)
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 
-		await knex('Users').insert({
-			id: randomUUID(),
+		const token = randomUUID()
+
+		await knex('users').insert({
+			id: token,
 			name,
 			username,
 			createdAt: new Date(),
 			updatedAt: new Date(),
 			password: hashedPassword,
-			avatar,
 			email,
 			phone
+		})
+
+		reply.cookie('token', token, {
+			path: '/',
+			maxAge: 60 * 60 * 24 * 7 // 7 days
 		})
 
 		return reply.status(201).send('User created successfully!')
@@ -58,31 +53,29 @@ export async function usersRoutes(app: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const getUserParamsSchema = z.object({
-				id: z.string().uuid()
+				token: z.string().uuid()
 			})
 
-			const { id } = getUserParamsSchema.parse(request.params)
+			const { token: id } = getUserParamsSchema.parse(request.cookies)
 
 			const updateUserSchemaBody = z.object({
 				name: z.string(),
 				username: z.string(),
-				avatar: z.string(),
 				password: z.string(),
 				email: z.string(),
 				phone: z.string()
 			})
 
-			const { name, username, avatar, email, password, phone } = updateUserSchemaBody.parse(request.body)
+			const { name, username, email, password, phone } = updateUserSchemaBody.parse(request.body)
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 
-			await knex('Users')
+			await knex('users')
 				.update({
 					name,
 					username,
 					updatedAt: new Date(),
 					password: hashedPassword,
-					avatar,
 					email,
 					phone
 				})
@@ -106,7 +99,8 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		const user = await knex('Users')
+		const user = await knex('users')
+			.select('id', 'username', 'name', 'email', 'password')
 			.where({
 				email: credential
 			})
@@ -130,40 +124,13 @@ export async function usersRoutes(app: FastifyInstance) {
 		if (!token) {
 			token = randomUUID()
 
-			reply.cookie('token', token, {
+			reply.cookie('token', user.id, {
 				path: '/',
 				maxAge: 60 * 60 * 24 * 7 // 7 days
 			})
 		}
 
-		return { user }
-	})
-
-	app.post('/upload', async (request, reply) => {
-		const parts = request.files()
-		const pump = util.promisify(pipeline)
-		const uploadedFiles = []
-
-		for await (const part of parts) {
-			const filename = part.filename
-			const folder = 'uploads'
-
-			if (!fs.existsSync(folder)) {
-				fs.mkdirSync(folder, { recursive: true })
-			}
-
-			const timestamp = new Date().getTime()
-			const extension = filename.split('.').pop()
-			const newFilename = `${timestamp}.${extension}`
-
-			const filePath = `${folder}/${newFilename}`
-
-			await pump(part.file, fs.createWriteStream(filePath))
-
-			uploadedFiles.push(filePath)
-		}
-
-		return reply.status(200).send({ message: 'Uploaded files successfully' })
+		return { token }
 	})
 
 	app.get(
@@ -172,7 +139,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async () => {
-			const users = await knex('Users').select('username', 'avatar', 'name', 'id')
+			const users = await knex('users').select('username', 'avatar', 'name', 'id')
 			return { users }
 		}
 	)
@@ -203,7 +170,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
 
-		await knex('Users')
+		await knex('users')
 			.update({
 				avatar: filePath
 			})
@@ -215,20 +182,20 @@ export async function usersRoutes(app: FastifyInstance) {
 	})
 
 	app.delete(
-		'/:id',
+		'/',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const getUserParamsSchema = z.object({
-				id: z.string().uuid()
+				token: z.string().uuid()
 			})
 
-			const { id } = getUserParamsSchema.parse(request.params)
+			const { token: id } = getUserParamsSchema.parse(request.cookies)
 
-			await knex('Users').delete().where({ id }).first()
+			await knex('users').delete().where({ id })
 
-			reply.status(204).send({ message: 'User deleted' })
+			reply.status(204)
 		}
 	)
 
@@ -244,7 +211,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { username } = getUserParamsSchema.parse(request.params)
 
-			const user = await knex('Users')
+			const user = await knex('users')
 				.select('username', 'email', 'avatar', 'phone', 'name')
 				.where({ username })
 				.first()
@@ -260,7 +227,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const { credential } = getUserParamsSchema.parse(request.body)
 
-		const user = await knex('Users')
+		const user = await knex('users')
 			.select('email')
 			.where({
 				username: credential

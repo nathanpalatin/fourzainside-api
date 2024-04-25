@@ -12,9 +12,14 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async request => {
-			const { token } = request.cookies
-			const transactions = await knex('Transactions').select('*').where({
-				session_id: token
+			const userSchemaBody = z.object({
+				token: z.string().uuid()
+			})
+
+			const { token: userId } = userSchemaBody.parse(request.cookies)
+
+			const transactions = await knex('transactions').select().where({
+				userId
 			})
 			return { transactions }
 		}
@@ -26,17 +31,21 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async request => {
+			const getTokenTransaction = z.object({
+				token: z.string().uuid()
+			})
+
 			const getTransactionParamsSchema = z.object({
 				id: z.string().uuid()
 			})
-			const { token } = request.cookies
+			const { token: userId } = getTokenTransaction.parse(request.cookies)
 
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			const transaction = await knex('transactions')
 				.where({
 					id,
-					session_id: token
+					userId
 				})
 				.first()
 
@@ -44,40 +53,39 @@ export async function transactionsRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.post('/', async (request, reply) => {
-		const createTransactionBodySchema = z.object({
-			title: z.string(),
-			amount: z.number(),
-			type: z.enum(['credit', 'debit']),
-			userId: z.string()
-		})
-
-		const { title, userId, amount, type } = createTransactionBodySchema.parse(request.body)
-
-		let sessionId = request.cookies.sessionId
-
-		if (!sessionId) {
-			sessionId = randomUUID()
-
-			reply.cookie('sessionId', sessionId, {
-				path: '/',
-				maxAge: 60 * 60 * 24 * 7 // 7 days
+	app.post(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getTokenTransaction = z.object({
+				token: z.string().uuid()
 			})
+
+			const createTransactionBodySchema = z.object({
+				title: z.string(),
+				amount: z.number(),
+				type: z.enum(['credit', 'debit'])
+			})
+
+			const { token: userId } = getTokenTransaction.parse(request.cookies)
+
+			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
+
+			await knex('transactions').insert({
+				id: randomUUID(),
+				title,
+				userId,
+				amount: type === 'credit' ? amount : amount * -1,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				type
+			})
+
+			return reply.status(201).send('Transaction created successfully!')
 		}
-
-		await knex('Transactions').insert({
-			id: randomUUID(),
-			title,
-			userId,
-			amount: type === 'credit' ? amount : amount * -1,
-			session_id: sessionId,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			type
-		})
-
-		return reply.status(201).send('Transaction created successfully!')
-	})
+	)
 
 	app.put(
 		'/:id',
@@ -94,7 +102,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 				amount: z.number(),
 				type: z.enum(['credit', 'debit'])
 			})
-			const { sessionId } = request.cookies
+			const { token } = request.cookies
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
@@ -106,7 +114,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 				})
 				.where({
 					id,
-					session_id: sessionId
+					userId: token
 				})
 
 			return reply.status(204).send('Transaction updated successfully!')
@@ -119,10 +127,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { sessionId } = request.cookies
-			await knex('transactions').delete().where('session_id', sessionId)
+			const { token: userId } = request.cookies
+			await knex('transactions').delete().where({ userId })
 
-			return reply.status(204).send('All transactions deleted successfully')
+			return reply.status(204).send('All your transactions deleted successfully')
 		}
 	)
 
@@ -136,12 +144,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
 				id: z.string().uuid()
 			})
 
-			const { sessionId } = request.cookies
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			await knex('transactions').delete().where({
-				id,
-				session_id: sessionId
+				id
 			})
 
 			return reply.status(204).send('Transaction deleted successfully')
