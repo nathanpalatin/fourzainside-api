@@ -89,6 +89,9 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
+			const tokenSchemaCookie = z.object({
+				token: z.string().uuid()
+			})
 			const createProductsBodySchema = z.object({
 				title: z.string(),
 				slug: z.string(),
@@ -98,20 +101,11 @@ export async function productsRoutes(app: FastifyInstance) {
 				featured: z.boolean()
 			})
 
+			const { token: userId } = tokenSchemaCookie.parse(request.cookies)
+
 			const { title, slug, price, image, description, featured } = createProductsBodySchema.parse(request.body)
 
-			let token = request.cookies.token
-
-			if (!token) {
-				token = randomUUID()
-
-				reply.cookie('token', token, {
-					path: '/',
-					maxAge: 60 * 60 * 24 * 7 // 7 days
-				})
-			}
-
-			await knex('Products').insert({
+			await knex('products').insert({
 				id: randomUUID(),
 				title,
 				slug,
@@ -119,7 +113,7 @@ export async function productsRoutes(app: FastifyInstance) {
 				price,
 				image,
 				featured,
-				session_id: token
+				userId
 			})
 
 			return reply.status(201).send('Product created successfully!')

@@ -178,7 +178,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				id
 			})
 
-		reply.status(201).send({ id, uploadedFile: filePath })
+		reply.status(201).send({ id, source: filePath })
 	})
 
 	app.delete(
