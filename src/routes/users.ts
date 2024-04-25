@@ -244,7 +244,10 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { username } = getUserParamsSchema.parse(request.params)
 
-			const user = await knex('Users').select().where({ username }).first()
+			const user = await knex('Users')
+				.select('username', 'email', 'avatar', 'phone', 'name')
+				.where({ username })
+				.first()
 
 			return { user }
 		}
