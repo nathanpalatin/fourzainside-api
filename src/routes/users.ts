@@ -139,14 +139,14 @@ export async function usersRoutes(app: FastifyInstance) {
 		return { user }
 	})
 
-	app.post('/upload', async function (req, reply) {
-		const parts = req.files()
+	app.post('/upload', async (request, reply) => {
+		const parts = request.files()
 		const pump = util.promisify(pipeline)
 		const uploadedFiles = []
 
 		for await (const part of parts) {
 			const filename = part.filename
-			const folder = 'uploads/users'
+			const folder = 'uploads'
 
 			if (!fs.existsSync(folder)) {
 				fs.mkdirSync(folder, { recursive: true })
@@ -176,6 +176,43 @@ export async function usersRoutes(app: FastifyInstance) {
 			return { users }
 		}
 	)
+
+	app.patch('/avatar', async (request, reply) => {
+		const userSchemaBody = z.object({
+			sessionId: z.string().uuid()
+		})
+
+		const { sessionId } = userSchemaBody.parse(request.cookies)
+
+		const part = await request.file()
+
+		if (!part) {
+			reply.status(400).send({ error: 'No file uploaded' })
+			return
+		}
+
+		const timestamp = new Date().getTime()
+		const extension = part.filename.split('.').pop()
+		const newFilename = `${timestamp}.${extension}`
+		const folder = `uploads/users/${sessionId}`
+		const filePath = `${folder}/${newFilename}`
+
+		if (!fs.existsSync(folder)) {
+			fs.mkdirSync(folder, { recursive: true })
+		}
+
+		await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
+
+		await knex('Users')
+			.update({
+				avatar: filePath
+			})
+			.where({
+				id: sessionId
+			})
+
+		reply.status(201).send({ sessionId, uploadedFile: filePath })
+	})
 
 	app.delete(
 		'/:id',
