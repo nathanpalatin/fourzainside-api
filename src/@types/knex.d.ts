@@ -32,5 +32,13 @@ declare module 'knex/types/tables' {
 			featured: boolean
 			userId: string
 		}
+		posts: {
+			id: string
+			title: string
+			content: string
+			userId: string
+			createdAt: Date
+			updatedAt: Date
+		}
 	}
 }

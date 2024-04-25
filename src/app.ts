@@ -3,9 +3,10 @@ import cookie from '@fastify/cookie'
 
 import multipart from '@fastify/multipart'
 
-import { transactionsRoutes } from './routes/transactions'
-import { productsRoutes } from './routes/products'
+import { postsRoutes } from './routes/posts'
 import { usersRoutes } from './routes/users'
+import { productsRoutes } from './routes/products'
+import { transactionsRoutes } from './routes/transactions'
 
 export const app = fastify()
 
@@ -31,12 +32,16 @@ app.register(cookie)
 
 app.register(multipart)
 
-app.register(productsRoutes, {
-	prefix: 'products'
-})
-
 app.register(usersRoutes, {
 	prefix: 'users'
+})
+
+app.register(postsRoutes, {
+	prefix: 'posts'
+})
+
+app.register(productsRoutes, {
+	prefix: 'products'
 })
 
 app.register(transactionsRoutes, {
