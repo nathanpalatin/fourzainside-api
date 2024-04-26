@@ -100,7 +100,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 
 		const user = await knex('users')
-			.select('id', 'username', 'name', 'email', 'password')
+			.select('id', 'username', 'avatar', 'name', 'email', 'password')
 			.where({
 				email: credential
 			})
@@ -124,13 +124,13 @@ export async function usersRoutes(app: FastifyInstance) {
 		if (!token) {
 			token = randomUUID()
 
-			reply.cookie('token', user.id, {
+			reply.cookie('token', token, {
 				path: '/',
 				maxAge: 60 * 60 * 24 * 7 // 7 days
 			})
 		}
 
-		return { token }
+		return { token, user }
 	})
 
 	app.get(
