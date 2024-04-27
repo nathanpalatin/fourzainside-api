@@ -100,7 +100,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 
 		const user = await knex('users')
-			.select('id', 'username', 'avatar', 'name', 'email', 'password')
+			.select('id', 'username', 'avatar', 'intId', 'name', 'email', 'password')
 			.where({
 				email: credential
 			})
