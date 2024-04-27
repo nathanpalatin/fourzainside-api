@@ -27,7 +27,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const token = randomUUID()
 
-		await knex('users').insert({
+		const [user] = await knex('users').insert({
 			id: token,
 			name,
 			username,
@@ -36,14 +36,14 @@ export async function usersRoutes(app: FastifyInstance) {
 			password: hashedPassword,
 			email,
 			phone
-		})
+		}).returning('*')
 
 		reply.cookie('token', token, {
 			path: '/',
 			maxAge: 60 * 60 * 24 * 7 // 7 days
 		})
 
-		return reply.status(201).send('User created successfully!')
+		return { token, user }
 	})
 
 	app.put(
