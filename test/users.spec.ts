@@ -1,5 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest'
-import { execSync } from 'node:child_process'
+import { afterAll, beforeAll, describe, it } from 'vitest'
 import request from 'supertest'
 import { app } from '../src/app'
 
@@ -12,19 +11,15 @@ describe('Users routes', () => {
 		await app.close()
 	})
 
-	beforeEach(() => {
-		execSync('npm run knex migrate:rollback --all')
-		execSync('npm run knex migrate:latest')
-	})
-
-	it('should be able to create a new transaction', async () => {
+	it('should be able to create a new user', async () => {
 		await request(app.server)
 			.post('/users')
 			.send({
-				title: 'New ',
-				amount: 5000,
-				type: 'credit',
-				userId: '04705cf3-aebf-423a-b2fc-f60f10b55fba'
+				name: 'Nathan',
+				username: 'nathan',
+				password: 'Tudo@2020',
+				email: 'email@nathan.com',
+				phone: '+5547999999999',
 			})
 			.expect(201)
 	})
