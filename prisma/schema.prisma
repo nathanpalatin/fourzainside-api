@@ -23,6 +23,8 @@ model Users {
   Products      Products[]
   Posts         Posts[]
   Medias        Medias[]
+  Followers     Followers[]
+  Chats         Chats[]
 
   @@map("users")
 }
@@ -78,4 +80,30 @@ model Medias {
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("medias")
+}
+
+model Followers {
+  id          String @id @default(uuid())
+  userId      Int    @default(0)
+  followingId Int    @default(0)
+
+  referenceId String?
+
+  Users Users? @relation(fields: [referenceId], references: [id], onDelete: Cascade)
+
+  @@map("followers")
+}
+
+model Chats {
+  id         String   @id @default(uuid())
+  userId     Int      @default(0)
+  chatWithId Int      @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  referenceId String?
+
+  Users Users? @relation(fields: [referenceId], references: [id], onDelete: Cascade)
+
+  @@map("chats")
 }
