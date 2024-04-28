@@ -21,7 +21,7 @@ describe('Users routes', () => {
 		await request(app.server)
 			.post('/users')
 			.send({
-				title: 'New transaction',
+				title: 'New ',
 				amount: 5000,
 				type: 'credit',
 				userId: '04705cf3-aebf-423a-b2fc-f60f10b55fba'
