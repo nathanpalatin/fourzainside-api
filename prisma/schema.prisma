@@ -25,6 +25,7 @@ model Users {
   Medias        Medias[]
   Followers     Followers[]
   Chats         Chats[]
+  Messages      Messages[]
 
   @@map("users")
 }
@@ -106,4 +107,21 @@ model Chats {
   Users Users? @relation(fields: [referenceId], references: [id], onDelete: Cascade)
 
   @@map("chats")
+}
+
+model Messages {
+  id            String   @id @default(uuid())
+  sendUserId    Int      @default(0)
+  receiveUserId Int      @default(0)
+  userName      String   @default("")
+  messageText   String
+  messageType   String
+  file          String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  usersId String?
+  Users   Users?  @relation(fields: [usersId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
 }
