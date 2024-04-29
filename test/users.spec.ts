@@ -16,12 +16,14 @@ describe('Users routes', () => {
 			.post('/users')
 			.send({
 				name: 'Nathan',
+				email: 'email@nathan.com',
 				username: 'nathan',
 				password: 'Tudo@2020',
-				email: 'email@nathan.com',
-				phone: '+5547999999999',
+				phone: '47999999999'
 			})
 			.expect(201)
 	})
+
+	
 	
 })
