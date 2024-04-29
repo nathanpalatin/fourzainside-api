@@ -46,6 +46,25 @@ declare module 'knex/types/tables' {
 			type: string
 			source: string
 			userId: string
+		},
+		chats: {
+			id: string
+			userId: string
+			chatWithId: string
+			created_at: Date
+			updated_at: Date
+		},
+		messages: {
+			id: string
+			sendUserId: string
+			receiveUserId: string
+			userName: string
+			messageText: string
+			messageType: string
+			file?: string | null
+			created_at: Date
+			updated_at: Date
 		}
+		
 	}
 }

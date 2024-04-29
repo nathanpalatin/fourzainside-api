@@ -97,8 +97,8 @@ model Followers {
 
 model Chats {
   id         String   @id @default(uuid())
-  userId     Int      @default(0)
-  chatWithId Int      @default(0)
+  userId     String   @default("")
+  chatWithId String   @default("")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -111,8 +111,8 @@ model Chats {
 
 model Messages {
   id            String   @id @default(uuid())
-  sendUserId    Int      @default(0)
-  receiveUserId Int      @default(0)
+  sendUserId    String   @default("")
+  receiveUserId String   @default("")
   userName      String   @default("")
   messageText   String
   messageType   String
