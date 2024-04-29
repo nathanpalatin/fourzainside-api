@@ -2,12 +2,8 @@ import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
 
 import { randomUUID } from 'node:crypto'
-import bcrypt from 'bcrypt'
-import { z } from 'zod'
 
-import util from 'node:util'
-import { pipeline } from 'node:stream'
-import fs from 'node:fs'
+import { z } from 'zod'
 
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
@@ -53,17 +49,52 @@ export async function chatsRoutes(app: FastifyInstance) {
   app.delete('/', {
     preHandler: [checkSessionIdExists]
   }, async (request, reply) => {
-    const getTokenTransaction = z.object({
+    const getTokenChats = z.object({
       token: z.string().uuid()
     })
 
-      const { token: userId } = getTokenTransaction.parse(request.cookies)
+      const { token: userId } = getTokenChats.parse(request.cookies)
 
     await knex('chats').delete('*').where({
       userId
     })
 
     return reply.status(204).send({message: 'Chat deleted successfully'})
+  })
+
+  /* ROTAS PARA AS MENSAGENS */
+
+  app.post('/message', {
+    preHandler: [checkSessionIdExists]
+  }, async (request, reply) =>{
+    const getTokenMessage = z.object({
+      token: z.string().uuid()
+    })
+
+    const createMessageSchemaBody = z.object({
+      receiveUserId: z.string().uuid(),
+      messageText: z.string(),
+      messageType: z.string(),
+      userName: z.string()
+  })
+
+    const { token: sendUserId } = getTokenMessage.parse(request.cookies)
+
+    const { receiveUserId, userName, messageText, messageType } = createMessageSchemaBody.parse(request.body)
+
+    const [message] = await knex('messages').insert({
+      id: randomUUID(),
+      sendUserId,
+      receiveUserId,
+      userName,
+      messageText,
+      messageType,
+      created_at: new Date(),
+      updated_at: new Date()
+    })
+
+    return reply.status(201).send(message)
+
   })
  
 }
