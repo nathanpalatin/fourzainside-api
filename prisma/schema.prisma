@@ -11,21 +11,21 @@ model Users {
   id            String         @id @default(uuid())
   name          String
   email         String         @unique
-  intId         Int            @default(0)
-  emailVerified Boolean        @default(false)
   password      String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   avatar        String?
   phone         String
   username      String         @unique
-  Transactions  Transactions[]
-  Products      Products[]
-  Posts         Posts[]
-  Medias        Medias[]
-  Followers     Followers[]
+  emailVerified Boolean        @default(false)
+  intId         Int            @default(0)
   Chats         Chats[]
+  Followers     Followers[]
+  Medias        Medias[]
   Messages      Messages[]
+  Posts         Posts[]
+  Products      Products[]
+  Transactions  Transactions[]
 
   @@map("users")
 }
@@ -39,8 +39,7 @@ model Products {
   description String
   featured    Boolean
   userId      String
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }
@@ -53,8 +52,7 @@ model Transactions {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   type      String
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
 }
@@ -66,8 +64,7 @@ model Posts {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("posts")
 }
@@ -77,20 +74,17 @@ model Medias {
   type   String @default("FILE")
   source String
   userId String
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("medias")
 }
 
 model Followers {
-  id          String @id @default(uuid())
-  userId      Int    @default(0)
-  followingId Int    @default(0)
-
+  id          String  @id @default(uuid())
+  userId      Int     @default(0)
+  followingId Int     @default(0)
   referenceId String?
-
-  Users Users? @relation(fields: [referenceId], references: [id], onDelete: Cascade)
+  Users       Users?  @relation(fields: [referenceId], references: [id], onDelete: Cascade)
 
   @@map("followers")
 }
@@ -101,8 +95,7 @@ model Chats {
   chatWithId String   @default("")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-
-  Users Users? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Users      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("chats")
 }
@@ -117,8 +110,7 @@ model Messages {
   file          String?
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
-
-  Users Users? @relation(fields: [sendUserId], references: [id], onDelete: Cascade)
+  Users         Users    @relation(fields: [sendUserId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
