@@ -102,9 +102,7 @@ model Chats {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  referenceId String?
-
-  Users Users? @relation(fields: [referenceId], references: [id], onDelete: Cascade)
+  Users Users? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("chats")
 }
