@@ -61,7 +61,7 @@ declare module 'knex/types/tables' {
 			userName: string
 			messageText: string
 			messageType: string
-			file?: string | null
+			chatsId: string
 			created_at: Date
 			updated_at: Date
 		}

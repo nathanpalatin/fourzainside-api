@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { checkSessionIdExists } from '../middlewares/check-session-id'
 
 export async function chatsRoutes(app: FastifyInstance) {
+
   app.get(
 		'/',
 		{
@@ -73,17 +74,20 @@ export async function chatsRoutes(app: FastifyInstance) {
 
     const createMessageSchemaBody = z.object({
       receiveUserId: z.string().uuid(),
+      chatsId: z.string().uuid(),
       messageText: z.string(),
       messageType: z.string(),
-      userName: z.string()
+      userName: z.string(),
   })
 
     const { token: sendUserId } = getTokenMessage.parse(request.cookies)
 
-    const { receiveUserId, userName, messageText, messageType } = createMessageSchemaBody.parse(request.body)
+    const { receiveUserId, userName, messageText, messageType, chatsId } = createMessageSchemaBody.parse(request.body)
 
+   
     const [message] = await knex('messages').insert({
       id: randomUUID(),
+      chatsId,
       sendUserId,
       receiveUserId,
       userName,
@@ -91,7 +95,7 @@ export async function chatsRoutes(app: FastifyInstance) {
       messageType,
       created_at: new Date(),
       updated_at: new Date()
-    })
+    }).returning('*')
 
     return reply.status(201).send(message)
 
