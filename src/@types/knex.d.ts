@@ -46,6 +46,7 @@ declare module 'knex/types/tables' {
 			type: string
 			source: string
 			userId: string
+			postId?: string
 		},
 		chats: {
 			id: string
