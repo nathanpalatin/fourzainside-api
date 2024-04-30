@@ -100,5 +100,46 @@ export async function chatsRoutes(app: FastifyInstance) {
     return reply.status(201).send(message)
 
   })
+
+  app.delete('/message', {
+    preHandler: [checkSessionIdExists]
+  }, async (request, reply) => {
+    const getTokenMessage = z.object({
+      token: z.string().uuid()
+    })
+
+    const createMessageSchemaBody = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { token: sendUserId } = getTokenMessage.parse(request.cookies)
+
+    const { id } = createMessageSchemaBody.parse(request.body)
+
+    await knex('messages').delete('*').where({
+      id,
+      sendUserId
+    })
+
+    reply.status(204).send({ message: 'Message deleted successfully.'})
+  })
+
+  app.get('/messages/:chatsId', {
+    preHandler: [checkSessionIdExists],
+  }, async (request, reply) =>{
+  
+    const createMessagesSchemaBody = z.object({
+      chatsId: z.string().uuid(),
+    })
+
+    const { chatsId } = createMessagesSchemaBody.parse(request.params)
+
+   const messages = await knex('messages').select('*').where({
+      chatsId
+    }).returning('*')
+
+    return reply.status(200).send({messages})
+
+  })
  
 }
