@@ -116,10 +116,10 @@ model Messages {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  chatsId String
+  chatId String
 
   Users Users  @relation(fields: [sendUserId], references: [id], onDelete: Cascade)
-  Chats Chats? @relation(fields: [chatsId], references: [id], onDelete: Cascade)
+  Chats Chats? @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }

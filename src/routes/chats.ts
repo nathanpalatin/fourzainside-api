@@ -74,7 +74,7 @@ export async function chatsRoutes(app: FastifyInstance) {
 
     const createMessageSchemaBody = z.object({
       receiveUserId: z.string().uuid(),
-      chatsId: z.string().uuid(),
+      chatId: z.string().uuid(),
       messageText: z.string(),
       messageType: z.string(),
       userName: z.string(),
@@ -82,12 +82,12 @@ export async function chatsRoutes(app: FastifyInstance) {
 
     const { token: sendUserId } = getTokenMessage.parse(request.cookies)
 
-    const { receiveUserId, userName, messageText, messageType, chatsId } = createMessageSchemaBody.parse(request.body)
+    const { receiveUserId, userName, messageText, messageType, chatId } = createMessageSchemaBody.parse(request.body)
 
    
     const [message] = await knex('messages').insert({
       id: randomUUID(),
-      chatsId,
+      chatId,
       sendUserId,
       receiveUserId,
       userName,
@@ -124,18 +124,18 @@ export async function chatsRoutes(app: FastifyInstance) {
     reply.status(204).send({ message: 'Message deleted successfully.'})
   })
 
-  app.get('/messages/:chatsId', {
+  app.get('/messages/:chatId', {
     preHandler: [checkSessionIdExists],
   }, async (request, reply) =>{
   
     const createMessagesSchemaBody = z.object({
-      chatsId: z.string().uuid(),
+      chatId: z.string().uuid(),
     })
 
-    const { chatsId } = createMessagesSchemaBody.parse(request.params)
+    const { chatId } = createMessagesSchemaBody.parse(request.params)
 
    const messages = await knex('messages').select('*').where({
-      chatsId
+      chatId
     }).returning('*')
 
     return reply.status(200).send({messages})
