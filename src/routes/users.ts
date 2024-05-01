@@ -46,7 +46,7 @@ export async function usersRoutes(app: FastifyInstance) {
 	})
 
 	app.put(
-		'/:id',
+		'/',
 		{
 			preHandler: [checkSessionIdExists]
 		},
@@ -61,11 +61,10 @@ export async function usersRoutes(app: FastifyInstance) {
 				name: z.string(),
 				username: z.string(),
 				password: z.string(),
-				email: z.string(),
 				phone: z.string()
 			})
 
-			const { name, username, email, password, phone } = updateUserSchemaBody.parse(request.body)
+			const { name, username, password, phone } = updateUserSchemaBody.parse(request.body)
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -75,7 +74,6 @@ export async function usersRoutes(app: FastifyInstance) {
 					username,
 					updatedAt: new Date(),
 					password: hashedPassword,
-					email,
 					phone
 				})
 				.where({
