@@ -1,8 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
 
-import { prisma } from '../lib/prisma'
-
 import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
@@ -29,18 +27,16 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const token = randomUUID()
 
-		const user = await prisma.users.create({
-			data: {
-				id: token,
-				name,
-				username,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				password: hashedPassword,
-				email,
-				phone
-			}
-		})
+		const [user] = await knex('users').insert({
+			id: token,
+			name,
+			username,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			password: hashedPassword,
+			email,
+			phone
+		}).returning('*')
 
 		reply.cookie('token', token, {
 			path: '/',
@@ -72,20 +68,19 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 
-			await prisma.users.update({
-				data: {
+			await knex('users')
+				.update({
 					name,
 					username,
 					updatedAt: new Date(),
 					password: hashedPassword,
 					phone
-				},
-				where: {
+				})
+				.where({
 					id
-				}
-			})
+				})
 
-			return reply.status(204).send()
+			return reply.status(204).send('User updated successfully!')
 		}
 	)
 
@@ -101,14 +96,15 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		const user = await prisma.users.findFirst({
-			where: {
-        OR: [
-					{ email: credential },
-					{ username: credential }
-			]
-    	}
-		})
+		const user = await knex('users')
+			.select('id', 'username', 'avatar', 'intId', 'name', 'email', 'phone', 'password')
+			.where({
+				email: credential
+			})
+			.orWhere({
+				username: credential
+			})
+			.first()
 
 		if (!user) {
 			return reply.status(404).send('User not found')
@@ -140,11 +136,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async () => {
-			const users = await prisma.users.findMany({
-				orderBy: {
-					username: 'desc',
-				},
-			})
+			const users = await knex('users').select('username', 'avatar', 'name', 'id', 'intId')
 			return { users }
 		}
 	)
@@ -175,14 +167,13 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
 
-		await prisma.users.update({
-			data: {
+		await knex('users')
+			.update({
 				avatar: filePath
-			},
-			where: {
+			})
+			.where({
 				id
-			}
-		})
+			})
 
 		reply.status(200).send({ id, source: filePath })
 	})
@@ -199,13 +190,9 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { token: id } = getUserParamsSchema.parse(request.cookies)
 
-			await prisma.users.delete({
-				where: {
-					id
-				}
-			})
+			await knex('users').delete().where({ id })
 
-			reply.status(204).send()
+			reply.status(204)
 		}
 	)
 
@@ -221,18 +208,10 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { username } = getUserParamsSchema.parse(request.params)
 
-			const user = await prisma.users.findFirst({
-				where: {
-					username
-				},
-				select: {
-					username: true,
-					email: true,
-					avatar: true,
-					phone: true,
-					name: true
-				}
-			})
+			const user = await knex('users')
+				.select('username', 'email', 'avatar', 'phone', 'name')
+				.where({ username })
+				.first()
 
 			return { user }
 		}
@@ -245,21 +224,16 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const { credential } = getUserParamsSchema.parse(request.body)
 
-		const user = await prisma.users.findMany({
-			where: {
-					OR: [
-							{ email: credential },
-							{ username: credential }
-					]
-			}
-	});
-	
-	if (!user || user.length === 0) {
-			return reply.status(404).send({ error: 'User not found' })
-	}
-	
-	// FAZER INTEGRAÇÃO DE API PARA ENVIO DE E-MAIL PARA REDEFINIÇÃO DE SENHA
-	
-	return reply.status(200).send({ message: 'E-mail sent successfully' })
-})
+		const user = await knex('users')
+			.select('email')
+			.where({
+				username: credential
+			})
+			.orWhere({
+				email: credential
+			})
+
+		// FAZER INTEGRACAO DE API PARA ENVIO DE E-MAIL PARA REDEFINIÇÃO DE SENHA
+		reply.status(200).send({ user })
+	})
 }
