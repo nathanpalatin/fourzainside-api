@@ -1,6 +1,8 @@
 import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
 
+import { prisma } from '../lib/prisma'
+
 import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcrypt'
 import { z } from 'zod'
@@ -27,7 +29,20 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const token = randomUUID()
 
-		const [user] = await knex('users').insert({
+		const user = await prisma.users.create({
+			data: {
+				id: token,
+				name,
+				username,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				password: hashedPassword,
+				email,
+				phone
+			}
+		})
+
+		/* 	const [user] = await knex('users').insert({
 			id: token,
 			name,
 			username,
@@ -36,7 +51,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			password: hashedPassword,
 			email,
 			phone
-		}).returning('*')
+		}).returning('*') */
 
 		reply.cookie('token', token, {
 			path: '/',
