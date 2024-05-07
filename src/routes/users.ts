@@ -42,17 +42,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		})
 
-		/* 	const [user] = await knex('users').insert({
-			id: token,
-			name,
-			username,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			password: hashedPassword,
-			email,
-			phone
-		}).returning('*') */
-
 		reply.cookie('token', token, {
 			path: '/',
 			maxAge: 60 * 60 * 24 * 7 // 7 days
