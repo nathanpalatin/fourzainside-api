@@ -11,24 +11,6 @@ import { chatsRoutes } from './routes/chats'
 
 export const app = fastify()
 
-app.route({
-	method: 'GET',
-	url: '/',
-	schema: {
-		response: {
-			200: {
-				type: 'object',
-				properties: {
-					error: { type: 'string' }
-				}
-			}
-		}
-	},
-	handler: (_request, reply) => {
-		reply.send({ message: 'Your request is empty' })
-	}
-})
-
 app.register(cookie)
 
 app.register(multipart)
