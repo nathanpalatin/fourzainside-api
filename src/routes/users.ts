@@ -11,7 +11,10 @@ import util from 'node:util'
 import { pipeline } from 'node:stream'
 import fs from 'node:fs'
 
+import jwt from 'jsonwebtoken'
+
 import { checkSessionIdExists } from '../middlewares/check-session-id'
+import { env } from '../env'
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
@@ -27,11 +30,9 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 
-		const token = randomUUID()
-
-		const user = await prisma.users.create({
+		await prisma.users.create({
 			data: {
-				id: token,
+				id: randomUUID(),
 				name,
 				username,
 				createdAt: new Date(),
@@ -42,11 +43,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		})
 
-		reply.cookie('token', token, {
-			path: '/',
-			maxAge: 60 * 60 * 24 * 7 // 7 days
-		})
-		return reply.status(201).send({ token, user })
+		return reply.status(201).send({ message: 'User created successfully.' })
 	})
 
 	app.put(
@@ -100,15 +97,11 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		const user = await knex('users')
-			.select('id', 'username', 'avatar', 'intId', 'name', 'email', 'phone', 'password')
-			.where({
-				email: credential
-			})
-			.orWhere({
-				username: credential
-			})
-			.first()
+		const user = await prisma.users.findFirst({
+			where: {
+				OR: [{ email: credential }, { username: credential }]
+			}
+		})
 
 		if (!user) {
 			return reply.status(404).send('User not found')
@@ -120,16 +113,12 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		let token = request.cookies.token
+		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '7d' })
 
-		if (!token) {
-			token = randomUUID()
-
-			reply.cookie('token', token, {
-				path: '/',
-				maxAge: 60 * 60 * 24 * 7 // 7 days
-			})
-		}
+		reply.cookie('token', token, {
+			path: '/',
+			maxAge: 60 * 60 * 24 * 7 // 7 days
+		})
 
 		return { token, user }
 	})
@@ -183,16 +172,16 @@ export async function usersRoutes(app: FastifyInstance) {
 	})
 
 	app.delete(
-		'/',
+		'/:id',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const getUserParamsSchema = z.object({
-				token: z.string().uuid()
+				id: z.string().uuid()
 			})
 
-			const { token: id } = getUserParamsSchema.parse(request.cookies)
+			const { id } = getUserParamsSchema.parse(request.params)
 
 			await knex('users').delete().where({ id })
 
