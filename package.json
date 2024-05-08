@@ -11,7 +11,8 @@
     "knex": "node --import tsx ./node_modules/knex/bin/cli.js",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "test": "vitest",
-    "vercel-build": "npx prisma migrate deploy"
+    "vercel-build": "npx prisma migrate deploy",
+    "build": "tsup src --out-dir build"
   },
   "keywords": [],
   "author": "",
