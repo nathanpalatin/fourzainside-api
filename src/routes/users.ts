@@ -1,20 +1,20 @@
 import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
+import { env } from '../env'
 
 import { prisma } from '../lib/prisma'
 
-import { randomUUID } from 'node:crypto'
-import bcrypt from 'bcrypt'
 import { z } from 'zod'
 
+import fs from 'node:fs'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
-import fs from 'node:fs'
 
+import { randomUUID } from 'node:crypto'
+import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 import { checkSessionIdExists } from '../middlewares/check-session-id'
-import { env } from '../env'
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
@@ -30,7 +30,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 
-		await prisma.users.create({
+		/* 		await prisma.users.create({
 			data: {
 				id: randomUUID(),
 				name,
@@ -42,6 +42,19 @@ export async function usersRoutes(app: FastifyInstance) {
 				phone
 			}
 		})
+ */
+		await knex('users')
+			.insert({
+				id: randomUUID(),
+				name,
+				username,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				password: hashedPassword,
+				email,
+				phone
+			})
+			.returning('*')
 
 		return reply.status(201).send({ message: 'User created successfully.' })
 	})
@@ -113,11 +126,10 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '7d' })
+		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '5m' })
 
 		reply.cookie('token', token, {
-			path: '/',
-			maxAge: 60 * 60 * 24 * 7 // 7 days
+			path: '/'
 		})
 
 		return { token, user }
