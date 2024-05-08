@@ -23,7 +23,4 @@ describe('Users routes', () => {
 			})
 			.expect(201)
 	})
-
-	
-	
 })

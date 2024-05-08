@@ -2,8 +2,6 @@ import { FastifyInstance } from 'fastify'
 import { knex } from '../database'
 import { env } from '../env'
 
-import { prisma } from '../lib/prisma'
-
 import { z } from 'zod'
 
 import fs from 'node:fs'
@@ -110,11 +108,21 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		const user = await prisma.users.findFirst({
+		/* 		const user = await prisma.users.findFirst({
 			where: {
 				OR: [{ email: credential }, { username: credential }]
 			}
-		})
+		}) */
+
+		const user = await knex('users')
+			.select('id', 'username', 'avatar', 'intId', 'name', 'email', 'phone', 'password')
+			.where({
+				email: credential
+			})
+			.orWhere({
+				username: credential
+			})
+			.first()
 
 		if (!user) {
 			return reply.status(404).send('User not found')
