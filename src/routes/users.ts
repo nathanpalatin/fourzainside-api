@@ -64,7 +64,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const getUserParamsSchema = z.object({
-				token: z.string().uuid()
+				token: z.string()
 			})
 
 			const { token: id } = getUserParamsSchema.parse(request.cookies)
