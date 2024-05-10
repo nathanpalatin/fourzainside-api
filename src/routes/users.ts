@@ -63,12 +63,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getUserParamsSchema = z.object({
-				token: z.string()
-			})
-
-			const { token: id } = getUserParamsSchema.parse(request.cookies)
-
 			const updateUserSchemaBody = z.object({
 				name: z.string(),
 				username: z.string(),
@@ -80,17 +74,14 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 
-			await knex('users')
+			/* 	await knex('users')
 				.update({
 					name,
 					username,
 					updatedAt: new Date(),
 					password: hashedPassword,
 					phone
-				})
-				.where({
-					id
-				})
+				}) */
 
 			return reply.status(204).send('User updated successfully!')
 		}
@@ -134,11 +125,9 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '5m' })
+		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '7d' })
 
-		reply.cookie('token', token, {
-			path: '/'
-		})
+		reply.header('Authorization', `${token}`)
 
 		return { token, user }
 	})
@@ -148,48 +137,53 @@ export async function usersRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async () => {
+		async (request, reply) => {
 			const users = await knex('users').select('username', 'avatar', 'name', 'id', 'intId')
-			return { users }
+			return reply.status(200).send({ users })
 		}
 	)
 
-	app.patch('/avatar', async (request, reply) => {
-		const userSchemaBody = z.object({
-			token: z.string().uuid()
-		})
-
-		const { token: id } = userSchemaBody.parse(request.cookies)
-
-		const part = await request.file()
-
-		if (!part) {
-			reply.status(400).send({ error: 'No file uploaded' })
-			return
-		}
-
-		const timestamp = new Date().getTime()
-		const extension = part.filename.split('.').pop()
-		const newFilename = `${timestamp}.${extension}`
-		const folder = `uploads/users/${id}`
-		const filePath = `${folder}/${newFilename}`
-
-		if (!fs.existsSync(folder)) {
-			fs.mkdirSync(folder, { recursive: true })
-		}
-
-		await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
-
-		await knex('users')
-			.update({
-				avatar: filePath
-			})
-			.where({
-				id
+	app.patch(
+		'/avatar',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const userSchemaBody = z.object({
+				authorization: z.string()
 			})
 
-		reply.status(200).send({ id, source: filePath })
-	})
+			const { authorization: id } = userSchemaBody.parse(request.headers)
+			const part = await request.file()
+
+			if (!part) {
+				reply.status(400).send({ error: 'No file uploaded' })
+				return
+			}
+
+			const timestamp = new Date().getTime()
+			const extension = part.filename.split('.').pop()
+			const newFilename = `${timestamp}.${extension}`
+			const folder = `uploads/users/avatar/${id}`
+			const filePath = `${folder}/${newFilename}`
+
+			if (!fs.existsSync(folder)) {
+				fs.mkdirSync(folder, { recursive: true })
+			}
+
+			await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
+
+			await knex('users')
+				.update({
+					avatar: filePath
+				})
+				.where({
+					id
+				})
+
+			reply.status(200).send({ source: filePath })
+		}
+	)
 
 	app.delete(
 		'/:id',
