@@ -3,3 +3,4 @@ node_modules
 test
 .env.test
 db/test.db
+/.env

@@ -76,14 +76,13 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 
-			/* 	await knex('users')
-				.update({
-					name,
-					username,
-					updatedAt: new Date(),
-					password: hashedPassword,
-					phone
-				}) */
+			await knex('users').update({
+				name,
+				username,
+				updatedAt: new Date(),
+				password: hashedPassword,
+				phone
+			})
 
 			return reply.status(204).send('User updated successfully!')
 		}
@@ -101,13 +100,13 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		const user = await prisma.users.findFirst({
+		/* 	const user = await prisma.users.findFirst({
 			where: {
 				OR: [{ email: credential }, { username: credential }]
 			}
-		})
+		}) */
 
-		/* 	const user = await knex('users')
+		const user = await knex('users')
 			.select('id', 'username', 'avatar', 'intId', 'name', 'email', 'phone', 'password')
 			.where({
 				email: credential
@@ -115,7 +114,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			.orWhere({
 				username: credential
 			})
-			.first() */
+			.first()
 
 		if (!user) {
 			return reply.status(404).send('User not found')
@@ -139,7 +138,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async (request, reply) => {
+		async (_request, reply) => {
 			const users = await knex('users').select('username', 'avatar', 'name', 'id', 'intId')
 			return reply.status(200).send({ users })
 		}
