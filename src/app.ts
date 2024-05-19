@@ -5,9 +5,10 @@ import multipart from '@fastify/multipart'
 
 import { postsRoutes } from './routes/posts'
 import { usersRoutes } from './routes/users'
+import { chatsRoutes } from './routes/chats'
 import { productsRoutes } from './routes/products'
 import { transactionsRoutes } from './routes/transactions'
-import { chatsRoutes } from './routes/chats'
+import { notificationsRoutes } from './routes/notifications'
 
 export const app = fastify()
 
@@ -21,6 +22,10 @@ app.register(usersRoutes, {
 
 app.register(postsRoutes, {
 	prefix: 'posts'
+})
+
+app.register(notificationsRoutes, {
+	prefix: 'notifications'
 })
 
 app.register(chatsRoutes, {

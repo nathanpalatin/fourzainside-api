@@ -8,7 +8,7 @@ import util from 'node:util'
 import { pipeline } from 'node:stream'
 import fs from 'node:fs'
 
-import { checkSessionIdExists } from '../middlewares/check-session-id'
+import { checkSessionIdExists } from '../middlewares/auth-token'
 
 export async function productsRoutes(app: FastifyInstance) {
 	app.get('/', async () => {

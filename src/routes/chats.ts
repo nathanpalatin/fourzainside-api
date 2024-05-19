@@ -5,141 +5,163 @@ import { randomUUID } from 'node:crypto'
 
 import { z } from 'zod'
 
-import { checkSessionIdExists } from '../middlewares/check-session-id'
+import { checkSessionIdExists } from '../middlewares/auth-token'
 
 export async function chatsRoutes(app: FastifyInstance) {
-
-  app.get(
+	app.get(
 		'/',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (_request, reply) => {
 			const chats = await knex('chats').select('id', 'userId', 'chatWithId', 'created_at')
-			return reply.status(200).send({chats})
+			return reply.status(200).send({ chats })
 		}
 	)
 
-  app.post('/', {
-    preHandler: [checkSessionIdExists]
-  }, async (request, reply) => {
-    const getTokenChat = z.object({
-      token: z.string().uuid()
-    })
+	app.post(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getTokenChat = z.object({
+				token: z.string().uuid()
+			})
 
-    const createChatSchemaBody = z.object({
-      chatWithId: z.string().uuid()
-    })
+			const createChatSchemaBody = z.object({
+				chatWithId: z.string().uuid()
+			})
 
-      const { token: userId } = getTokenChat.parse(request.cookies)
+			const { token: userId } = getTokenChat.parse(request.cookies)
 
-      const { chatWithId } = createChatSchemaBody.parse(request.body)
+			const { chatWithId } = createChatSchemaBody.parse(request.body)
 
-      const [chat] = await knex('chats').insert({
-        id: randomUUID(),
-        userId,
-        chatWithId,
-        created_at: new Date(),
-        updated_at: new Date()
-      }).returning('*')
+			const [chat] = await knex('chats')
+				.insert({
+					id: randomUUID(),
+					userId,
+					chatWithId,
+					created_at: new Date(),
+					updated_at: new Date()
+				})
+				.returning('*')
 
-      return reply.status(201).send(chat)
+			return reply.status(201).send(chat)
+		}
+	)
 
-  })
+	app.delete(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getTokenChats = z.object({
+				token: z.string().uuid()
+			})
 
-  app.delete('/', {
-    preHandler: [checkSessionIdExists]
-  }, async (request, reply) => {
-    const getTokenChats = z.object({
-      token: z.string().uuid()
-    })
+			const { token: userId } = getTokenChats.parse(request.cookies)
 
-      const { token: userId } = getTokenChats.parse(request.cookies)
+			await knex('chats').delete('*').where({
+				userId
+			})
 
-    await knex('chats').delete('*').where({
-      userId
-    })
+			return reply.status(204).send({ message: 'Chat deleted successfully' })
+		}
+	)
 
-    return reply.status(204).send({message: 'Chat deleted successfully'})
-  })
+	/* ROTAS PARA AS MENSAGENS */
 
-  /* ROTAS PARA AS MENSAGENS */
+	app.post(
+		'/message',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getTokenMessage = z.object({
+				token: z.string().uuid()
+			})
 
-  app.post('/message', {
-    preHandler: [checkSessionIdExists]
-  }, async (request, reply) =>{
-    const getTokenMessage = z.object({
-      token: z.string().uuid()
-    })
+			const createMessageSchemaBody = z.object({
+				receiveUserId: z.string().uuid(),
+				chatId: z.string().uuid(),
+				messageText: z.string(),
+				messageType: z.string(),
+				userName: z.string()
+			})
 
-    const createMessageSchemaBody = z.object({
-      receiveUserId: z.string().uuid(),
-      chatId: z.string().uuid(),
-      messageText: z.string(),
-      messageType: z.string(),
-      userName: z.string(),
-  })
+			const { token: sendUserId } = getTokenMessage.parse(request.cookies)
 
-    const { token: sendUserId } = getTokenMessage.parse(request.cookies)
+			const { receiveUserId, userName, messageText, messageType, chatId } = createMessageSchemaBody.parse(
+				request.body
+			)
 
-    const { receiveUserId, userName, messageText, messageType, chatId } = createMessageSchemaBody.parse(request.body)
+			const [message] = await knex('messages')
+				.insert({
+					id: randomUUID(),
+					chatId,
+					sendUserId,
+					receiveUserId,
+					userName,
+					messageText,
+					messageType,
+					created_at: new Date(),
+					updated_at: new Date()
+				})
+				.returning('*')
 
-   
-    const [message] = await knex('messages').insert({
-      id: randomUUID(),
-      chatId,
-      sendUserId,
-      receiveUserId,
-      userName,
-      messageText,
-      messageType,
-      created_at: new Date(),
-      updated_at: new Date()
-    }).returning('*')
+			return reply.status(201).send(message)
+		}
+	)
 
-    return reply.status(201).send(message)
+	app.delete(
+		'/message',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getTokenMessage = z.object({
+				token: z.string().uuid()
+			})
 
-  })
+			const createMessageSchemaBody = z.object({
+				id: z.string().uuid()
+			})
 
-  app.delete('/message', {
-    preHandler: [checkSessionIdExists]
-  }, async (request, reply) => {
-    const getTokenMessage = z.object({
-      token: z.string().uuid()
-    })
+			const { token: sendUserId } = getTokenMessage.parse(request.cookies)
 
-    const createMessageSchemaBody = z.object({
-      id: z.string().uuid(),
-    })
+			const { id } = createMessageSchemaBody.parse(request.body)
 
-    const { token: sendUserId } = getTokenMessage.parse(request.cookies)
+			await knex('messages').delete('*').where({
+				id,
+				sendUserId
+			})
 
-    const { id } = createMessageSchemaBody.parse(request.body)
+			reply.status(204).send({ message: 'Message deleted successfully.' })
+		}
+	)
 
-    await knex('messages').delete('*').where({
-      id,
-      sendUserId
-    })
+	app.get(
+		'/messages/:chatId',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const createMessagesSchemaBody = z.object({
+				chatId: z.string().uuid()
+			})
 
-    reply.status(204).send({ message: 'Message deleted successfully.'})
-  })
+			const { chatId } = createMessagesSchemaBody.parse(request.params)
 
-  app.get('/messages/:chatId', {
-    preHandler: [checkSessionIdExists],
-  }, async (request, reply) =>{
-  
-    const createMessagesSchemaBody = z.object({
-      chatId: z.string().uuid(),
-    })
+			const messages = await knex('messages')
+				.select('*')
+				.where({
+					chatId
+				})
+				.returning('*')
 
-    const { chatId } = createMessagesSchemaBody.parse(request.params)
-
-   const messages = await knex('messages').select('*').where({
-      chatId
-    }).returning('*')
-
-    return reply.status(200).send({messages})
-
-  })
- 
+			return reply.status(200).send({ messages })
+		}
+	)
 }

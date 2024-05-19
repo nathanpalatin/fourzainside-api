@@ -9,17 +9,17 @@ datasource db {
 }
 
 model Users {
-  id            String         @id @default(uuid())
+  id            String          @id @default(uuid())
   name          String
-  email         String         @unique
+  email         String          @unique
   password      String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
   avatar        String?
   phone         String
-  username      String         @unique
-  emailVerified Boolean        @default(false)
-  intId         Int            @default(0)
+  username      String          @unique
+  emailVerified Boolean         @default(false)
+  intId         Int             @default(0)
   Chats         Chats[]
   Followers     Followers[]
   Medias        Medias[]
@@ -27,6 +27,7 @@ model Users {
   Posts         Posts[]
   Products      Products[]
   Transactions  Transactions[]
+  Notifications Notifications[]
 
   @@map("users")
 }
@@ -126,4 +127,18 @@ model Messages {
   Chats Chats? @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   @@map("messages")
+}
+
+model Notifications {
+  id               String   @id @default(uuid())
+  notificationType String
+  sendUserId       String?
+  receiveUserId    String
+  status           String   @default("unread")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  Users Users @relation(fields: [receiveUserId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }

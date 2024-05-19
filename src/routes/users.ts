@@ -14,7 +14,7 @@ import { randomUUID } from 'node:crypto'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-import { checkSessionIdExists } from '../middlewares/check-session-id'
+import { checkSessionIdExists } from '../middlewares/auth-token'
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {

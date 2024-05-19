@@ -47,14 +47,14 @@ declare module 'knex/types/tables' {
 			source: string
 			userId: string
 			postId?: string
-		},
+		}
 		chats: {
 			id: string
 			userId: string
 			chatWithId: string
 			created_at: Date
 			updated_at: Date
-		},
+		}
 		messages: {
 			id: string
 			sendUserId: string
@@ -66,6 +66,14 @@ declare module 'knex/types/tables' {
 			created_at: Date
 			updated_at: Date
 		}
-		
+		notifications: {
+			id: string
+			status: string
+			sendUserId: string
+			receiveUserId: string
+			notificationType: string
+			created_at: Date
+			updated_at: Date
+		}
 	}
 }

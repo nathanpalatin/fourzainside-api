@@ -9,7 +9,7 @@ import { pipeline } from 'node:stream'
 
 import { randomUUID } from 'node:crypto'
 
-import { checkSessionIdExists } from '../middlewares/check-session-id'
+import { checkSessionIdExists } from '../middlewares/auth-token'
 
 export async function postsRoutes(app: FastifyInstance) {
 	app.get(
@@ -128,7 +128,7 @@ export async function postsRoutes(app: FastifyInstance) {
 			})
 
 			const uploadMediaSchema = z.object({
-			 postId: z.string().uuid()
+				postId: z.string().uuid()
 			})
 
 			const { token: userId } = tokenSchema.parse(request.cookies)
@@ -139,7 +139,6 @@ export async function postsRoutes(app: FastifyInstance) {
 			const uploadedFiles = []
 
 			const folder = `uploads/posts/${postId}`
-
 
 			if (!fs.existsSync(folder)) {
 				fs.mkdirSync(folder, { recursive: true })
@@ -156,11 +155,11 @@ export async function postsRoutes(app: FastifyInstance) {
 				uploadedFiles.push(filePath)
 
 				await knex('medias').insert({
-							id: randomUUID(),
-							postId,
-							source: filePath,
-							userId,
-							type: 'image',	
+					id: randomUUID(),
+					postId,
+					source: filePath,
+					userId,
+					type: 'image'
 				})
 			}
 
