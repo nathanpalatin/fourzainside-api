@@ -3,9 +3,20 @@
   "builds": [
     {
       "src": "src/server.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "env": {
+        "PRISMA_GENERATE": "true"
+      },
+      "config": {
+        "includeFiles": [
+          "node_modules/.prisma/**"
+        ]
+      }
     }
   ],
+  "hooks": {
+    "prebuild": "npm run prisma:generate"
+  },
   "routes": [
     {
       "src": "(.*)",
