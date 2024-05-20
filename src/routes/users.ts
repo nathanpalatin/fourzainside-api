@@ -1,5 +1,4 @@
 import { FastifyInstance } from 'fastify'
-import { knex } from '../database'
 import { env } from '../env'
 
 import { prisma } from '../lib/prisma'
@@ -30,7 +29,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const hashedPassword = await bcrypt.hash(password, 10)
 
-		/* 		await prisma.users.create({
+		await prisma.users.create({
 			data: {
 				id: randomUUID(),
 				name,
@@ -42,19 +41,6 @@ export async function usersRoutes(app: FastifyInstance) {
 				phone
 			}
 		})
- */
-		await knex('users')
-			.insert({
-				id: randomUUID(),
-				name,
-				username,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				password: hashedPassword,
-				email,
-				phone
-			})
-			.returning('*')
 
 		return reply.status(201).send({ message: 'User created successfully.' })
 	})
@@ -71,17 +57,27 @@ export async function usersRoutes(app: FastifyInstance) {
 				password: z.string(),
 				phone: z.string()
 			})
+			const getUserHeaderSchema = z.object({
+				userId: z.string()
+			})
+
+			const { userId: id } = getUserHeaderSchema.parse(request.headers)
 
 			const { name, username, password, phone } = updateUserSchemaBody.parse(request.body)
 
 			const hashedPassword = await bcrypt.hash(password, 10)
 
-			await knex('users').update({
-				name,
-				username,
-				updatedAt: new Date(),
-				password: hashedPassword,
-				phone
+			await prisma.users.update({
+				where: {
+					id
+				},
+				data: {
+					name,
+					username,
+					updatedAt: new Date(),
+					password: hashedPassword,
+					phone
+				}
 			})
 
 			return reply.status(204).send('User updated successfully!')
@@ -100,21 +96,11 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(500).send('Invalid credentials or password')
 		}
 
-		/* 	const user = await prisma.users.findFirst({
+		const user = await prisma.users.findFirst({
 			where: {
 				OR: [{ email: credential }, { username: credential }]
 			}
-		}) */
-
-		const user = await knex('users')
-			.select('id', 'username', 'avatar', 'intId', 'name', 'email', 'phone', 'password')
-			.where({
-				email: credential
-			})
-			.orWhere({
-				username: credential
-			})
-			.first()
+		})
 
 		if (!user) {
 			return reply.status(404).send('User not found')
@@ -139,7 +125,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (_request, reply) => {
-			const users = await knex('users').select('username', 'avatar', 'name', 'id', 'intId')
+			const users = await prisma.users.findMany({ select: { id: true, email: true, name: true, avatar: true } })
 			return reply.status(200).send({ users })
 		}
 	)
@@ -151,10 +137,10 @@ export async function usersRoutes(app: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const userSchemaBody = z.object({
-				authorization: z.string()
+				userId: z.string()
 			})
 
-			const { authorization: id } = userSchemaBody.parse(request.headers)
+			const { userId: id } = userSchemaBody.parse(request.headers)
 			const part = await request.file()
 
 			if (!part) {
@@ -174,33 +160,38 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
 
-			await knex('users')
-				.update({
-					avatar: filePath
-				})
-				.where({
+			await prisma.users.update({
+				where: {
 					id
-				})
+				},
+				data: {
+					avatar: filePath
+				}
+			})
 
 			reply.status(200).send({ source: filePath })
 		}
 	)
 
 	app.delete(
-		'/:id',
+		'/',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const getUserParamsSchema = z.object({
-				id: z.string().uuid()
+				userId: z.string()
 			})
 
-			const { id } = getUserParamsSchema.parse(request.params)
+			const { userId: id } = getUserParamsSchema.parse(request.headers)
 
-			await knex('users').delete().where({ id })
+			await prisma.users.delete({
+				where: {
+					id
+				}
+			})
 
-			reply.status(204)
+			reply.status(204).send({ message: 'User deleted successfully.' })
 		}
 	)
 
@@ -216,10 +207,18 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { username } = getUserParamsSchema.parse(request.params)
 
-			const user = await knex('users')
-				.select('username', 'email', 'avatar', 'phone', 'name')
-				.where({ username })
-				.first()
+			const user = await prisma.users.findFirst({
+				where: {
+					username
+				},
+				select: {
+					username: true,
+					email: true,
+					avatar: true,
+					phone: true,
+					name: true
+				}
+			})
 
 			return { user }
 		}
@@ -232,16 +231,15 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const { credential } = getUserParamsSchema.parse(request.body)
 
-		const user = await knex('users')
-			.select('email')
-			.where({
-				username: credential
-			})
-			.orWhere({
-				email: credential
-			})
+		const user = await prisma.users.findFirst({
+			where: {
+				OR: [{ email: credential }, { username: credential }]
+			},
+			select: {
+				email: true
+			}
+		})
 
-		// FAZER INTEGRACAO DE API PARA ENVIO DE E-MAIL PARA REDEFINIÇÃO DE SENHA
 		reply.status(200).send({ user })
 	})
 }
