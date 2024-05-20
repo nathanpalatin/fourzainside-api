@@ -14,9 +14,6 @@
       }
     }
   ],
-  "hooks": {
-    "prebuild": "npm run prisma:generate"
-  },
   "routes": [
     {
       "src": "(.*)",
