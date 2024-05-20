@@ -1,7 +1,6 @@
 import { FastifyInstance } from 'fastify'
-
+import { prisma } from '../lib/prisma'
 import { z } from 'zod'
-import { knex } from '../database'
 
 import fs from 'node:fs'
 import util from 'node:util'
@@ -18,11 +17,16 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (_request, reply) => {
-			const posts = await knex('posts').select('id', 'title', 'content', 'userId', 'createdAt')
-
-			reply.status(200)
-
-			return { posts }
+			const posts = await prisma.posts.findMany({
+				select: {
+					id: true,
+					title: true,
+					content: true,
+					userId: true,
+					createdAt: true
+				}
+			})
+			return reply.status(200).send({ posts })
 		}
 	)
 
@@ -32,8 +36,8 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const tokenSchema = z.object({
-				token: z.string().uuid()
+			const getPostsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
 			const postsSchemaBody = z.object({
@@ -41,17 +45,19 @@ export async function postsRoutes(app: FastifyInstance) {
 				content: z.string()
 			})
 
-			const { token: userId } = tokenSchema.parse(request.cookies)
+			const { userId } = getPostsHeaderSchema.parse(request.headers)
 
 			const { title, content } = postsSchemaBody.parse(request.body)
 
-			await knex('posts').insert({
-				id: randomUUID(),
-				userId,
-				content,
-				title,
-				createdAt: new Date(),
-				updatedAt: new Date()
+			await prisma.posts.create({
+				data: {
+					id: randomUUID(),
+					userId,
+					content,
+					title,
+					createdAt: new Date(),
+					updatedAt: new Date()
+				}
 			})
 
 			reply.status(201).send({ message: 'Post created successfully' })
@@ -59,35 +65,38 @@ export async function postsRoutes(app: FastifyInstance) {
 	)
 
 	app.put(
-		'/',
+		'/:id',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const tokenSchema = z.object({
-				token: z.string().uuid()
+			const getPostsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
-			const getTransactionParamsSchema = z.object({
-				id: z.string().uuid(),
+			const getPostParamsSchema = z.object({
+				id: z.string().uuid()
+			})
+			const getTransactionBodySchema = z.object({
 				title: z.string(),
 				content: z.string()
 			})
 
-			const { token: userId } = tokenSchema.parse(request.cookies)
-			const { id, title, content } = getTransactionParamsSchema.parse(request.body)
+			const { id } = getPostParamsSchema.parse(request.params)
+			const { userId } = getPostsHeaderSchema.parse(request.headers)
+			const { title, content } = getTransactionBodySchema.parse(request.body)
 
-			await knex('posts')
-				.update({
-					title,
-					content
-				})
-				.where({
+			await prisma.posts.update({
+				where: {
 					id,
 					userId
-				})
-
-			reply.status(204).send({ message: '' })
+				},
+				data: {
+					title,
+					content
+				}
+			})
+			return reply.status(204).send({ message: 'Post updated successfully.' })
 		}
 	)
 
@@ -97,23 +106,19 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const tokenSchema = z.object({
-				token: z.string().uuid()
+			const getPostsHeaderSchema = z.object({
+				userId: z.string()
 			})
 
-			const getTransactionParamsSchema = z.object({
-				id: z.string().uuid()
+			const { userId } = getPostsHeaderSchema.parse(request.headers)
+
+			await prisma.posts.deleteMany({
+				where: {
+					userId
+				}
 			})
 
-			const { token: userId } = tokenSchema.parse(request.cookies)
-			const { id } = getTransactionParamsSchema.parse(request.body)
-
-			await knex('posts').delete('*').where({
-				id,
-				userId
-			})
-
-			return reply.status(204).send('Post deleted successfully')
+			return reply.status(204).send('All your posts deleted successfully')
 		}
 	)
 
@@ -123,15 +128,15 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const tokenSchema = z.object({
-				token: z.string().uuid()
+			const getPostsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
 			const uploadMediaSchema = z.object({
 				postId: z.string().uuid()
 			})
 
-			const { token: userId } = tokenSchema.parse(request.cookies)
+			const { userId } = getPostsHeaderSchema.parse(request.headers)
 			const { postId } = uploadMediaSchema.parse(request.body)
 
 			const parts = request.files()
@@ -154,16 +159,18 @@ export async function postsRoutes(app: FastifyInstance) {
 
 				uploadedFiles.push(filePath)
 
-				await knex('medias').insert({
-					id: randomUUID(),
-					postId,
-					source: filePath,
-					userId,
-					type: 'image'
+				await prisma.medias.create({
+					data: {
+						id: randomUUID(),
+						postId,
+						source: filePath,
+						userId,
+						type: 'image'
+					}
 				})
 			}
 
-			return reply.status(200).send({ message: 'Uploaded file successfully' })
+			return reply.status(201).send({ message: 'Post media file uploaded successfully' })
 		}
 	)
 }

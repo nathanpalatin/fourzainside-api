@@ -1,10 +1,9 @@
 import { FastifyInstance } from 'fastify'
-import { knex } from '../database'
+import { prisma } from '../lib/prisma'
+import { z } from 'zod'
 
 import { randomUUID } from 'node:crypto'
-import { z } from 'zod'
 import { checkSessionIdExists } from '../middlewares/auth-token'
-import { prisma } from '../lib/prisma'
 
 export async function notificationsRoutes(app: FastifyInstance) {
 	app.get(
