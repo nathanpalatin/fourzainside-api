@@ -19,9 +19,19 @@ export async function notificationsRoutes(app: FastifyInstance) {
 
 			const { userId: receiveUserId } = getNotificationParamsSchema.parse(request.headers)
 
-			const notifications = await knex('notifications').select('*').where({
-				receiveUserId
+			const notifications = await prisma.notifications.findMany({
+				where: {
+					receiveUserId
+				},
+				select: {
+					id: true,
+					sendUserId: true,
+					notificationType: true,
+					createdAt: true,
+					status: true
+				}
 			})
+
 			return reply.status(200).send({ notifications })
 		}
 	)
@@ -57,25 +67,26 @@ export async function notificationsRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.put(
+	app.patch(
 		'/:id',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionParamsSchema = z.object({
-				userId: z.string().uuid()
+			const getNotificationParamsSchema = z.object({
+				id: z.string().uuid()
 			})
 
-			const { userId: receiveUserId } = getTransactionParamsSchema.parse(request.headers)
+			const { id } = getNotificationParamsSchema.parse(request.params)
 
-			await knex('notifications')
-				.update({
+			await prisma.notifications.update({
+				where: {
+					id
+				},
+				data: {
 					status: 'read'
-				})
-				.where({
-					receiveUserId
-				})
+				}
+			})
 
 			return reply.status(204)
 		}
@@ -87,35 +98,16 @@ export async function notificationsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionParamsSchema = z.object({
+			const getNotificationsHeaderSchema = z.object({
 				userId: z.string().uuid()
 			})
 
-			const { userId: receiveUserId } = getTransactionParamsSchema.parse(request.headers)
-
-			await knex('notifications').delete().where({ receiveUserId })
+			const { userId: receiveUserId } = getNotificationsHeaderSchema.parse(request.headers)
+			await prisma.notifications.deleteMany({
+				where: { receiveUserId }
+			})
 
 			return reply.status(204).send('All your notifications deleted successfully')
-		}
-	)
-
-	app.delete(
-		'/:id',
-		{
-			preHandler: [checkSessionIdExists]
-		},
-		async (request, reply) => {
-			const getTransactionParamsSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const { userId: receiveUserId } = getTransactionParamsSchema.parse(request.headers)
-
-			await knex('notifications').delete().where({
-				receiveUserId
-			})
-
-			return reply.status(204).send('Transaction deleted successfully')
 		}
 	)
 }
