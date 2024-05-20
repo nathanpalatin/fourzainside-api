@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
-import { knex } from '../database'
-
+import { prisma } from '../lib/prisma'
 import { z } from 'zod'
+
 import { randomUUID } from 'node:crypto'
 
 import util from 'node:util'
@@ -9,7 +9,6 @@ import { pipeline } from 'node:stream'
 import fs from 'node:fs'
 
 import { checkSessionIdExists } from '../middlewares/auth-token'
-import { prisma } from '../lib/prisma'
 
 export async function productsRoutes(app: FastifyInstance) {
 	app.get('/', async (_request, reply) => {
@@ -99,8 +98,8 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const tokenSchemaCookie = z.object({
-				token: z.string().uuid()
+			const getHeaderTokenSchema = z.object({
+				userId: z.string()
 			})
 			const createProductsBodySchema = z.object({
 				title: z.string(),
@@ -111,19 +110,21 @@ export async function productsRoutes(app: FastifyInstance) {
 				featured: z.boolean()
 			})
 
-			const { token: userId } = tokenSchemaCookie.parse(request.cookies)
+			const { userId } = getHeaderTokenSchema.parse(request.headers)
 
 			const { title, slug, price, image, description, featured } = createProductsBodySchema.parse(request.body)
 
-			await knex('products').insert({
-				id: randomUUID(),
-				title,
-				slug,
-				description,
-				price,
-				image,
-				featured,
-				userId
+			await prisma.products.create({
+				data: {
+					id: randomUUID(),
+					title,
+					slug,
+					description,
+					price,
+					image,
+					featured,
+					userId
+				}
 			})
 
 			return reply.status(201).send('Product created successfully!')
@@ -152,18 +153,19 @@ export async function productsRoutes(app: FastifyInstance) {
 
 			const { title, price, slug, description, image, featured } = createProductsBodySchema.parse(request.body)
 
-			await knex('Products')
-				.update({
+			await prisma.products.update({
+				where: {
+					id
+				},
+				data: {
 					title,
 					slug,
 					price,
 					description,
 					image,
 					featured
-				})
-				.where({
-					id
-				})
+				}
+			})
 
 			return reply.status(204).send('Product updated successfully!')
 		}
@@ -175,8 +177,17 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { sessionId } = request.cookies
-			await knex('Products').delete().where('session_id', sessionId)
+			const getHeaderTokenSchema = z.object({
+				userId: z.string()
+			})
+
+			const { userId } = getHeaderTokenSchema.parse(request.headers)
+
+			await prisma.products.deleteMany({
+				where: {
+					userId
+				}
+			})
 
 			return reply.status(204).send('All your products deleted successfully')
 		}
@@ -194,8 +205,10 @@ export async function productsRoutes(app: FastifyInstance) {
 
 			const { id } = getProductsParamsSchema.parse(request.params)
 
-			await knex('Products').delete().where({
-				id
+			await prisma.products.delete({
+				where: {
+					id
+				}
 			})
 
 			return reply.status(204).send('Product deleted successfully')
