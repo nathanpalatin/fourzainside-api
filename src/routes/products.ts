@@ -9,19 +9,22 @@ import { pipeline } from 'node:stream'
 import fs from 'node:fs'
 
 import { checkSessionIdExists } from '../middlewares/auth-token'
+import { prisma } from '../lib/prisma'
 
 export async function productsRoutes(app: FastifyInstance) {
-	app.get('/', async () => {
-		const products = await knex('products').select('*')
-		return { products }
+	app.get('/', async (_request, reply) => {
+		const products = await prisma.products.findMany()
+		return reply.status(200).send({ products })
 	})
 
-	app.get('/featured', async _request => {
-		const productsFeatured = await knex('Products').where({
-			featured: true
+	app.get('/featured', async (_request, reply) => {
+		const productsFeatured = await prisma.products.findMany({
+			where: {
+				featured: true
+			}
 		})
 
-		return { productsFeatured }
+		return reply.status(200).send({ productsFeatured })
 	})
 
 	app.post(
@@ -55,32 +58,39 @@ export async function productsRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.get('/:slug', async request => {
+	app.get('/:slug', async (request, reply) => {
 		const getProductsParamsSchema = z.object({
 			slug: z.string()
 		})
 
 		const { slug } = getProductsParamsSchema.parse(request.params)
 
-		const product = await knex('Products')
-			.where({
+		const product = await prisma.products.findFirst({
+			where: {
 				slug
-			})
-			.first()
+			}
+		})
 
-		return { product }
+		return reply.status(200).send({ product })
 	})
 
-	app.get('/search/:slug', async request => {
+	app.get('/search/:slug', async (request, reply) => {
 		const getProductsParamsSchema = z.object({
 			slug: z.string()
 		})
 
 		const { slug } = getProductsParamsSchema.parse(request.params)
 
-		const products = await knex('Products').whereILike('slug', `%${slug}%`)
+		const products = await prisma.products.findMany({
+			where: {
+				slug: {
+					contains: slug,
+					mode: 'insensitive'
+				}
+			}
+		})
 
-		return { products }
+		return reply.status(200).send({ products })
 	})
 
 	app.post(
