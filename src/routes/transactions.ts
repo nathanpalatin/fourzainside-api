@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify'
-import { knex } from '../database'
+import { prisma } from '../lib/prisma'
+import { z } from 'zod'
 
 import { randomUUID } from 'node:crypto'
-import { z } from 'zod'
 import { checkSessionIdExists } from '../middlewares/auth-token'
 
 export async function transactionsRoutes(app: FastifyInstance) {
@@ -11,17 +11,18 @@ export async function transactionsRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async request => {
-			const userSchemaBody = z.object({
-				token: z.string().uuid()
+		async (request, reply) => {
+			const getTransactionsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
-			const { token: userId } = userSchemaBody.parse(request.cookies)
+			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
 
-			const transactions = await knex('transactions').select().where({
-				userId
+			const transactions = await prisma.transactions.findMany({
+				where: { userId }
 			})
-			return { transactions }
+
+			return reply.status(200).send({ transactions })
 		}
 	)
 
@@ -30,26 +31,23 @@ export async function transactionsRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async request => {
-			const getTokenTransaction = z.object({
-				token: z.string().uuid()
+		async (request, reply) => {
+			const getTransactionsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
 			const getTransactionParamsSchema = z.object({
 				id: z.string().uuid()
 			})
-			const { token: userId } = getTokenTransaction.parse(request.cookies)
+			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
 
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
-			const transaction = await knex('transactions')
-				.where({
-					id,
-					userId
-				})
-				.first()
+			const transaction = await prisma.transactions.findFirst({
+				where: { id, userId }
+			})
 
-			return { transaction }
+			return reply.status(200).send({ transaction })
 		}
 	)
 
@@ -59,8 +57,8 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTokenTransaction = z.object({
-				token: z.string().uuid()
+			const getTransactionsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
 			const createTransactionBodySchema = z.object({
@@ -69,18 +67,20 @@ export async function transactionsRoutes(app: FastifyInstance) {
 				type: z.enum(['credit', 'debit'])
 			})
 
-			const { token: userId } = getTokenTransaction.parse(request.cookies)
+			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
 
 			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
 
-			await knex('transactions').insert({
-				id: randomUUID(),
-				title,
-				userId,
-				amount: type === 'credit' ? amount : amount * -1,
-				createdAt: new Date(),
-				updatedAt: new Date(),
-				type
+			await prisma.transactions.create({
+				data: {
+					id: randomUUID(),
+					title,
+					userId,
+					amount: type === 'credit' ? amount : amount * -1,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+					type
+				}
 			})
 
 			return reply.status(201).send('Transaction created successfully!')
@@ -93,6 +93,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
+			const getTransactionsHeaderSchema = z.object({
+				userId: z.string().uuid()
+			})
+
 			const getTransactionParamsSchema = z.object({
 				id: z.string().uuid()
 			})
@@ -102,20 +106,23 @@ export async function transactionsRoutes(app: FastifyInstance) {
 				amount: z.number(),
 				type: z.enum(['credit', 'debit'])
 			})
-			const { token } = request.cookies
+
+			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
+
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
 
-			await knex('transactions')
-				.update({
+			await prisma.transactions.update({
+				where: {
+					id,
+					userId
+				},
+				data: {
 					title,
 					amount: type === 'credit' ? amount : amount * -1
-				})
-				.where({
-					id,
-					userId: token
-				})
+				}
+			})
 
 			return reply.status(204).send('Transaction updated successfully!')
 		}
@@ -127,8 +134,16 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { token: userId } = request.cookies
-			await knex('transactions').delete().where({ userId })
+			const getTransactionsHeaderSchema = z.object({
+				userId: z.string().uuid()
+			})
+			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
+
+			await prisma.transactions.deleteMany({
+				where: {
+					userId
+				}
+			})
 
 			return reply.status(204).send('All your transactions deleted successfully')
 		}
@@ -140,14 +155,20 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
+			const getTransactionsHeaderSchema = z.object({
+				userId: z.string().uuid()
+			})
+
 			const getTransactionParamsSchema = z.object({
 				id: z.string().uuid()
 			})
 
+			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
+
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
-			await knex('transactions').delete().where({
-				id
+			await prisma.transactions.delete({
+				where: { userId, id }
 			})
 
 			return reply.status(204).send('Transaction deleted successfully')
