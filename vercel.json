@@ -4,9 +4,6 @@
     {
       "src": "src/server.ts",
       "use": "@vercel/node",
-      "env": {
-        "PRISMA_GENERATE": "true"
-      },
       "config": {
         "includeFiles": [
           "node_modules/.prisma/**"
