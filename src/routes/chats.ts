@@ -1,10 +1,8 @@
 import { FastifyInstance } from 'fastify'
-import { knex } from '../database'
-
-import { randomUUID } from 'node:crypto'
-
+import { prisma } from '../lib/prisma'
 import { z } from 'zod'
 
+import { randomUUID } from 'node:crypto'
 import { checkSessionIdExists } from '../middlewares/auth-token'
 
 export async function chatsRoutes(app: FastifyInstance) {
@@ -13,8 +11,24 @@ export async function chatsRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async (_request, reply) => {
-			const chats = await knex('chats').select('id', 'userId', 'chatWithId', 'created_at')
+		async (request, reply) => {
+			const getChatsHeaderSchema = z.object({
+				userId: z.string().uuid()
+			})
+
+			const { userId } = getChatsHeaderSchema.parse(request.headers)
+
+			const chats = await prisma.chats.findMany({
+				where: {
+					userId
+				},
+				select: {
+					id: true,
+					userId: true,
+					chatWithId: true,
+					createdAt: true
+				}
+			})
 			return reply.status(200).send({ chats })
 		}
 	)
@@ -25,29 +39,29 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTokenChat = z.object({
-				token: z.string().uuid()
+			const getChatsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
 			const createChatSchemaBody = z.object({
 				chatWithId: z.string().uuid()
 			})
 
-			const { token: userId } = getTokenChat.parse(request.cookies)
+			const { userId } = getChatsHeaderSchema.parse(request.headers)
 
 			const { chatWithId } = createChatSchemaBody.parse(request.body)
 
-			const [chat] = await knex('chats')
-				.insert({
+			const chat = await prisma.chats.create({
+				data: {
 					id: randomUUID(),
 					userId,
 					chatWithId,
-					created_at: new Date(),
-					updated_at: new Date()
-				})
-				.returning('*')
+					createdAt: new Date(),
+					updatedAt: new Date()
+				}
+			})
 
-			return reply.status(201).send(chat)
+			return reply.status(201).send({ chat })
 		}
 	)
 
@@ -57,17 +71,18 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTokenChats = z.object({
-				token: z.string().uuid()
+			const getChatsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
-			const { token: userId } = getTokenChats.parse(request.cookies)
+			const { userId } = getChatsHeaderSchema.parse(request.headers)
 
-			await knex('chats').delete('*').where({
-				userId
+			await prisma.chats.deleteMany({
+				where: {
+					userId
+				}
 			})
-
-			return reply.status(204).send({ message: 'Chat deleted successfully' })
+			return reply.status(204).send({ message: 'All your chats deleted successfully' })
 		}
 	)
 
@@ -79,8 +94,8 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTokenMessage = z.object({
-				token: z.string().uuid()
+			const getChatsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
 
 			const createMessageSchemaBody = z.object({
@@ -91,14 +106,14 @@ export async function chatsRoutes(app: FastifyInstance) {
 				userName: z.string()
 			})
 
-			const { token: sendUserId } = getTokenMessage.parse(request.cookies)
+			const { userId: sendUserId } = getChatsHeaderSchema.parse(request.headers)
 
 			const { receiveUserId, userName, messageText, messageType, chatId } = createMessageSchemaBody.parse(
 				request.body
 			)
 
-			const [message] = await knex('messages')
-				.insert({
+			const message = await prisma.messages.create({
+				data: {
 					id: randomUUID(),
 					chatId,
 					sendUserId,
@@ -106,10 +121,10 @@ export async function chatsRoutes(app: FastifyInstance) {
 					userName,
 					messageText,
 					messageType,
-					created_at: new Date(),
-					updated_at: new Date()
-				})
-				.returning('*')
+					createdAt: new Date(),
+					updatedAt: new Date()
+				}
+			})
 
 			return reply.status(201).send(message)
 		}
@@ -121,21 +136,22 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTokenMessage = z.object({
-				token: z.string().uuid()
+			const getChatsHeaderSchema = z.object({
+				userId: z.string().uuid()
 			})
-
 			const createMessageSchemaBody = z.object({
 				id: z.string().uuid()
 			})
 
-			const { token: sendUserId } = getTokenMessage.parse(request.cookies)
+			const { userId: sendUserId } = getChatsHeaderSchema.parse(request.headers)
 
 			const { id } = createMessageSchemaBody.parse(request.body)
 
-			await knex('messages').delete('*').where({
-				id,
-				sendUserId
+			await prisma.messages.delete({
+				where: {
+					id,
+					sendUserId
+				}
 			})
 
 			reply.status(204).send({ message: 'Message deleted successfully.' })
@@ -154,12 +170,11 @@ export async function chatsRoutes(app: FastifyInstance) {
 
 			const { chatId } = createMessagesSchemaBody.parse(request.params)
 
-			const messages = await knex('messages')
-				.select('*')
-				.where({
+			const messages = await prisma.messages.findMany({
+				where: {
 					chatId
-				})
-				.returning('*')
+				}
+			})
 
 			return reply.status(200).send({ messages })
 		}
