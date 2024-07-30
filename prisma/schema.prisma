@@ -19,15 +19,14 @@ model Users {
   phone         String
   username      String          @unique
   emailVerified Boolean         @default(false)
-  intId         Int             @default(0)
   Chats         Chats[]
   Followers     Followers[]
   Medias        Medias[]
   Messages      Messages[]
+  Notifications Notifications[]
   Posts         Posts[]
   Products      Products[]
   Transactions  Transactions[]
-  Notifications Notifications[]
 
   @@map("users")
 }
@@ -41,8 +40,7 @@ model Products {
   description String
   featured    Boolean
   userId      String
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }
@@ -55,8 +53,7 @@ model Transactions {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   type      String
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("transactions")
 }
@@ -69,8 +66,7 @@ model Posts {
   updatedAt DateTime @updatedAt
   userId    String
   Medias    Medias[]
-
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("posts")
 }
@@ -78,12 +74,11 @@ model Posts {
 model Medias {
   id     String  @id @default(uuid())
   type   String  @default("FILE")
-  postId String?
   source String
   userId String
-
-  user  Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Posts Posts? @relation(fields: [postId], references: [id])
+  postId String?
+  Posts  Posts?  @relation(fields: [postId], references: [id])
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("medias")
 }
@@ -92,8 +87,7 @@ model Followers {
   id          String @id @default(uuid())
   userId      String
   followingId String
-
-  Users Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Users       Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("followers")
 }
@@ -104,9 +98,8 @@ model Chats {
   chatWithId String
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")
+  Users      Users      @relation(fields: [userId], references: [id], onDelete: Cascade)
   Messages   Messages[]
-
-  Users Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("chats")
 }
@@ -120,11 +113,9 @@ model Messages {
   messageType   String
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
-
-  chatId String
-
-  Users Users  @relation(fields: [sendUserId], references: [id], onDelete: Cascade)
-  Chats Chats? @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId        String
+  Chats         Chats    @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  Users         Users    @relation(fields: [sendUserId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }
@@ -137,8 +128,7 @@ model Notifications {
   status           String   @default("unread")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
-
-  Users Users @relation(fields: [receiveUserId], references: [id], onDelete: Cascade)
+  Users            Users    @relation(fields: [receiveUserId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }

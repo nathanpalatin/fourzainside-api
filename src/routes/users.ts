@@ -27,6 +27,15 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const { name, username, email, password, phone } = createUserSchemaBody.parse(request.body)
 
+		const userExists = await prisma.users.findMany({
+			where: {
+				OR: [{ email }, { username }]
+			}
+		})
+
+		if (userExists) {
+			return reply.status(400).send({ error: 'User already exists!' })
+		}
 		const hashedPassword = await bcrypt.hash(password, 10)
 
 		await prisma.users.create({
