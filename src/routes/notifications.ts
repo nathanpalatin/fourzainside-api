@@ -92,6 +92,26 @@ export async function notificationsRoutes(app: FastifyInstance) {
 	)
 
 	app.delete(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getNotificationsParamsSchema = z.object({
+				id: z.string().uuid()
+			})
+
+			const { id } = getNotificationsParamsSchema.parse(request.params)
+
+			await prisma.notifications.delete({
+				where: { id }
+			})
+
+			return reply.status(204).send('All your notifications deleted successfully')
+		}
+	)
+
+	app.delete(
 		'/',
 		{
 			preHandler: [checkSessionIdExists]

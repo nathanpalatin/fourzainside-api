@@ -222,7 +222,6 @@ export async function usersRoutes(app: FastifyInstance) {
 				},
 				select: {
 					username: true,
-					email: true,
 					avatar: true,
 					phone: true,
 					name: true
