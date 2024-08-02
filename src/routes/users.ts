@@ -204,6 +204,28 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	)
 
+	app.delete(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getUserParamsSchema = z.object({
+				id: z.string()
+			})
+
+			const { id } = getUserParamsSchema.parse(request.params)
+
+			await prisma.users.delete({
+				where: {
+					id
+				}
+			})
+
+			reply.status(204).send({ message: 'User deleted successfully.' })
+		}
+	)
+
 	app.get(
 		'/:username',
 		{
