@@ -12,6 +12,10 @@ const envSchema = z.object({
 	DATABASE_CLIENT: z.enum(['sqlite', 'pg']).default('pg'),
 	DATABASE_URL: z.string(),
 	JWT_SECRET_KEY: z.string(),
+	BLOB_READ_WRITE_TOKEN: z.string(),
+	AWS_ACCESS_KEY_ID: z.string(),
+	AWS_SECRET_ACCESS_KEY: z.string(),
+	AWS_REGION: z.string(),
 	PORT: z.coerce.number().default(3333)
 })
 

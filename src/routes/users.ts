@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { env } from '../env'
+import { put } from '@vercel/blob'
 
 import { prisma } from '../lib/prisma'
 
@@ -153,8 +154,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			const part = await request.file()
 
 			if (!part) {
-				reply.status(400).send({ error: 'No file uploaded' })
-				return
+				return reply.status(400).send({ error: 'No file uploaded' })
 			}
 
 			const timestamp = new Date().getTime()
@@ -169,16 +169,22 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
 
-			await prisma.users.update({
-				where: {
-					id
-				},
-				data: {
-					avatar: filePath
-				}
-			})
+			try {
+				const { url } = await put(filePath, 'blob', {
+					access: 'public',
+					token: env.BLOB_READ_WRITE_TOKEN
+				})
 
-			reply.status(200).send({ source: filePath })
+				await prisma.users.update({
+					where: { id },
+					data: { avatar: filePath }
+				})
+
+				reply.status(200).send({ source: url })
+			} catch (error) {
+				console.error('Error uploading file:', error)
+				reply.status(500).send({ error: 'Failed to upload file' })
+			}
 		}
 	)
 

@@ -43,6 +43,7 @@
     "@fastify/cookie": "^9.3.1",
     "@fastify/multipart": "^8.2.0",
     "@prisma/client": "^5.14.0",
+    "@vercel/blob": "^0.23.4",
     "aws-sdk": "^2.1615.0",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",

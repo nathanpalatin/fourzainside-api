@@ -4,3 +4,4 @@ test
 .env.test
 db/test.db
 /.env
+/uploads
