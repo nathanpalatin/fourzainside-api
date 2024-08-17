@@ -1,9 +1,14 @@
 import { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
-import { z } from 'zod'
 
-import { randomUUID } from 'node:crypto'
 import { checkSessionIdExists } from '../middlewares/auth-token'
+import { getTokenHeaderSchema } from '../@types/zod/user'
+import {
+	createChatSchemaBody,
+	createMessageIdSchemaBody,
+	createMessageSchemaBody,
+	createMessagesSchemaBody
+} from '../@types/zod/chat'
 
 export async function chatsRoutes(app: FastifyInstance) {
 	app.get(
@@ -12,11 +17,7 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getChatsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const { userId } = getChatsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			const chats = await prisma.chats.findMany({
 				where: {
@@ -39,25 +40,13 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getChatsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const createChatSchemaBody = z.object({
-				chatWithId: z.string().uuid()
-			})
-
-			const { userId } = getChatsHeaderSchema.parse(request.headers)
-
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { chatWithId } = createChatSchemaBody.parse(request.body)
 
 			const chat = await prisma.chats.create({
 				data: {
-					id: randomUUID(),
 					userId,
-					chatWithId,
-					createdAt: new Date(),
-					updatedAt: new Date()
+					chatWithId
 				}
 			})
 
@@ -71,11 +60,7 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getChatsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const { userId } = getChatsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			await prisma.chats.deleteMany({
 				where: {
@@ -94,35 +79,19 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getChatsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const createMessageSchemaBody = z.object({
-				receiveUserId: z.string().uuid(),
-				chatId: z.string().uuid(),
-				messageText: z.string(),
-				messageType: z.string(),
-				userName: z.string()
-			})
-
-			const { userId: sendUserId } = getChatsHeaderSchema.parse(request.headers)
-
+			const { userId: sendUserId } = getTokenHeaderSchema.parse(request.headers)
 			const { receiveUserId, userName, messageText, messageType, chatId } = createMessageSchemaBody.parse(
 				request.body
 			)
 
 			const message = await prisma.messages.create({
 				data: {
-					id: randomUUID(),
 					chatId,
 					sendUserId,
 					receiveUserId,
 					userName,
 					messageText,
-					messageType,
-					createdAt: new Date(),
-					updatedAt: new Date()
+					messageType
 				}
 			})
 
@@ -136,16 +105,8 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getChatsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-			const createMessageSchemaBody = z.object({
-				id: z.string().uuid()
-			})
-
-			const { userId: sendUserId } = getChatsHeaderSchema.parse(request.headers)
-
-			const { id } = createMessageSchemaBody.parse(request.body)
+			const { userId: sendUserId } = getTokenHeaderSchema.parse(request.headers)
+			const { id } = createMessageIdSchemaBody.parse(request.body)
 
 			await prisma.messages.delete({
 				where: {
@@ -164,10 +125,6 @@ export async function chatsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const createMessagesSchemaBody = z.object({
-				chatId: z.string().uuid()
-			})
-
 			const { chatId } = createMessagesSchemaBody.parse(request.params)
 
 			const messages = await prisma.messages.findMany({

@@ -1,9 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
-import { z } from 'zod'
 
-import { randomUUID } from 'node:crypto'
 import { checkSessionIdExists } from '../middlewares/auth-token'
+import { getTokenHeaderSchema } from '../@types/zod/user'
+
+import { getNotificationBodySchema, getNotificationParamsSchema } from '../@types/zod/notification'
 
 export async function notificationsRoutes(app: FastifyInstance) {
 	app.get(
@@ -12,11 +13,7 @@ export async function notificationsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getNotificationParamsSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const { userId: receiveUserId } = getNotificationParamsSchema.parse(request.headers)
+			const { userId: receiveUserId } = getTokenHeaderSchema.parse(request.headers)
 
 			const notifications = await prisma.notifications.findMany({
 				where: {
@@ -41,21 +38,12 @@ export async function notificationsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getNotificationBodySchema = z.object({
-				receiveUserId: z.string().uuid(),
-				notificationType: z.string()
-			})
-			const getNotificationHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const { userId: sendUserId } = getNotificationHeaderSchema.parse(request.headers)
+			const { userId: sendUserId } = getTokenHeaderSchema.parse(request.headers)
 
 			const { receiveUserId, notificationType } = getNotificationBodySchema.parse(request.body)
 
 			await prisma.notifications.create({
 				data: {
-					id: randomUUID(),
 					notificationType,
 					sendUserId,
 					receiveUserId
@@ -72,10 +60,6 @@ export async function notificationsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getNotificationParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-
 			const { id } = getNotificationParamsSchema.parse(request.params)
 
 			await prisma.notifications.update({
@@ -97,17 +81,13 @@ export async function notificationsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getNotificationsParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-
-			const { id } = getNotificationsParamsSchema.parse(request.params)
+			const { id } = getNotificationParamsSchema.parse(request.params)
 
 			await prisma.notifications.delete({
 				where: { id }
 			})
 
-			return reply.status(204).send('All your notifications deleted successfully')
+			return reply.status(204).send('Notification deleted successfully')
 		}
 	)
 
@@ -117,11 +97,7 @@ export async function notificationsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getNotificationsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const { userId: receiveUserId } = getNotificationsHeaderSchema.parse(request.headers)
+			const { userId: receiveUserId } = getTokenHeaderSchema.parse(request.headers)
 			await prisma.notifications.deleteMany({
 				where: { receiveUserId }
 			})

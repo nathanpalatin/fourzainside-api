@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const getUserHeaderSchema = z.object({
+export const getTokenHeaderSchema = z.object({
 	userId: z.string()
 })
 

@@ -9,6 +9,8 @@ import { pipeline } from 'node:stream'
 import { randomUUID } from 'node:crypto'
 
 import { checkSessionIdExists } from '../middlewares/auth-token'
+import { getTokenHeaderSchema } from '../@types/zod/user'
+import { getPostBodySchema, getPostParamsSchema, uploadMediaSchema } from '../@types/zod/post'
 
 export async function postsRoutes(app: FastifyInstance) {
 	app.get(
@@ -36,16 +38,12 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getPostsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
 			const postsSchemaBody = z.object({
 				title: z.string(),
 				content: z.string()
 			})
 
-			const { userId } = getPostsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			const { title, content } = postsSchemaBody.parse(request.body)
 
@@ -70,21 +68,9 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getPostsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const getPostParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-			const getTransactionBodySchema = z.object({
-				title: z.string(),
-				content: z.string()
-			})
-
 			const { id } = getPostParamsSchema.parse(request.params)
-			const { userId } = getPostsHeaderSchema.parse(request.headers)
-			const { title, content } = getTransactionBodySchema.parse(request.body)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
+			const { title, content } = getPostBodySchema.parse(request.body)
 
 			await prisma.posts.update({
 				where: {
@@ -106,11 +92,7 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getPostsHeaderSchema = z.object({
-				userId: z.string()
-			})
-
-			const { userId } = getPostsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			await prisma.posts.deleteMany({
 				where: {
@@ -128,15 +110,7 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getPostsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const uploadMediaSchema = z.object({
-				postId: z.string().uuid()
-			})
-
-			const { userId } = getPostsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { postId } = uploadMediaSchema.parse(request.body)
 
 			const parts = request.files()

@@ -1,7 +1,7 @@
 {
   "name": "apirest",
   "version": "1.0.0",
-  "description": "",
+  "description": "API Rest Node.JS with Typescript, Zod, Prisma and PostgreSQL",
   "main": "server.ts",
   "type": "module",
   "engines": {
@@ -9,18 +9,19 @@
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "knex": "node --import tsx ./node_modules/knex/bin/cli.js",
+    "start": "node build/server.js",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
+    "pretest:e2e": "run-s cd prisma/vitest-environment-prisma && npm link",
     "vercel-build": "npx prisma migrate deploy",
     "build": "tsup src --out-dir build",
     "postinstall": "prisma generate"
   },
   "keywords": [],
-  "author": "",
+  "author": "Nathan Palatin",
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

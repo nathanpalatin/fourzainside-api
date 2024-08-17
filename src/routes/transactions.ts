@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
-import { z } from 'zod'
 
-import { randomUUID } from 'node:crypto'
 import { checkSessionIdExists } from '../middlewares/auth-token'
+import { getTokenHeaderSchema } from '../@types/zod/user'
+import { createTransactionBodySchema, getTransactionParamsSchema } from '../@types/zod/transaction'
 
 export async function transactionsRoutes(app: FastifyInstance) {
 	app.get(
@@ -12,11 +12,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			const transactions = await prisma.transactions.findMany({
 				where: { userId }
@@ -32,15 +28,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const getTransactionParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
-
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			const transaction = await prisma.transactions.findFirst({
@@ -57,28 +45,14 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const createTransactionBodySchema = z.object({
-				title: z.string(),
-				amount: z.number(),
-				type: z.enum(['credit', 'debit'])
-			})
-
-			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
-
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
 
 			await prisma.transactions.create({
 				data: {
-					id: randomUUID(),
 					title,
 					userId,
 					amount: type === 'credit' ? amount : amount * -1,
-					createdAt: new Date(),
-					updatedAt: new Date(),
 					type
 				}
 			})
@@ -93,21 +67,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const getTransactionParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-
-			const createTransactionBodySchema = z.object({
-				title: z.string(),
-				amount: z.number(),
-				type: z.enum(['credit', 'debit'])
-			})
-
-			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
@@ -134,10 +94,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			await prisma.transactions.deleteMany({
 				where: {
@@ -155,16 +112,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getTransactionsHeaderSchema = z.object({
-				userId: z.string().uuid()
-			})
-
-			const getTransactionParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-
-			const { userId } = getTransactionsHeaderSchema.parse(request.headers)
-
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			await prisma.transactions.delete({

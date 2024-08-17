@@ -1,14 +1,17 @@
 import { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
-import { z } from 'zod'
-
-import { randomUUID } from 'node:crypto'
 
 import util from 'node:util'
 import { pipeline } from 'node:stream'
 import fs from 'node:fs'
 
 import { checkSessionIdExists } from '../middlewares/auth-token'
+import {
+	createProductsBodySchema,
+	getProductParamsSchema,
+	getProductsParamsSchema
+} from '../@types/zod/product'
+import { getTokenHeaderSchema } from '../@types/zod/user'
 
 export async function productsRoutes(app: FastifyInstance) {
 	app.get('/', async (_request, reply) => {
@@ -22,7 +25,6 @@ export async function productsRoutes(app: FastifyInstance) {
 				featured: true
 			}
 		})
-
 		return reply.status(200).send({ productsFeatured })
 	})
 
@@ -58,10 +60,6 @@ export async function productsRoutes(app: FastifyInstance) {
 	)
 
 	app.get('/:slug', async (request, reply) => {
-		const getProductsParamsSchema = z.object({
-			slug: z.string()
-		})
-
 		const { slug } = getProductsParamsSchema.parse(request.params)
 
 		const product = await prisma.products.findFirst({
@@ -74,10 +72,6 @@ export async function productsRoutes(app: FastifyInstance) {
 	})
 
 	app.get('/search/:slug', async (request, reply) => {
-		const getProductsParamsSchema = z.object({
-			slug: z.string()
-		})
-
 		const { slug } = getProductsParamsSchema.parse(request.params)
 
 		const products = await prisma.products.findMany({
@@ -98,25 +92,12 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getHeaderTokenSchema = z.object({
-				userId: z.string()
-			})
-			const createProductsBodySchema = z.object({
-				title: z.string(),
-				slug: z.string(),
-				description: z.string(),
-				price: z.number(),
-				image: z.string(),
-				featured: z.boolean()
-			})
-
-			const { userId } = getHeaderTokenSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			const { title, slug, price, image, description, featured } = createProductsBodySchema.parse(request.body)
 
 			await prisma.products.create({
 				data: {
-					id: randomUUID(),
 					title,
 					slug,
 					description,
@@ -137,19 +118,7 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getProductsParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-
-			const createProductsBodySchema = z.object({
-				title: z.string(),
-				slug: z.string(),
-				price: z.number(),
-				description: z.string(),
-				image: z.string(),
-				featured: z.boolean()
-			})
-			const { id } = getProductsParamsSchema.parse(request.params)
+			const { id } = getProductParamsSchema.parse(request.params)
 
 			const { title, price, slug, description, image, featured } = createProductsBodySchema.parse(request.body)
 
@@ -177,18 +146,13 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getHeaderTokenSchema = z.object({
-				userId: z.string()
-			})
-
-			const { userId } = getHeaderTokenSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			await prisma.products.deleteMany({
 				where: {
 					userId
 				}
 			})
-
 			return reply.status(204).send('All your products deleted successfully')
 		}
 	)
@@ -199,11 +163,7 @@ export async function productsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getProductsParamsSchema = z.object({
-				id: z.string().uuid()
-			})
-
-			const { id } = getProductsParamsSchema.parse(request.params)
+			const { id } = getProductParamsSchema.parse(request.params)
 
 			await prisma.products.delete({
 				where: {

@@ -16,8 +16,8 @@ import { checkSessionIdExists } from '../middlewares/auth-token'
 import {
 	createLoginSchemaBody,
 	createUserSchemaBody,
+	getTokenHeaderSchema,
 	getUserCredentialSchema,
-	getUserHeaderSchema,
 	getUserParamsSchema,
 	updateUserSchemaBody
 } from '../@types/zod/user'
@@ -58,7 +58,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			await request.jwtVerify()
 
-			const { userId: id } = getUserHeaderSchema.parse(request.headers)
+			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
 			const { name, username, password, phone } = updateUserSchemaBody.parse(request.body)
 
@@ -108,7 +108,9 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		reply.header('Authorization', `${token}`)
 
-		return { token, user: { email: user.email, id: user.id, name: user.name, avatar: user.avatar } }
+		return reply
+			.status(200)
+			.send({ token, user: { email: user.email, id: user.id, name: user.name, avatar: user.avatar } })
 	})
 
 	app.get(
@@ -116,7 +118,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async (request, reply) => {
+		async (_request, reply) => {
 			const users = await prisma.users.findMany({ select: { id: true, email: true, name: true, avatar: true } })
 			return reply.status(200).send({ users })
 		}
@@ -128,7 +130,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { userId: id } = getUserHeaderSchema.parse(request.headers)
+			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 			const part = await request.file()
 
 			if (!part) {
@@ -172,7 +174,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { userId: id } = getUserHeaderSchema.parse(request.headers)
+			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
 			await prisma.users.delete({
 				where: {
@@ -190,7 +192,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { userId: id } = getUserHeaderSchema.parse(request.headers)
+			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
 			await prisma.users.delete({
 				where: {
