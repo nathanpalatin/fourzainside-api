@@ -16,7 +16,7 @@ describe('Users routes', () => {
 			.post('/users')
 			.send({
 				name: 'Nathan',
-				email: 'emaileee@nathan.com',
+				email: 'email@nathan.com',
 				username: 'nathanpalatin',
 				createdAt: new Date(),
 				updatedAt: new Date(),

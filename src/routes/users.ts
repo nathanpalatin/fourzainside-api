@@ -11,7 +11,7 @@ import util from 'node:util'
 import { pipeline } from 'node:stream'
 
 import { randomUUID } from 'node:crypto'
-import bcrypt from 'bcrypt'
+import { hash, compare } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 import { checkSessionIdExists } from '../middlewares/auth-token'
@@ -37,7 +37,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		if (userExists) {
 			return reply.status(400).send({ error: 'User already exists!' })
 		}
-		const hashedPassword = await bcrypt.hash(password, 10)
+		const hashedPassword = await hash(password, 6)
 
 		await prisma.users.create({
 			data: {
@@ -75,7 +75,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { name, username, password, phone } = updateUserSchemaBody.parse(request.body)
 
-			const hashedPassword = await bcrypt.hash(password, 10)
+			const hashedPassword = await hash(password, 6)
 
 			await prisma.users.update({
 				where: {
@@ -116,7 +116,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(404).send('User not found')
 		}
 
-		const isValidPassword = await bcrypt.compare(password, user.password)
+		const isValidPassword = await compare(password, user.password)
 
 		if (!isValidPassword) {
 			return reply.status(403).send('Invalid credentials or password')
