@@ -1,6 +1,8 @@
+import { env } from './env'
+
 import fastify from 'fastify'
 import cookie from '@fastify/cookie'
-
+import fastifyJwt from '@fastify/jwt'
 import multipart from '@fastify/multipart'
 
 import { postsRoutes } from './routes/posts'
@@ -11,6 +13,10 @@ import { transactionsRoutes } from './routes/transactions'
 import { notificationsRoutes } from './routes/notifications'
 
 export const app = fastify()
+
+app.register(fastifyJwt, {
+	secret: env.JWT_SECRET_KEY
+})
 
 app.register(cookie)
 

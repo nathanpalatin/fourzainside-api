@@ -1,34 +1,32 @@
-import { FastifyInstance } from 'fastify'
 import { env } from '../env'
-import { put } from '@vercel/blob'
-
-import { prisma } from '../lib/prisma'
-
-import { z } from 'zod'
+import jwt from 'jsonwebtoken'
 
 import fs from 'node:fs'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
 
-import { randomUUID } from 'node:crypto'
+import { FastifyInstance } from 'fastify'
+import { put } from '@vercel/blob'
+
+import { prisma } from '../lib/prisma'
+
 import { hash, compare } from 'bcrypt'
-import jwt from 'jsonwebtoken'
 
 import { checkSessionIdExists } from '../middlewares/auth-token'
+import {
+	createLoginSchemaBody,
+	createUserSchemaBody,
+	getUserCredentialSchema,
+	getUserHeaderSchema,
+	getUserParamsSchema,
+	updateUserSchemaBody
+} from '../@types/zod/user'
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
-		const createUserSchemaBody = z.object({
-			name: z.string(),
-			username: z.string(),
-			password: z.string(),
-			email: z.string(),
-			phone: z.string()
-		})
-
 		const { name, username, email, password, phone } = createUserSchemaBody.parse(request.body)
 
-		const userExists = await prisma.users.findMany({
+		const userExists = await prisma.users.findFirst({
 			where: {
 				OR: [{ email }, { username }]
 			}
@@ -41,11 +39,8 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		await prisma.users.create({
 			data: {
-				id: randomUUID(),
 				name,
 				username,
-				createdAt: new Date(),
-				updatedAt: new Date(),
 				password: hashedPassword,
 				email,
 				phone
@@ -61,15 +56,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const updateUserSchemaBody = z.object({
-				name: z.string(),
-				username: z.string(),
-				password: z.string(),
-				phone: z.string()
-			})
-			const getUserHeaderSchema = z.object({
-				userId: z.string()
-			})
+			await request.jwtVerify()
 
 			const { userId: id } = getUserHeaderSchema.parse(request.headers)
 
@@ -95,11 +82,6 @@ export async function usersRoutes(app: FastifyInstance) {
 	)
 
 	app.post('/login', async (request, reply) => {
-		const createLoginSchemaBody = z.object({
-			credential: z.string(),
-			password: z.string()
-		})
-
 		const { credential, password } = createLoginSchemaBody.parse(request.body)
 
 		if (!credential || !password) {
@@ -134,7 +116,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async (_request, reply) => {
+		async (request, reply) => {
 			const users = await prisma.users.findMany({ select: { id: true, email: true, name: true, avatar: true } })
 			return reply.status(200).send({ users })
 		}
@@ -146,11 +128,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const userSchemaBody = z.object({
-				userId: z.string()
-			})
-
-			const { userId: id } = userSchemaBody.parse(request.headers)
+			const { userId: id } = getUserHeaderSchema.parse(request.headers)
 			const part = await request.file()
 
 			if (!part) {
@@ -180,7 +158,7 @@ export async function usersRoutes(app: FastifyInstance) {
 					data: { avatar: filePath }
 				})
 
-				reply.status(200).send({ source: url })
+				reply.status(200).send({ url })
 			} catch (error) {
 				console.error('Error uploading file:', error)
 				reply.status(500).send({ error: 'Failed to upload file' })
@@ -194,11 +172,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getUserParamsSchema = z.object({
-				userId: z.string()
-			})
-
-			const { userId: id } = getUserParamsSchema.parse(request.headers)
+			const { userId: id } = getUserHeaderSchema.parse(request.headers)
 
 			await prisma.users.delete({
 				where: {
@@ -216,11 +190,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const getUserParamsSchema = z.object({
-				id: z.string()
-			})
-
-			const { id } = getUserParamsSchema.parse(request.params)
+			const { userId: id } = getUserHeaderSchema.parse(request.headers)
 
 			await prisma.users.delete({
 				where: {
@@ -238,10 +208,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, _reply) => {
-			const getUserParamsSchema = z.object({
-				username: z.string()
-			})
-
 			const { username } = getUserParamsSchema.parse(request.params)
 
 			const user = await prisma.users.findFirst({
@@ -261,11 +227,7 @@ export async function usersRoutes(app: FastifyInstance) {
 	)
 
 	app.post('/password', async (request, reply) => {
-		const getUserParamsSchema = z.object({
-			credential: z.string()
-		})
-
-		const { credential } = getUserParamsSchema.parse(request.body)
+		const { credential } = getUserCredentialSchema.parse(request.body)
 
 		const user = await prisma.users.findFirst({
 			where: {
