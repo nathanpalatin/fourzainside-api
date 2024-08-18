@@ -180,7 +180,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				}
 			})
 
-			reply.status(204).send({ message: 'User deleted successfully.' })
+			reply.status(204).send({ message: 'All users has been deleted successfully.' })
 		}
 	)
 
@@ -198,7 +198,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				}
 			})
 
-			reply.status(204).send({ message: 'User deleted successfully.' })
+			reply.status(204).send({ message: 'User has been deleted successfully.' })
 		}
 	)
 

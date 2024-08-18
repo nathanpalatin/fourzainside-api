@@ -1,8 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 
 import { app } from '../app'
+import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
 
 describe('Users routes (e2e)', () => {
 	beforeAll(async () => {
@@ -33,44 +34,25 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('should be able to list all users', async () => {
-		const user = await request(app.server).post('/users/login').send({
-			credential: 'nathanpalatin',
-			password: '123456'
-		})
-
-		const token = user.body.token
-
+		const { token } = await createAndAuthenticateUser(app)
 		const response = await request(app.server).get('/users/').set('Authorization', `${token}`)
 		expect(response.statusCode).toEqual(200)
 	})
 
 	it('should be able to update a user', async () => {
-		const loginResponse = await request(app.server).post('/users/login').send({
-			credential: 'nathanpalatin',
-			password: '123456'
-		})
-
-		const token = loginResponse.body.token
-
+		const { token } = await createAndAuthenticateUser(app)
 		const response = await request(app.server).put('/users').set('Authorization', `${token}`).send({
-			name: 'Nathan Palatin',
-			username: 'nathanpalatin',
-			password: '123',
-			phone: '1999999999'
+			name: 'John Doe2',
+			username: 'johndoe',
+			password: '123456',
+			phone: '1233333'
 		})
 		expect(response.statusCode).toEqual(204)
 	})
 
-	it('should be able to delete user', async () => {
-		const loginResponse = await request(app.server).post('/users/login').send({
-			credential: 'nathanpalatin',
-			password: '123'
-		})
-
-		const token = loginResponse.body.token
-		const decodedToken = jwt.decode(token)
-
-		const response = await request(app.server).delete(`/users/${decodedToken}`).set('Authorization', `${token}`)
+	it('should be able to delete account', async () => {
+		const { token } = await createAndAuthenticateUser(app)
+		const response = await request(app.server).delete('/users').set('Authorization', `${token}`)
 
 		expect(response.statusCode).toEqual(204)
 	})

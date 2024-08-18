@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 
 import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
 
@@ -17,17 +17,16 @@ describe('Products routes (e2e)', () => {
 
 	it('should be able to create a new product', async () => {
 		const { token } = await createAndAuthenticateUser(app)
-
-		const parsedToken = jwt.decode(token)
+		const parsedToken = jwt.decode(token) as JwtPayload
 
 		const response = await request(app.server).post('/products').set('Authorization', `${token}`).send({
 			title: 'Produto teste 1',
 			slug: 'produto-test-1',
 			description: 'Esse foi um produto teste',
 			price: 199,
-			image: '',
+			image: 'https://github.com/nathanpalatin.png',
 			featured: true,
-			userId: parsedToken?.sub
+			userId: parsedToken.userId
 		})
 
 		expect(response.statusCode).toEqual(201)
@@ -36,6 +35,12 @@ describe('Products routes (e2e)', () => {
 	it('should be able to list all products', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 		const response = await request(app.server).get('/products').set('Authorization', `${token}`)
+		expect(response.statusCode).toEqual(200)
+	})
+
+	it('should be able to list featured products', async () => {
+		const { token } = await createAndAuthenticateUser(app)
+		const response = await request(app.server).get('/products/featured').set('Authorization', `${token}`)
 		expect(response.statusCode).toEqual(200)
 	})
 
