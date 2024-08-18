@@ -5,6 +5,9 @@ export default defineConfig({
 	plugins: [tsconfigPaths()],
 	test: {
 		environmentMatchGlobs: [['src/routes/**', 'prisma']],
-		dir: 'src'
+		dir: 'src',
+		coverage: {
+			include: ['src/routes']
+		}
 	}
 })

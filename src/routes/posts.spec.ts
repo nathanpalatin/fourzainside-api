@@ -26,4 +26,11 @@ describe('Posts routes (e2e)', () => {
 
 		expect(response.statusCode).toEqual(201)
 	})
+
+	it('should be able to list all posts', async () => {
+		const { token } = await createAndAuthenticateUser(app)
+		const response = await request(app.server).get('/posts').set('Authorization', `${token}`)
+
+		expect(response.statusCode).toEqual(200)
+	})
 })
