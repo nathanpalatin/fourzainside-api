@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify'
-import { prisma } from '../lib/prisma'
+import { prisma } from '@/lib/prisma'
 
-import { checkSessionIdExists } from '../middlewares/auth-token'
-import { getTokenHeaderSchema } from '../@types/zod/user'
+import { checkSessionIdExists } from '@/middlewares/auth-token'
+import { getTokenHeaderSchema } from '@/@types/zod/user'
 import {
 	createChatSchemaBody,
 	createMessageIdSchemaBody,

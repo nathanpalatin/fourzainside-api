@@ -1,17 +1,17 @@
 import { FastifyInstance } from 'fastify'
-import { prisma } from '../lib/prisma'
+import { prisma } from '@/lib/prisma'
 
 import util from 'node:util'
 import { pipeline } from 'node:stream'
 import fs from 'node:fs'
 
-import { checkSessionIdExists } from '../middlewares/auth-token'
+import { checkSessionIdExists } from '@/middlewares/auth-token'
 import {
 	createProductsBodySchema,
 	getProductParamsSchema,
 	getProductsParamsSchema
-} from '../@types/zod/product'
-import { getTokenHeaderSchema } from '../@types/zod/user'
+} from '@/@types/zod/product'
+import { getTokenHeaderSchema } from '@/@types/zod/user'
 
 export async function productsRoutes(app: FastifyInstance) {
 	app.get('/', async (_request, reply) => {

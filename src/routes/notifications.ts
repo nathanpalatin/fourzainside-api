@@ -1,10 +1,10 @@
 import { FastifyInstance } from 'fastify'
-import { prisma } from '../lib/prisma'
+import { prisma } from '@/lib/prisma'
 
-import { checkSessionIdExists } from '../middlewares/auth-token'
-import { getTokenHeaderSchema } from '../@types/zod/user'
+import { checkSessionIdExists } from '@/middlewares/auth-token'
+import { getTokenHeaderSchema } from '@/@types/zod/user'
 
-import { getNotificationBodySchema, getNotificationParamsSchema } from '../@types/zod/notification'
+import { getNotificationBodySchema, getNotificationParamsSchema } from '@/@types/zod/notification'
 
 export async function notificationsRoutes(app: FastifyInstance) {
 	app.get(

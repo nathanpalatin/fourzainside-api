@@ -1,8 +1,10 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import request from 'supertest'
 import jwt from 'jsonwebtoken'
 
-import { app } from '../app'
+import { createAndAuthenticateUser } from '@/utils/tests/create-and-authenticate'
+
+import { app } from '@/app'
 
 describe('Products routes (e2e)', () => {
 	beforeAll(async () => {
@@ -13,25 +15,39 @@ describe('Products routes (e2e)', () => {
 		await app.close()
 	})
 
-	/* it('should be able to create a new product', async () => {
-		const response = await request(app.server).post('/users').send({
-			name: 'Nathan Palatin',
-			email: 'email@nathan.com',
-			username: 'nathanpalatin',
-			password: '123456',
-			phone: '47999999999'
+	it('should be able to create a new product', async () => {
+		const { token } = await createAndAuthenticateUser(app)
+
+		const parsedToken = jwt.decode(token)
+
+		const response = await request(app.server).post('/products').set('Authorization', `${token}`).send({
+			title: 'Produto teste 1',
+			slug: 'produto-test-1',
+			description: 'Esse foi um produto teste',
+			price: 199,
+			image: '',
+			featured: true,
+			userId: parsedToken?.sub
 		})
+
 		expect(response.statusCode).toEqual(201)
-	}) */
+	})
 
 	it('should be able to list all products', async () => {
-		const user = await request(app.server).post('/users/login').send({
-			credential: 'nathanpalatin',
-			password: '123456'
-		})
-
-		const token = user.body.token
+		const { token } = await createAndAuthenticateUser(app)
 		const response = await request(app.server).get('/products').set('Authorization', `${token}`)
 		expect(response.statusCode).toEqual(200)
+	})
+
+	it('should be able to delete one product', async () => {
+		const { token } = await createAndAuthenticateUser(app)
+		const product = await request(app.server).delete(`/products`).set('Authorization', `${token}`)
+		expect(product.statusCode).toEqual(204)
+	})
+
+	it('should be able to delete all products', async () => {
+		const { token } = await createAndAuthenticateUser(app)
+		const response = await request(app.server).delete(`/products`).set('Authorization', `${token}`)
+		expect(response.statusCode).toEqual(204)
 	})
 })

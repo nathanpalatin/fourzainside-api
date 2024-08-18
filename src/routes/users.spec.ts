@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import jwt from 'jsonwebtoken'
 
-import { app } from '../app'
+import { app } from '@/app'
 
 describe('Users routes (e2e)', () => {
 	beforeAll(async () => {
@@ -40,7 +40,7 @@ describe('Users routes (e2e)', () => {
 
 		const token = user.body.token
 
-		const response = await request(app.server).get('/users').set('Authorization', `${token}`)
+		const response = await request(app.server).get('/users/').set('Authorization', `${token}`)
 		expect(response.statusCode).toEqual(200)
 	})
 

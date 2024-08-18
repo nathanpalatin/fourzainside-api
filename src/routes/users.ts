@@ -1,4 +1,4 @@
-import { env } from '../env'
+import { env } from '@/env'
 import jwt from 'jsonwebtoken'
 
 import fs from 'node:fs'
@@ -8,11 +8,11 @@ import { pipeline } from 'node:stream'
 import { FastifyInstance } from 'fastify'
 import { put } from '@vercel/blob'
 
-import { prisma } from '../lib/prisma'
+import { prisma } from '@/lib/prisma'
 
 import { hash, compare } from 'bcrypt'
 
-import { checkSessionIdExists } from '../middlewares/auth-token'
+import { checkSessionIdExists } from '@/middlewares/auth-token'
 import {
 	createLoginSchemaBody,
 	createUserSchemaBody,
