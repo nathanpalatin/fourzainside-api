@@ -1,8 +1,8 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import jwt from 'jsonwebtoken'
 
-import { createAndAuthenticateUser } from '@/utils/tests/create-and-authenticate'
+import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
 
 import { app } from '../app'
 

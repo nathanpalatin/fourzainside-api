@@ -1,16 +1,16 @@
-import { env } from '@/env'
+import { env } from './env'
 
 import fastify from 'fastify'
 import cookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import multipart from '@fastify/multipart'
 
-import { postsRoutes } from '@/routes/posts'
-import { usersRoutes } from '@/routes/users'
-import { chatsRoutes } from '@/routes/chats'
-import { productsRoutes } from '@/routes/products'
-import { transactionsRoutes } from '@/routes/transactions'
-import { notificationsRoutes } from '@/routes/notifications'
+import { postsRoutes } from './routes/posts'
+import { usersRoutes } from './routes/users'
+import { chatsRoutes } from './routes/chats'
+import { productsRoutes } from './routes/products'
+import { transactionsRoutes } from './routes/transactions'
+import { notificationsRoutes } from './routes/notifications'
 
 export const app = fastify()
 

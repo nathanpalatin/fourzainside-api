@@ -7,9 +7,9 @@ import { pipeline } from 'node:stream'
 
 import { randomUUID } from 'node:crypto'
 
-import { checkSessionIdExists } from '@/middlewares/auth-token'
-import { getTokenHeaderSchema } from '@/@types/zod/user'
-import { getPostBodySchema, getPostParamsSchema, uploadMediaSchema } from '@/@types/zod/post'
+import { checkSessionIdExists } from '../middlewares/auth-token'
+import { getTokenHeaderSchema } from '../@types/zod/user'
+import { getPostBodySchema, getPostParamsSchema, uploadMediaSchema } from '../@types/zod/post'
 
 export async function postsRoutes(app: FastifyInstance) {
 	app.get(

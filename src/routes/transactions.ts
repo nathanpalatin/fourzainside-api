@@ -1,9 +1,9 @@
 import { FastifyInstance } from 'fastify'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '../lib/prisma'
 
-import { checkSessionIdExists } from '@/middlewares/auth-token'
-import { getTokenHeaderSchema } from '@/@types/zod/user'
-import { createTransactionBodySchema, getTransactionParamsSchema } from '@/@types/zod/transaction'
+import { checkSessionIdExists } from '../middlewares/auth-token'
+import { getTokenHeaderSchema } from '../@types/zod/user'
+import { createTransactionBodySchema, getTransactionParamsSchema } from '../@types/zod/transaction'
 
 export async function transactionsRoutes(app: FastifyInstance) {
 	app.get(

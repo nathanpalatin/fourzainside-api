@@ -3,7 +3,7 @@ import request from 'supertest'
 import jwt from 'jsonwebtoken'
 
 import { app } from '../app'
-import { createAndAuthenticateUser } from '@/utils/tests/create-and-authenticate'
+import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
 
 describe('Transactions routes (e2e)', () => {
 	beforeAll(async () => {
