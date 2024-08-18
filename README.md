@@ -1,5 +1,3 @@
-
-
 ## RFs (Requisitos funcionais)
 
 - [ ] Dev ser possível se cadastrar
@@ -20,5 +18,5 @@
 
 - [ ] A senha do usuário precisa estar criptografada
 - [ ] Os dados da aplicação precisam estar persistidos em banco PostgreSQL
-- [ ] Todas listas precisam estar paginas com 20 itens por página
+- [ ] Todas listas precisam estar com 20 itens por página
 - [ ] O usuário deve ser identificado por um JWT (Json Web Token)

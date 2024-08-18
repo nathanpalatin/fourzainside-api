@@ -4,7 +4,7 @@
   "description": "API Rest Node.JS with Typescript, Zod, Prisma and PostgreSQL",
   "main": "server.ts",
   "engines": {
-    "node": "20.x"
+    "node": "18.x"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -14,9 +14,9 @@
     "test:create-prisma-environment": "npm link ./prisma/vitest-environment-prisma",
     "test:install-prisma-environment": "npm link vitest-environment-prisma",
     "test:watch": "vitest",
+    "test:ui": "vitest --ui",
     "test:e2e": "vitest --dir src/routes",
     "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui",
     "pretest:e2e": "run-s test:create-prisma-environment test:install-prisma-environment",
     "vercel-build": "npx prisma migrate deploy",
     "build": "tsup src --out-dir build",
