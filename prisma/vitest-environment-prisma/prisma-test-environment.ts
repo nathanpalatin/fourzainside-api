@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { randomUUID } from 'node:crypto'
 import { execSync } from 'node:child_process'
 import { Environment } from 'vitest'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../../node_modules/.prisma/client'
 
 const prisma = new PrismaClient()
 function generateDabaseURL(schema: string) {

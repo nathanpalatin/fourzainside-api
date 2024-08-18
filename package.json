@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "API Rest Node.JS with Typescript, Zod, Prisma and PostgreSQL",
   "main": "server.ts",
-  "type": "module",
   "engines": {
     "node": "18.x"
   },
