@@ -3,5 +3,6 @@ node_modules
 src/tests
 .env.test
 /db
+/build
 /.env
 /prisma/development-schema.prisma
