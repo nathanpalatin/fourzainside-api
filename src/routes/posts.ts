@@ -38,23 +38,15 @@ export async function postsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const postsSchemaBody = z.object({
-				title: z.string(),
-				content: z.string()
-			})
-
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const { title, content } = postsSchemaBody.parse(request.body)
+			const { title, content } = getPostBodySchema.parse(request.body)
 
 			await prisma.posts.create({
 				data: {
-					id: randomUUID(),
 					userId,
 					content,
-					title,
-					createdAt: new Date(),
-					updatedAt: new Date()
+					title
 				}
 			})
 

@@ -56,8 +56,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			await request.jwtVerify()
-
 			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
 			const { name, username, password, phone } = updateUserSchemaBody.parse(request.body)
