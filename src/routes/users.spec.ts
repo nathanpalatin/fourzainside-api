@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
-import { app } from '../app'
 import jwt from 'jsonwebtoken'
+
+import { app } from '../app'
 
 describe('Users routes (e2e)', () => {
 	beforeAll(async () => {
@@ -60,7 +61,7 @@ describe('Users routes (e2e)', () => {
 		expect(response.statusCode).toEqual(204)
 	})
 
-	it('should be able to delete account', async () => {
+	it('should be able to delete user', async () => {
 		const loginResponse = await request(app.server).post('/users/login').send({
 			credential: 'nathanpalatin',
 			password: '123'
