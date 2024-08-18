@@ -1,8 +1,6 @@
 node_modules
 .env
-src/tests
 .env.test
 /db
 /build
-/.env
 /prisma/development-schema.prisma
