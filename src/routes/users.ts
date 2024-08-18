@@ -108,7 +108,10 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		return reply
 			.status(200)
-			.send({ token, user: { email: user.email, id: user.id, name: user.name, avatar: user.avatar } })
+			.send({
+				token,
+				user: { username: user.username, email: user.email, id: user.id, name: user.name, avatar: user.avatar }
+			})
 	})
 
 	app.get(
@@ -158,7 +161,7 @@ export async function usersRoutes(app: FastifyInstance) {
 					data: { avatar: filePath }
 				})
 
-				reply.status(200).send({ url })
+				return reply.status(200).send({ url })
 			} catch (error) {
 				console.error('Error uploading file:', error)
 				reply.status(500).send({ error: 'Failed to upload file' })
@@ -180,7 +183,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				}
 			})
 
-			reply.status(204).send({ message: 'All users has been deleted successfully.' })
+			return reply.status(204).send({ message: 'All users has been deleted successfully.' })
 		}
 	)
 
@@ -207,7 +210,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async (request, _reply) => {
+		async (request, reply) => {
 			const { username } = getUserParamsSchema.parse(request.params)
 
 			const user = await prisma.users.findFirst({
@@ -222,7 +225,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				}
 			})
 
-			return { user }
+			return reply.status(200).send({ user })
 		}
 	)
 
