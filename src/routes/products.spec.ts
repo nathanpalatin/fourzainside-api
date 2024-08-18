@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 
 import { createAndAuthenticateUser } from '@/utils/tests/create-and-authenticate'
 
-import { app } from '@/app'
+import { app } from '../app'
 
 describe('Products routes (e2e)', () => {
 	beforeAll(async () => {
