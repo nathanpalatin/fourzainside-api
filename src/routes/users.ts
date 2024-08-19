@@ -106,12 +106,10 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		reply.header('Authorization', `${token}`)
 
-		return reply
-			.status(200)
-			.send({
-				token,
-				user: { username: user.username, email: user.email, id: user.id, name: user.name, avatar: user.avatar }
-			})
+		return reply.status(200).send({
+			token,
+			user: { username: user.username, email: user.email, id: user.id, name: user.name, avatar: user.avatar }
+		})
 	})
 
 	app.get(
@@ -134,8 +132,8 @@ export async function usersRoutes(app: FastifyInstance) {
 			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 			const part = await request.file()
 
-			if (!part) {
-				return reply.status(400).send({ error: 'No file uploaded' })
+			if (!part || part.mimetype !== 'image/png') {
+				return reply.status(400).send({ error: 'No file found' })
 			}
 
 			const timestamp = new Date().getTime()
@@ -150,22 +148,17 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			await util.promisify(pipeline)(part.file, fs.createWriteStream(filePath))
 
-			try {
-				const { url } = await put(filePath, 'blob', {
-					access: 'public',
-					token: env.BLOB_READ_WRITE_TOKEN
-				})
+			const { url } = await put(filePath, 'blob', {
+				access: 'public',
+				token: env.BLOB_READ_WRITE_TOKEN
+			})
 
-				await prisma.users.update({
-					where: { id },
-					data: { avatar: filePath }
-				})
+			await prisma.users.update({
+				where: { id },
+				data: { avatar: filePath }
+			})
 
-				return reply.status(200).send({ url })
-			} catch (error) {
-				console.error('Error uploading file:', error)
-				reply.status(500).send({ error: 'Failed to upload file' })
-			}
+			return reply.status(200).send({ url })
 		}
 	)
 

@@ -11,6 +11,7 @@ import { chatsRoutes } from './routes/chats'
 import { productsRoutes } from './routes/products'
 import { transactionsRoutes } from './routes/transactions'
 import { notificationsRoutes } from './routes/notifications'
+import { ZodError } from 'zod'
 
 export const app = fastify()
 
@@ -44,4 +45,10 @@ app.register(productsRoutes, {
 
 app.register(transactionsRoutes, {
 	prefix: 'transactions'
+})
+
+app.setErrorHandler((error, _, reply) => {
+	if (error instanceof ZodError) {
+		return reply.status(400).send({ error: 'Validation error', issues: error.format() })
+	}
 })

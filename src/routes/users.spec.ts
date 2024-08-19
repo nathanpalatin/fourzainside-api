@@ -15,10 +15,6 @@ describe('Users routes (e2e)', () => {
 		await app.close()
 	})
 
-	beforeEach(async () => {
-		await createAndAuthenticateUser(app)
-	})
-
 	it('should be able to create a new user', async () => {
 		const response = await request(app.server).post('/users').send({
 			name: 'Nathan Palatin',
@@ -81,16 +77,21 @@ describe('Users routes (e2e)', () => {
 		const response = await request(app.server)
 			.patch('/users/avatar')
 			.set('Authorization', `${token}`)
+			.set('Content-Type', 'multipart/form-data')
 			.attach('file', stream.path)
 
 		expect(response.statusCode).toEqual(200)
 	})
 
-	it.skip('should not be able to change avatar without file', async () => {
+	it('should not be able to change avatar without file', async () => {
 		const { token } = await createAndAuthenticateUser(app)
-		const filePath = path.resolve(__dirname, '../../uploads', 'favicon.png')
+		const filePath = path.resolve(__dirname, '../../uploads', 'favicon.jpg')
+		const stream = createReadStream(filePath)
+		const response = await request(app.server)
+			.patch('/users/avatar')
+			.set('Authorization', `${token}`)
+			.attach('file', stream.path)
 
-		const response = await request(app.server).patch('/users/avatar').set('Authorization', `${token}`)
 		expect(response.statusCode).toEqual(400)
 	})
 
@@ -110,6 +111,13 @@ describe('Users routes (e2e)', () => {
 			credential: 'johndoe'
 		})
 		expect(response.statusCode).toEqual(200)
+	})
+
+	it('should be able to delete a user', async () => {
+		const { token, userId } = await createAndAuthenticateUser(app)
+		const response = await request(app.server).delete(`/users/${userId}`).set('Authorization', `${token}`)
+
+		expect(response.statusCode).toEqual(204)
 	})
 
 	it('should be able to delete account', async () => {

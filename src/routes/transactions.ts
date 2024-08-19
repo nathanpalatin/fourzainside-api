@@ -28,11 +28,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			const transaction = await prisma.transactions.findFirst({
-				where: { id, userId }
+				where: { id }
 			})
 
 			return reply.status(200).send({ transaction })
@@ -67,16 +66,13 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { userId } = getTokenHeaderSchema.parse(request.headers)
-
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
 
 			await prisma.transactions.update({
 				where: {
-					id,
-					userId
+					id
 				},
 				data: {
 					title,
@@ -112,11 +108,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { id } = getTransactionParamsSchema.parse(request.params)
 
 			await prisma.transactions.delete({
-				where: { userId, id }
+				where: { id }
 			})
 
 			return reply.status(204).send('Transaction deleted successfully')
