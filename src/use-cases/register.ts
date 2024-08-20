@@ -3,15 +3,13 @@ import { prisma } from '../lib/prisma'
 
 interface RegisterUseCaseRequest {
 	name: string
-	username: string
 	email: string
-	phone: string
 	password: string
+	username: string
+	phone: string
 }
 
 export async function registerUseCase({ name, username, email, phone, password }: RegisterUseCaseRequest) {
-	const password_hash = await hash(password, 6)
-
 	const userWithSameEmail = await prisma.users.findUnique({
 		where: {
 			email
@@ -21,6 +19,8 @@ export async function registerUseCase({ name, username, email, phone, password }
 	if (userWithSameEmail) {
 		throw new Error('Email already exists')
 	}
+
+	const password_hash = await hash(password, 6)
 
 	await prisma.users.create({
 		data: {

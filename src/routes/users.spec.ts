@@ -34,12 +34,29 @@ describe('Users routes (e2e)', () => {
 		expect(response.statusCode).toEqual(200)
 	})
 
+	it('should be able to refresh a token', async () => {
+		const user = await request(app.server).post('/users/login').send({
+			credential: 'nathanpalatin',
+			password: '123456'
+		})
+
+		const cookies = user.get('Set-Cookie')
+
+		const response = await request(app.server).patch('/users/token/refresh').set('Cookie', cookies)
+
+		expect(response.statusCode).toEqual(200)
+		expect(response.body).toEqual({
+			token: expect.any(String)
+		})
+		expect(response.get('Set-Cookie')).toEqual([expect.stringContaining('refreshToken=')])
+	})
+
 	it('should not be able to log in with empty credentials', async () => {
 		const response = await request(app.server).post('/users/login').send({
 			credential: '',
 			password: ''
 		})
-		expect(response.statusCode).toEqual(500)
+		expect(response.statusCode).toEqual(400)
 	})
 
 	it('try to log in without user registred.', async () => {

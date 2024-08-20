@@ -35,7 +35,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				password
 			})
 		} catch (error) {
-			return reply.status(409).send()
+			return reply.status(409).send({ error })
 		}
 
 		return reply.status(201).send({ message: 'User created successfully.' })
@@ -93,14 +93,56 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '7d' })
+		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY)
+		const refreshToken = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '7d' })
 
 		reply.header('Authorization', `${token}`)
 
-		return reply.status(200).send({
-			token,
-			user: { username: user.username, email: user.email, id: user.id, name: user.name, avatar: user.avatar }
-		})
+		return reply
+			.setCookie('refreshToken', refreshToken, {
+				path: '/',
+				secure: true,
+				httpOnly: true,
+				sameSite: true
+			})
+			.status(200)
+			.send({
+				token,
+				user: { username: user.username, email: user.email, id: user.id, name: user.name, avatar: user.avatar }
+			})
+	})
+
+	app.patch('/token/refresh', async (request, reply) => {
+		await request.jwtVerify({ onlyCookie: true })
+
+		const token = await reply.jwtSign(
+			{},
+			{
+				sign: {
+					sub: request.user.sub
+				}
+			}
+		)
+
+		const refreshToken = await reply.jwtSign(
+			{},
+			{
+				sign: {
+					sub: request.user.sub,
+					expiresIn: '7d'
+				}
+			}
+		)
+
+		return reply
+			.setCookie('refreshToken', refreshToken, {
+				path: '/',
+				secure: true,
+				httpOnly: true,
+				sameSite: true
+			})
+			.status(200)
+			.send({ token })
 	})
 
 	app.get(
