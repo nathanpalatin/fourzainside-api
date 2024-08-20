@@ -21,31 +21,22 @@ import {
 	getUserParamsSchema,
 	updateUserSchemaBody
 } from '../@types/zod/user'
+import { registerUseCase } from '../use-cases/register'
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
 		const { name, username, email, password, phone } = createUserSchemaBody.parse(request.body)
-
-		const userExists = await prisma.users.findFirst({
-			where: {
-				OR: [{ email }, { username }]
-			}
-		})
-
-		if (userExists) {
-			return reply.status(400).send({ error: 'User already exists!' })
-		}
-		const hashedPassword = await hash(password, 6)
-
-		await prisma.users.create({
-			data: {
+		try {
+			await registerUseCase({
 				name,
 				username,
-				password: hashedPassword,
 				email,
-				phone
-			}
-		})
+				phone,
+				password
+			})
+		} catch (error) {
+			return reply.status(409).send()
+		}
 
 		return reply.status(201).send({ message: 'User created successfully.' })
 	})
