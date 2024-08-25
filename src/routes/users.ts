@@ -93,10 +93,8 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY)
+		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '30m' })
 		const refreshToken = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '7d' })
-
-		reply.header('Authorization', `${token}`)
 
 		return reply
 			.setCookie('refreshToken', refreshToken, {
@@ -108,6 +106,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			.status(200)
 			.send({
 				token,
+				refreshToken,
 				user: { username: user.username, email: user.email, id: user.id, name: user.name, avatar: user.avatar }
 			})
 	})
@@ -142,7 +141,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				sameSite: true
 			})
 			.status(200)
-			.send({ token })
+			.send({ token, refreshToken })
 	})
 
 	app.get(

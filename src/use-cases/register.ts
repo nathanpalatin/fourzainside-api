@@ -1,13 +1,6 @@
 import { hash } from 'bcrypt'
 import { prisma } from '../lib/prisma'
-
-interface RegisterUseCaseRequest {
-	name: string
-	email: string
-	password: string
-	username: string
-	phone: string
-}
+import { RegisterUseCaseRequest } from '../@types/use-cases/users'
 
 export async function registerUseCase({ name, username, email, phone, password }: RegisterUseCaseRequest) {
 	const userWithSameEmail = await prisma.users.findUnique({

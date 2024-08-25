@@ -9,8 +9,6 @@
 
 - [x] O usuário não deve poder se cadastrar com e-mail duplicado
 - [x] O usuário não pode se cadastrar com telefone duplicado
-- [ ] O usuário pode alterar seu conta para privado ou público
-- [ ] O usuário poderá bloquear outros usuários em toda a aplicação
 - [x] O perfil do usuário deve ser visível apenas para os usuários com permissão
 
 ## RNFs (Regras não-funcionais)
