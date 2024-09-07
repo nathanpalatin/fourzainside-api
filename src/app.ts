@@ -11,6 +11,7 @@ import { chatsRoutes } from './routes/chats'
 import { productsRoutes } from './routes/products'
 import { transactionsRoutes } from './routes/transactions'
 import { notificationsRoutes } from './routes/notifications'
+
 import { ZodError } from 'zod'
 
 export const app = fastify()
@@ -22,7 +23,7 @@ app.register(fastifyJwt, {
 		signed: false
 	},
 	sign: {
-		expiresIn: '10m'
+		expiresIn: '30m'
 	}
 })
 

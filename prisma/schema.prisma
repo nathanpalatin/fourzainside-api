@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  SELLER
+  USER
+}
+
 model Users {
   id            String          @id @default(uuid())
   name          String
@@ -18,6 +24,7 @@ model Users {
   avatar        String?
   phone         String
   username      String          @unique
+  role          Role            @default(USER)
   emailVerified Boolean         @default(false)
   Chats         Chats[]
   Followers     Followers[]

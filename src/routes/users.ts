@@ -1,5 +1,4 @@
 import { env } from '../env'
-import jwt from 'jsonwebtoken'
 
 import fs from 'node:fs'
 import util from 'node:util'
@@ -74,7 +73,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		const { credential, password } = createLoginSchemaBody.parse(request.body)
 
 		if (!credential || !password) {
-			return reply.status(500).send('Invalid credentials or password')
+			return reply.status(400).send('Invalid credentials or password')
 		}
 
 		const user = await prisma.users.findFirst({
@@ -93,8 +92,9 @@ export async function usersRoutes(app: FastifyInstance) {
 			return reply.status(403).send('Invalid credentials or password')
 		}
 
-		const token = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '30m' })
-		const refreshToken = jwt.sign({ userId: user.id }, env.JWT_SECRET_KEY, { expiresIn: '7d' })
+		const token = await reply.jwtSign({ userId: user.id, role: user.role }, { expiresIn: '1h' })
+
+		const refreshToken = await reply.jwtSign({ userId: user.id, role: user.role }, { expiresIn: '7d' })
 
 		return reply
 			.setCookie('refreshToken', refreshToken, {
@@ -107,41 +107,49 @@ export async function usersRoutes(app: FastifyInstance) {
 			.send({
 				token,
 				refreshToken,
-				user: { username: user.username, email: user.email, id: user.id, name: user.name, avatar: user.avatar }
+				user: {
+					username: user.username,
+					role: user.role,
+					email: user.email,
+					id: user.id,
+					name: user.name,
+					avatar: user.avatar
+				}
 			})
 	})
 
 	app.patch('/token/refresh', async (request, reply) => {
-		await request.jwtVerify({ onlyCookie: true })
+		const refreshToken = request.cookies.refreshToken
 
-		const token = await reply.jwtSign(
-			{},
-			{
-				sign: {
-					sub: request.user.sub
-				}
-			}
-		)
+		if (!refreshToken) {
+			return reply.status(401).send({ error: 'Refresh token is missing' })
+		}
+		try {
+			const decoded = (await app.jwt.verify(refreshToken)) as { userId: string; role: string }
 
-		const refreshToken = await reply.jwtSign(
-			{},
-			{
-				sign: {
-					sub: request.user.sub,
-					expiresIn: '7d'
-				}
-			}
-		)
+			const token = await reply.jwtSign({ userId: decoded.userId, role: decoded.role }, { expiresIn: '1h' })
 
-		return reply
-			.setCookie('refreshToken', refreshToken, {
-				path: '/',
-				secure: true,
-				httpOnly: true,
-				sameSite: true
-			})
-			.status(200)
-			.send({ token, refreshToken })
+			return reply.status(200).send({ token, refreshToken })
+		} catch (error) {
+			const decoded = (await app.jwt.verify(refreshToken)) as { userId: string; role: string }
+
+			const newRefreshToken = await reply.jwtSign(
+				{ userId: decoded.userId, role: decoded.role },
+				{ expiresIn: '7d' }
+			)
+
+			const token = await reply.jwtSign({ userId: decoded.userId, role: decoded.role }, { expiresIn: '1h' })
+
+			return reply
+				.setCookie('refreshToken', newRefreshToken, {
+					path: '/',
+					secure: true,
+					httpOnly: true,
+					sameSite: true
+				})
+				.status(200)
+				.send({ token, refreshToken: newRefreshToken })
+		}
 	})
 
 	app.get(
