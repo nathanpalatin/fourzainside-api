@@ -2,6 +2,9 @@ import { defineConfig } from 'tsup'
 
 export default defineConfig({
 	entry: ['src'],
+	format: ['cjs', 'esm'],
+	onSuccess: 'node copy-package.mjs',
+	outDir: 'build',
 	splitting: false,
 	sourcemap: true,
 	clean: true,
