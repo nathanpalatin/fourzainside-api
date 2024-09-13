@@ -46,9 +46,9 @@ describe('Users routes (e2e)', () => {
 
 		expect(response.statusCode).toEqual(200)
 		expect(response.body).toEqual({
-			token: expect.any(String)
+			token: expect.any(String),
+			refreshToken: expect.any(String)
 		})
-		expect(response.get('Set-Cookie')).toEqual([expect.stringContaining('refreshToken=')])
 	})
 
 	it('should not be able to log in with empty credentials', async () => {

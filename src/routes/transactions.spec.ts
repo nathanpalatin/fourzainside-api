@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 
@@ -36,7 +36,6 @@ describe('Transactions routes (e2e)', () => {
 
 	it('should be able to get one transaction', async () => {
 		const { token } = await createAndAuthenticateUser(app)
-
 		const response = await request(app.server)
 			.get(`/transactions/329f9cda-30ef-4d82-908e-72ee6b649ed9`)
 			.set('Authorization', `${token}`)
@@ -52,7 +51,7 @@ describe('Transactions routes (e2e)', () => {
 			.send({
 				title: 'Test Transaction 2',
 				amount: 1000,
-				type: 'debit'
+				type: 'credit'
 			})
 
 		expect(response.statusCode).toEqual(204)
