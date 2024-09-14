@@ -79,13 +79,15 @@ model Posts {
 }
 
 model Medias {
-  id     String  @id @default(uuid())
-  type   String  @default("FILE")
-  source String
-  userId String
-  postId String?
-  Posts  Posts?  @relation(fields: [postId], references: [id])
-  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(uuid())
+  type      String   @default("FILE")
+  source    String
+  userId    String
+  postId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Posts     Posts?   @relation(fields: [postId], references: [id])
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("medias")
 }

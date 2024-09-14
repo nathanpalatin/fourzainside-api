@@ -22,6 +22,7 @@ import { chatsRoutes } from './routes/chats'
 import { productsRoutes } from './routes/products'
 import { transactionsRoutes } from './routes/transactions'
 import { notificationsRoutes } from './routes/notifications'
+import { uploadRoutes } from './routes/upload-files'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -80,6 +81,10 @@ app.register(productsRoutes, {
 
 app.register(transactionsRoutes, {
 	prefix: 'transactions'
+})
+
+app.register(uploadRoutes, {
+	prefix: 'uploads'
 })
 
 app.setErrorHandler((error, _, reply) => {

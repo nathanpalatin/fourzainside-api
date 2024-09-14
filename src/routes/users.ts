@@ -22,6 +22,11 @@ import {
 } from '../@types/zod/user'
 import { registerUseCase } from '../use-cases/register'
 
+interface QueryParams {
+	limit?: string // Limite como string porque a query string sempre é passada como texto
+	page?: string // Página também como string
+}
+
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
 		const { name, username, email, password, phone } = createUserSchemaBody.parse(request.body)
@@ -152,13 +157,30 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	})
 
-	app.get(
+	app.get<{ Querystring: QueryParams }>(
 		'/',
 		{
 			preHandler: [checkSessionIdExists]
 		},
-		async (_request, reply) => {
-			const users = await prisma.users.findMany({ select: { id: true, email: true, name: true, avatar: true } })
+		async (request, reply) => {
+			const limit = parseInt(request.query.limit || '10', 10)
+			const page = parseInt(request.query.page || '1', 10)
+			const offset = (page - 1) * limit
+
+			const users = await prisma.users.findMany({
+				select: {
+					id: true,
+					username: true,
+					name: true,
+					avatar: true
+				},
+				orderBy: {
+					createdAt: 'desc'
+				},
+				take: limit,
+				skip: offset
+			})
+
 			return reply.status(200).send({ users })
 		}
 	)

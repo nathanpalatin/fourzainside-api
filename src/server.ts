@@ -7,5 +7,5 @@ app
 		host: '0.0.0.0'
 	})
 	.then(() => {
-		console.log('Server its working!', env.PORT)
+		console.log('Server its online! 🚀')
 	})
