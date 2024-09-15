@@ -4,6 +4,9 @@ import fs from 'node:fs'
 import util from 'node:util'
 import { pipeline } from 'node:stream'
 
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { z } from 'zod'
+
 import { FastifyInstance } from 'fastify'
 import { put } from '@vercel/blob'
 
@@ -298,4 +301,51 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		reply.status(200).send({ user })
 	})
+
+	app.withTypeProvider<ZodTypeProvider>().get(
+		'/profile',
+		{
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Auth'],
+				summary: 'Get authenticated user profile',
+				security: [{ bearerAuth: [] }],
+				response: {
+					200: z.object({
+						user: z.object({
+							id: z.string().uuid(),
+							name: z.string(),
+							username: z.string(),
+							avatar: z.string().url().nullable()
+						})
+					})
+				}
+			}
+		},
+		async (request, reply) => {
+			try {
+				const { userId } = request.headers
+
+				const user = await prisma.users.findUnique({
+					select: {
+						id: true,
+						name: true,
+						username: true,
+						avatar: true
+					},
+					where: {
+						id: String(userId)
+					}
+				})
+
+				if (!user) {
+					return reply.status(404).send({ error: 'User not found.' })
+				}
+
+				return reply.status(200).send({ user })
+			} catch (error) {
+				return reply.status(500).send({ error: 'An error occurred while fetching the profile.' })
+			}
+		}
+	)
 }
