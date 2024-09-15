@@ -83,10 +83,6 @@ app.register(transactionsRoutes, {
 	prefix: 'transactions'
 })
 
-app.register(uploadRoutes, {
-	prefix: 'uploads'
-})
-
 app.setErrorHandler((error, _, reply) => {
 	if (error instanceof ZodError) {
 		return reply.status(400).send({ error: 'Validation error', issues: error.format() })
