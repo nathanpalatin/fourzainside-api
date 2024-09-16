@@ -309,11 +309,11 @@ export async function usersRoutes(app: FastifyInstance) {
 			schema: {
 				tags: ['Auth'],
 				summary: 'Get authenticated user profile',
-				security: [{ bearerAuth: [] }],
 				response: {
 					200: z.object({
 						user: z.object({
 							id: z.string().uuid(),
+							role: z.enum(['ADMIN', 'USER', 'SELLER']),
 							name: z.string(),
 							username: z.string(),
 							avatar: z.string().url().nullable()
@@ -327,14 +327,15 @@ export async function usersRoutes(app: FastifyInstance) {
 				const { userId } = request.headers
 
 				const user = await prisma.users.findUnique({
+					where: {
+						id: String(userId)
+					},
 					select: {
 						id: true,
 						name: true,
+						role: true,
 						username: true,
 						avatar: true
-					},
-					where: {
-						id: String(userId)
 					}
 				})
 
