@@ -81,7 +81,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		const { credential, password } = createLoginSchemaBody.parse(request.body)
 
 		if (!credential || !password) {
-			return reply.status(400).send('Invalid credentials or password')
+			return reply.status(400).send({ message: 'Invalid credentials or password' })
 		}
 
 		const user = await prisma.users.findFirst({
@@ -91,13 +91,13 @@ export async function usersRoutes(app: FastifyInstance) {
 		})
 
 		if (!user) {
-			return reply.status(404).send('User not found')
+			return reply.status(404).send({ message: 'User not found' })
 		}
 
 		const isValidPassword = await compare(password, user.password)
 
 		if (!isValidPassword) {
-			return reply.status(403).send('Invalid credentials or password')
+			return reply.status(403).send({ message: 'Invalid password' })
 		}
 
 		const token = await reply.jwtSign({ userId: user.id, role: user.role }, { expiresIn: '1h' })
@@ -130,7 +130,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		const refreshToken = request.cookies.refreshToken
 
 		if (!refreshToken) {
-			return reply.status(401).send({ error: 'Refresh token is missing' })
+			return reply.status(401).send({ message: 'Refresh token is missing' })
 		}
 		try {
 			const decoded = (await app.jwt.verify(refreshToken)) as { userId: string; role: string }
@@ -340,12 +340,12 @@ export async function usersRoutes(app: FastifyInstance) {
 				})
 
 				if (!user) {
-					return reply.status(404).send({ error: 'User not found.' })
+					return reply.status(404).send({ message: 'User not found.' })
 				}
 
 				return reply.status(200).send({ user })
 			} catch (error) {
-				return reply.status(500).send({ error: 'An error occurred while fetching the profile.' })
+				return reply.status(500).send({ message: 'An error occurred while fetching the profile.' })
 			}
 		}
 	)
