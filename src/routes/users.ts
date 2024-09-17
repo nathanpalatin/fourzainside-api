@@ -18,6 +18,7 @@ import { checkSessionIdExists } from '../middlewares/auth-token'
 import {
 	createLoginSchemaBody,
 	createUserSchemaBody,
+	getRefreshTokenSchema,
 	getTokenHeaderSchema,
 	getUserCredentialSchema,
 	getUserParamsSchema,
@@ -127,7 +128,7 @@ export async function usersRoutes(app: FastifyInstance) {
 	})
 
 	app.patch('/token/refresh', async (request, reply) => {
-		const refreshToken = request.cookies.refreshToken
+		const { refreshToken } = getRefreshTokenSchema.parse(request.body)
 
 		if (!refreshToken) {
 			return reply.status(401).send({ message: 'Refresh token is missing' })
