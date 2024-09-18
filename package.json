@@ -1,5 +1,5 @@
 {
-  "name": "apirest",
+  "name": "montvenue-api",
   "version": "1.0.0",
   "description": "API Rest Node.JS with Typescript, Zod, Prisma and PostgreSQL",
   "main": "src/server.ts",

@@ -26,6 +26,16 @@ import { uploadRoutes } from './routes/upload-files'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
+app.route({
+	method: 'GET',
+	url: '/',
+	handler: async () => {
+		return {
+			montvenue: 'Route API Protected by God'
+		}
+	}
+})
+
 app.register(fastifyJwt, {
 	secret: env.JWT_SECRET_KEY,
 	cookie: {
