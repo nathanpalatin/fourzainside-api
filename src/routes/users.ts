@@ -27,17 +27,16 @@ import {
 import { registerUseCase } from '../use-cases/register'
 
 interface QueryParams {
-	limit?: string // Limite como string porque a query string sempre é passada como texto
-	page?: string // Página também como string
+	limit?: string
+	page?: string
 }
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
-		const { name, username, email, password, phone } = createUserSchemaBody.parse(request.body)
+		const { name, email, password, phone } = createUserSchemaBody.parse(request.body)
 		try {
 			await registerUseCase({
 				name,
-				username,
 				email,
 				phone,
 				password

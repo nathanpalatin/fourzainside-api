@@ -34,6 +34,7 @@ model Users {
   Posts         Posts[]
   Products      Products[]
   Transactions  Transactions[]
+  Wallets       Wallets[]
 
   @@map("users")
 }
@@ -72,7 +73,7 @@ model Posts {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
-  Medias    Medias[]
+  medias    Medias[]
   user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("posts")
@@ -86,7 +87,7 @@ model Medias {
   postId    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Posts     Posts?   @relation(fields: [postId], references: [id])
+  Posts     Posts?   @relation(fields: [postId], references: [id], onDelete: Cascade)
   user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("medias")
@@ -140,4 +141,15 @@ model Notifications {
   Users            Users    @relation(fields: [receiveUserId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+model Wallets {
+  id       String @id @default(uuid())
+  balance  Int
+  coinType String
+  country  String @default("pt-br")
+  userId   String
+  Users    Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("wallets")
 }

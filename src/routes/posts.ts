@@ -14,9 +14,7 @@ import { getPostBodySchema, getPostParamsSchema, uploadMediaSchema } from '../@t
 export async function postsRoutes(app: FastifyInstance) {
 	app.get(
 		'/',
-		{
-			preHandler: [checkSessionIdExists]
-		},
+
 		async (_request, reply) => {
 			const posts = await prisma.posts.findMany({
 				select: {
@@ -24,7 +22,20 @@ export async function postsRoutes(app: FastifyInstance) {
 					title: true,
 					content: true,
 					userId: true,
-					createdAt: true
+					createdAt: true,
+					medias: {
+						select: {
+							source: true,
+							type: true
+						}
+					},
+					user: {
+						select: {
+							name: true,
+							username: true,
+							avatar: true
+						}
+					}
 				}
 			})
 			return reply.status(200).send({ posts })
