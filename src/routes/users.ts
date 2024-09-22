@@ -56,9 +56,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
-			const { name, username, password, phone } = updateUserSchemaBody.parse(request.body)
-
-			const hashedPassword = await hash(password, 6)
+			const { name, username, phone } = updateUserSchemaBody.parse(request.body)
 
 			await prisma.users.update({
 				where: {
@@ -68,7 +66,6 @@ export async function usersRoutes(app: FastifyInstance) {
 					name,
 					username,
 					updatedAt: new Date(),
-					password: hashedPassword,
 					phone
 				}
 			})
