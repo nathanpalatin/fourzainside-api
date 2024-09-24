@@ -24,7 +24,15 @@ export async function notificationsRoutes(app: FastifyInstance) {
 					sendUserId: true,
 					notificationType: true,
 					createdAt: true,
-					status: true
+					status: true,
+					senderUserId: {
+						select: {
+							id: true,
+							username: true,
+							name: true,
+							avatar: true
+						}
+					}
 				}
 			})
 

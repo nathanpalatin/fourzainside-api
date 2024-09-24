@@ -15,26 +15,27 @@ enum Role {
 }
 
 model Users {
-  id            String          @id @default(uuid())
-  name          String
-  email         String          @unique
-  password      String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  avatar        String?
-  phone         String
-  username      String          @unique
-  role          Role            @default(USER)
-  emailVerified Boolean         @default(false)
-  Chats         Chats[]
-  Followers     Followers[]
-  Medias        Medias[]
-  Messages      Messages[]
-  Notifications Notifications[]
-  Posts         Posts[]
-  Products      Products[]
-  Transactions  Transactions[]
-  Wallets       Wallets[]
+  id                 String          @id @default(uuid())
+  name               String
+  email              String          @unique
+  password           String
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  avatar             String?
+  phone              String
+  username           String          @unique
+  role               Role            @default(USER)
+  emailVerified      Boolean         @default(false)
+  Chats              Chats[]
+  Followers          Followers[]
+  Medias             Medias[]
+  Messages           Messages[]
+  NotificationSender Notifications[] @relation("senderUserId")
+  Posts              Posts[]
+  Products           Products[]
+  Transactions       Transactions[]
+  Wallets            Wallets[]
+  Notifications      Notifications[]
 
   @@map("users")
 }
@@ -138,7 +139,9 @@ model Notifications {
   status           String   @default("unread")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
-  Users            Users    @relation(fields: [receiveUserId], references: [id], onDelete: Cascade)
+
+  Users        Users  @relation(fields: [receiveUserId], references: [id], onDelete: Cascade)
+  senderUserId Users? @relation("senderUserId", fields: [sendUserId], references: [id])
 
   @@map("notifications")
 }

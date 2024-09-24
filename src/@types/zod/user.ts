@@ -27,7 +27,8 @@ export const getUserCredentialSchema = z.object({
 export const updateUserSchemaBody = z.object({
 	name: z.string().optional(),
 	username: z.string().optional(),
-	phone: z.string().optional()
+	phone: z.string().optional(),
+	avatar: z.string().optional()
 })
 
 export const createLoginSchemaBody = z.object({

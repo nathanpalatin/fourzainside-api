@@ -56,7 +56,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
-			const { name, username, phone } = updateUserSchemaBody.parse(request.body)
+			const { name, username, phone, avatar } = updateUserSchemaBody.parse(request.body)
 
 			await prisma.users.update({
 				where: {
@@ -66,7 +66,8 @@ export async function usersRoutes(app: FastifyInstance) {
 					name,
 					username,
 					updatedAt: new Date(),
-					phone
+					phone,
+					avatar
 				}
 			})
 
@@ -83,7 +84,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const user = await prisma.users.findFirst({
 			where: {
-				OR: [{ email: credential }, { username: credential }]
+				OR: [{ email: credential }, { username: { equals: credential, mode: 'insensitive' } }]
 			}
 		})
 
