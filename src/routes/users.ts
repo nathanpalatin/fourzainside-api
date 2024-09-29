@@ -84,7 +84,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const user = await prisma.users.findFirst({
 			where: {
-				OR: [{ email: credential }, { username: { equals: credential, mode: 'insensitive' } }]
+				OR: [{ email: credential }, { username: credential }, { cpf: credential }]
 			}
 		})
 
