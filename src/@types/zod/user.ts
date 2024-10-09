@@ -10,7 +10,8 @@ export const getRefreshTokenSchema = z.object({
 
 export const createUserSchemaBody = z.object({
 	name: z.string(),
-	username: z.string(),
+	cpf: z.string(),
+	birthdate: z.string(),
 	password: z.string().min(6),
 	email: z.string().email(),
 	phone: z.string()

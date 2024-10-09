@@ -12,7 +12,7 @@ import { put } from '@vercel/blob'
 
 import { prisma } from '../lib/prisma'
 
-import { hash, compare } from 'bcrypt'
+import { compare } from 'bcrypt'
 
 import { checkSessionIdExists } from '../middlewares/auth-token'
 import {
@@ -32,12 +32,15 @@ interface QueryParams {
 }
 
 export async function usersRoutes(app: FastifyInstance) {
+
 	app.post('/', async (request, reply) => {
-		const { name, email, password, phone } = createUserSchemaBody.parse(request.body)
+		const { name, email, password, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
 		try {
 			await registerUseCase({
 				name,
 				email,
+				birthdate,
+				cpf,
 				phone,
 				password
 			})
@@ -84,9 +87,14 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const user = await prisma.users.findFirst({
 			where: {
-				OR: [{ email: credential }, { username: credential }, { cpf: credential }]
+				OR: [
+					{ email: credential },
+					{ username: credential },
+					{ cpf: credential }
+				]
 			}
 		})
+		
 
 		if (!user) {
 			return reply.status(404).send({ message: 'User not found' })
@@ -316,7 +324,13 @@ export async function usersRoutes(app: FastifyInstance) {
 							username: z.string(),
 							avatar: z.string().url().nullable()
 						})
-					})
+					}),
+					404: z.object({
+						message: z.string()
+					}),
+					500: z.object({
+            message: z.string()
+          })
 				}
 			}
 		},
