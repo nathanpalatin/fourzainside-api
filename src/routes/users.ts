@@ -25,6 +25,7 @@ import {
 	updateUserSchemaBody
 } from '../@types/zod/user'
 import { registerUseCase } from '../use-cases/register'
+import { BadRequestError } from './_errors/bad-request-error'
 
 interface QueryParams {
 	limit?: string
@@ -32,20 +33,20 @@ interface QueryParams {
 }
 
 export async function usersRoutes(app: FastifyInstance) {
-
 	app.post('/', async (request, reply) => {
-		const { name, email, password, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
+		const { name, email, password, username, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
 		try {
 			await registerUseCase({
 				name,
 				email,
+				username,
 				birthdate,
 				cpf,
 				phone,
 				password
 			})
 		} catch (error) {
-			return reply.status(409).send({ error })
+			throw new BadRequestError('Internal server error.')
 		}
 
 		return reply.status(201).send({ message: 'User created successfully.' })
@@ -61,18 +62,22 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			const { name, username, phone, avatar } = updateUserSchemaBody.parse(request.body)
 
-			await prisma.users.update({
-				where: {
-					id
-				},
-				data: {
-					name,
-					username,
-					updatedAt: new Date(),
-					phone,
-					avatar
-				}
-			})
+			try {
+				await prisma.users.update({
+					where: {
+						id
+					},
+					data: {
+						name,
+						username,
+						updatedAt: new Date(),
+						phone,
+						avatar
+					}
+				})
+			} catch (error) {
+				throw new BadRequestError('Internal server error.')
+			}
 
 			return reply.status(204).send('User updated successfully!')
 		}
@@ -87,17 +92,12 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const user = await prisma.users.findFirst({
 			where: {
-				OR: [
-					{ email: credential },
-					{ username: credential },
-					{ cpf: credential }
-				]
+				OR: [{ email: credential }, { username: credential }, { cpf: credential }]
 			}
 		})
-		
 
 		if (!user) {
-			return reply.status(404).send({ message: 'User not found' })
+			throw new BadRequestError('Invalid credentials.')
 		}
 
 		const isValidPassword = await compare(password, user.password)
@@ -133,7 +133,7 @@ export async function usersRoutes(app: FastifyInstance) {
 	})
 
 	app.patch('/token/refresh', async (request, reply) => {
-		const { refreshToken } = getRefreshTokenSchema.parse(request.body)
+		const { refreshToken } = getRefreshTokenSchema.parse(request.cookies)
 
 		if (!refreshToken) {
 			return reply.status(401).send({ message: 'Refresh token is missing' })
@@ -305,6 +305,10 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		})
 
+		if (!user) {
+			return reply.status(404).send({ message: 'User not found' })
+		}
+
 		reply.status(200).send({ user })
 	})
 
@@ -329,8 +333,8 @@ export async function usersRoutes(app: FastifyInstance) {
 						message: z.string()
 					}),
 					500: z.object({
-            message: z.string()
-          })
+						message: z.string()
+					})
 				}
 			}
 		},

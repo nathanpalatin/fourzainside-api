@@ -24,6 +24,7 @@ import { transactionsRoutes } from './routes/transactions'
 import { notificationsRoutes } from './routes/notifications'
 import { uploadRoutes } from './routes/upload-files'
 import { walletRoutes } from './routes/wallets'
+import { errorHandler } from './error-handlers'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -102,8 +103,4 @@ app.register(uploadRoutes, {
 	prefix: 'uploads'
 })
 
-app.setErrorHandler((error, _, reply) => {
-	if (error instanceof ZodError) {
-		return reply.status(400).send({ error: 'Validation error', issues: error.format() })
-	}
-})
+app.setErrorHandler(errorHandler)

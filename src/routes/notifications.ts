@@ -1,6 +1,6 @@
+
 import { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
-
 import { checkSessionIdExists } from '../middlewares/auth-token'
 import { getTokenHeaderSchema } from '../@types/zod/user'
 
@@ -14,7 +14,6 @@ export async function notificationsRoutes(app: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const { userId: receiveUserId } = getTokenHeaderSchema.parse(request.headers)
-
 			const notifications = await prisma.notifications.findMany({
 				where: {
 					receiveUserId
