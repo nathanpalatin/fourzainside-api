@@ -7,8 +7,6 @@ import multipart from '@fastify/multipart'
 import fastifySwagger from '@fastify/swagger'
 import fastifySwaggerUI from '@fastify/swagger-ui'
 
-import { ZodError } from 'zod'
-
 import {
 	jsonSchemaTransform,
 	serializerCompiler,
@@ -24,16 +22,17 @@ import { transactionsRoutes } from './routes/transactions'
 import { notificationsRoutes } from './routes/notifications'
 import { uploadRoutes } from './routes/upload-files'
 import { walletRoutes } from './routes/wallets'
-import { errorHandler } from './error-handlers'
+
+import { errorHandler } from './utils/error-handlers'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
 app.route({
 	method: 'GET',
 	url: '/',
-	handler: async () => {
+	handler: () => {
 		return {
-			montvenue: 'Route API Protected by God'
+			montvenue: 'API Route not found.'
 		}
 	}
 })
@@ -51,6 +50,8 @@ app.register(fastifyJwt, {
 
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
+
+app.setErrorHandler(errorHandler)
 
 app.register(fastifySwagger, {
 	openapi: {
@@ -102,5 +103,3 @@ app.register(transactionsRoutes, {
 app.register(uploadRoutes, {
 	prefix: 'uploads'
 })
-
-app.setErrorHandler(errorHandler)
