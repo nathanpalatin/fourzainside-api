@@ -28,6 +28,8 @@ model Users {
   username           String          @unique
   role               Role            @default(USER)
   emailVerified      Boolean         @default(false)
+
+  
   Chats              Chats[]
   Followers          Followers[]
   Medias             Medias[]
