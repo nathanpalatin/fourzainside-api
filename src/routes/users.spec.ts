@@ -15,15 +15,15 @@ describe('Users routes (e2e)', () => {
 		await app.close()
 	})
 
-	it('should be able to create a new user', async () => {
+	it.only('should be able to create a new user', async () => {
 		const response = await request(app.server).post('/users').send({
 			name: 'Nathan Palatin',
-			email: 'email@nathan.com',
-			username: 'nathanpalatin',
-			cpf: '426.315.238-73',
+			email: 'email@email.com',
+			username: 'nathan',
+			cpf: '426.315.238-71',
 			birthdate: '1993-06-14T00:00:00.000Z',
 			password: '123456',
-			phone: '47999999999'
+			phone: '47999999939'
 		})
 		expect(response.statusCode).toEqual(201)
 	})
