@@ -35,19 +35,15 @@ interface QueryParams {
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
 		const { name, email, password, username, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
-		try {
-			await registerUseCase({
-				name,
-				email,
-				username,
-				birthdate,
-				cpf,
-				phone,
-				password
-			})
-		} catch (error) {
-			throw new BadRequestError('Internal server error.')
-		}
+		await registerUseCase({
+			name,
+			email,
+			username,
+			birthdate,
+			cpf,
+			phone,
+			password
+		})
 
 		return reply.status(201).send({ message: 'User created successfully.' })
 	})
@@ -103,7 +99,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		const isValidPassword = await compare(password, user.password)
 
 		if (!isValidPassword) {
-			return reply.status(403).send({ message: 'Invalid password' })
+			throw new BadRequestError('Invalid password.')
 		}
 
 		const token = await reply.jwtSign({ userId: user.id, role: user.role }, { expiresIn: '1h' })
@@ -136,7 +132,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		const { refreshToken } = getRefreshTokenSchema.parse(request.cookies)
 
 		if (!refreshToken) {
-			return reply.status(401).send({ message: 'Refresh token is missing' })
+			throw new BadRequestError('Refresh token not found.')
 		}
 		try {
 			const decoded = (await app.jwt.verify(refreshToken)) as { userId: string; role: string }
@@ -234,24 +230,6 @@ export async function usersRoutes(app: FastifyInstance) {
 	)
 
 	app.delete(
-		'/',
-		{
-			preHandler: [checkSessionIdExists]
-		},
-		async (request, reply) => {
-			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
-
-			await prisma.users.delete({
-				where: {
-					id
-				}
-			})
-
-			return reply.status(204).send({ message: 'All users has been deleted successfully.' })
-		}
-	)
-
-	app.delete(
 		'/:id',
 		{
 			preHandler: [checkSessionIdExists]
@@ -282,12 +260,16 @@ export async function usersRoutes(app: FastifyInstance) {
 					username
 				},
 				select: {
+					id: true,
 					username: true,
 					avatar: true,
-					phone: true,
 					name: true
 				}
 			})
+
+			if (!user) {
+				throw new BadRequestError('User not found.')
+			}
 
 			return reply.status(200).send({ user })
 		}
@@ -306,7 +288,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		})
 
 		if (!user) {
-			return reply.status(404).send({ message: 'User not found' })
+			throw new BadRequestError('User not found.')
 		}
 
 		reply.status(200).send({ user })
@@ -356,7 +338,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				})
 
 				if (!user) {
-					return reply.status(404).send({ message: 'User not found.' })
+					throw new BadRequestError('User not found.')
 				}
 
 				return reply.status(200).send({ user })

@@ -1,18 +1,18 @@
-## RFs (Requisitos funcionais)
+## Functional Requirements (FRs)
 
-- [x] Dev ser possível se cadastrar
-- [x] Dev ser possível se autenticar
-- [x] Dev ser possível obter o perfil de um usuário logado
-- [x] Deve ser possível buscar usuários pelo nome
+- [x] It must be possible to sign up
+- [x] It must be possible to authenticate
+- [x] It must be possible to retrieve the profile of a logged-in user
+- [x] It must be possible to search for users by name
 
-## RNs (Regras de negócio)
+## Business Rules (BRs)
 
-- [x] O usuário não deve poder se cadastrar com e-mail duplicado
-- [x] O usuário não pode se cadastrar com telefone duplicado
-- [x] O perfil do usuário deve ser visível apenas para os usuários com permissão
+- [x] A user must not be able to sign up with a duplicate email
+- [x] A user must not be able to sign up with a duplicate phone number
+- [x] A user's profile must only be visible to authorized users
 
-## RNFs (Regras não-funcionais)
+## Non-Functional Requirements (NFRs)
 
-- [x] A senha do usuário precisa estar criptografada
-- [x] Os dados da aplicação precisam estar persistidos em banco PostgreSQL
-- [x] O usuário deve ser identificado por um JWT (Json Web Token)
+- [x] A user's password must be encrypted
+- [x] The application's data must be persisted in a PostgreSQL database
+- [x] A user must be identified by a JWT (Json Web Token)

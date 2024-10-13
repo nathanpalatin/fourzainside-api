@@ -9,9 +9,11 @@ async function seed() {
 		data: {
 			name: faker.person.fullName(),
 			email: faker.internet.email(),
-			username: faker.internet.displayName(),
+			username: faker.internet.displayName().toLocaleLowerCase(),
 			avatar: faker.image.avatarGitHub(),
-			phone: '+551234567890',
+			phone: faker.phone.number(),
+			cpf: faker.string.numeric(11),
+			birthdate: faker.date.anytime(),
 			password: await hash('123456', 6)
 		}
 	})

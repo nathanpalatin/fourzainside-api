@@ -1,16 +1,25 @@
 import { hash } from 'bcrypt'
 import { prisma } from '../lib/prisma'
 import { RegisterUseCaseRequest } from '../@types/use-cases/users'
+import { BadRequestError } from '../routes/_errors/bad-request-error'
 
-export async function registerUseCase({ name, cpf, email, username, birthdate, phone, password }: RegisterUseCaseRequest) {
-	const userWithSameEmail = await prisma.users.findUnique({
+export async function registerUseCase({
+	name,
+	cpf,
+	email,
+	username,
+	birthdate,
+	phone,
+	password
+}: RegisterUseCaseRequest) {
+	const userExists = await prisma.users.findMany({
 		where: {
-			email
+			OR: [{ email }, { username }, { cpf }, { phone }]
 		}
 	})
 
-	if (userWithSameEmail) {
-		throw new Error('Email already exists')
+	if (userExists) {
+		throw new BadRequestError('User already exists.')
 	}
 
 	const password_hash = await hash(password, 6)

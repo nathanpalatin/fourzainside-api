@@ -24,7 +24,7 @@ model Users {
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   avatar             String?
-  phone              String
+  phone              String          @unique
   username           String          @unique
   role               Role            @default(USER)
   emailVerified      Boolean         @default(false)
