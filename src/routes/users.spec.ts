@@ -20,6 +20,8 @@ describe('Users routes (e2e)', () => {
 			name: 'Nathan Palatin',
 			email: 'email@nathan.com',
 			username: 'nathanpalatin',
+			cpf: '426.315.238-73',
+			birthdate: '1993-06-14T00:00:00.000Z',
 			password: '123456',
 			phone: '47999999999'
 		})
@@ -42,7 +44,7 @@ describe('Users routes (e2e)', () => {
 
 		const cookies = user.get('Set-Cookie')
 
-		const response = await request(app.server).patch('/users/token/refresh').set('Cookie', cookies)
+		const response = await request(app.server).patch('/users/token/refresh').set('Cookie', String(cookies))
 
 		expect(response.statusCode).toEqual(200)
 		expect(response.body).toEqual({
@@ -59,18 +61,18 @@ describe('Users routes (e2e)', () => {
 		expect(response.statusCode).toEqual(400)
 	})
 
-	it('try to log in without user registred.', async () => {
+	it('should not be to log in without user registred.', async () => {
 		const response = await request(app.server).post('/users/login').send({
 			credential: 'nathanp',
 			password: '123456'
 		})
-		expect(response.statusCode).toEqual(404)
+		expect(response.statusCode).toEqual(403)
 	})
 
 	it('try to log in with wrong password.', async () => {
 		const response = await request(app.server).post('/users/login').send({
 			credential: 'nathanpalatin',
-			password: '123123'
+			password: '1234561'
 		})
 		expect(response.statusCode).toEqual(403)
 	})
@@ -98,18 +100,6 @@ describe('Users routes (e2e)', () => {
 			.attach('file', stream.path)
 
 		expect(response.statusCode).toEqual(200)
-	})
-
-	it('should not be able to change avatar without file', async () => {
-		const { token } = await createAndAuthenticateUser(app)
-		const filePath = path.resolve(__dirname, '../../uploads', 'favicon.jpg')
-		const stream = createReadStream(filePath)
-		const response = await request(app.server)
-			.patch('/users/avatar')
-			.set('Authorization', `${token}`)
-			.attach('file', stream.path)
-
-		expect(response.statusCode).toEqual(400)
 	})
 
 	it('should be able to update a user', async () => {

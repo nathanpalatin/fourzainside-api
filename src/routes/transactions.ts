@@ -4,6 +4,7 @@ import { prisma } from '../lib/prisma'
 import { checkSessionIdExists } from '../middlewares/auth-token'
 import { getTokenHeaderSchema } from '../@types/zod/user'
 import { createTransactionBodySchema, getTransactionParamsSchema } from '../@types/zod/transaction'
+import { BadRequestError } from './_errors/bad-request-error'
 
 export async function transactionsRoutes(app: FastifyInstance) {
 	app.get(
@@ -34,6 +35,10 @@ export async function transactionsRoutes(app: FastifyInstance) {
 				where: { id }
 			})
 
+			if (!transaction) {
+				throw new BadRequestError('Transaction not found.')
+			}
+
 			return reply.status(200).send({ transaction })
 		}
 	)
@@ -47,7 +52,7 @@ export async function transactionsRoutes(app: FastifyInstance) {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
 			const { title, amount, type } = createTransactionBodySchema.parse(request.body)
 
-			await prisma.transactions.create({
+			const res = await prisma.transactions.create({
 				data: {
 					title,
 					userId,
@@ -56,7 +61,12 @@ export async function transactionsRoutes(app: FastifyInstance) {
 				}
 			})
 
-			return reply.status(201).send('Transaction created successfully!')
+			return reply.status(201).send({
+				message: 'Transaction created successfully!',
+				transaction: {
+					id: res.id
+				}
+			})
 		}
 	)
 

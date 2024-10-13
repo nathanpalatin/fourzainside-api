@@ -1,4 +1,3 @@
-version: '4'
 services:
  api-montvenue-pg:
   image: bitnami/postgresql:latest

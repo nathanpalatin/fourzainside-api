@@ -5,9 +5,7 @@ import { execSync } from 'node:child_process'
 import { Environment } from 'vitest/environments'
 import { PrismaClient } from '../../node_modules/.prisma/client'
 
-const prisma = new PrismaClient({
-	log: ['query']
-})
+const prisma = new PrismaClient()
 function generateDabaseURL(schema: string) {
 	if (!process.env.DATABASE_URL) {
 		throw new Error('Please provide a DATABASE_URL environment variables')
