@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createReadStream } from 'node:fs'
 import path from 'node:path'
@@ -15,15 +15,15 @@ describe('Users routes (e2e)', () => {
 		await app.close()
 	})
 
-	it.only('should be able to create a new user', async () => {
+	it('should be able to create a new user', async () => {
 		const response = await request(app.server).post('/users').send({
 			name: 'Nathan Palatin',
 			email: 'email@email.com',
 			username: 'nathan',
-			cpf: '426.315.238-71',
+			cpf: '999.999.999-99',
 			birthdate: '1993-06-14T00:00:00.000Z',
 			password: '123456',
-			phone: '47999999939'
+			phone: '47999999999'
 		})
 		expect(response.statusCode).toEqual(201)
 	})
@@ -120,9 +120,9 @@ describe('Users routes (e2e)', () => {
 		expect(response.statusCode).toEqual(200)
 	})
 
-	it('should be able to delete a user', async () => {
+	it('should be able to desactive a user', async () => {
 		const { token, userId } = await createAndAuthenticateUser(app)
-		const response = await request(app.server).delete(`/users/${userId}`).set('Authorization', `${token}`)
+		const response = await request(app.server).patch(`/users/${userId}`).set('Authorization', `${token}`)
 
 		expect(response.statusCode).toEqual(204)
 	})

@@ -229,7 +229,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.delete(
+	app.patch(
 		'/:id',
 		{
 			preHandler: [checkSessionIdExists]
@@ -237,13 +237,38 @@ export async function usersRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
+			await prisma.users.update({
+				data: {
+					emailVerified: false
+				},
+				where: {
+					id
+				}
+			})
+
+			reply.status(204).send({ message: 'User has been disabled successfully.' })
+		}
+	)
+
+	app.delete(
+		'/',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const getUserParamsSchema = z.object({
+				userId: z.string()
+			})
+
+			const { userId: id } = getUserParamsSchema.parse(request.headers)
+
 			await prisma.users.delete({
 				where: {
 					id
 				}
 			})
 
-			reply.status(204).send({ message: 'User has been deleted successfully.' })
+			reply.status(204).send({ message: 'User deleted successfully.' })
 		}
 	)
 
