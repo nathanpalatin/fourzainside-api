@@ -24,8 +24,9 @@ import {
 	getUserParamsSchema,
 	updateUserSchemaBody
 } from '../@types/zod/user'
-import { registerUseCase } from '../use-cases/register'
 import { BadRequestError } from './_errors/bad-request-error'
+import { makeRegisterUseCase } from '../use-cases/factories/make-register-use-case'
+import { UserAlreadyExistsError } from '../use-cases/errors/user-already-exists-error'
 
 interface QueryParams {
 	limit?: string
@@ -35,16 +36,25 @@ interface QueryParams {
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
 		const { name, email, password, username, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
-		await registerUseCase({
-			name,
-			email,
-			username,
-			birthdate,
-			cpf,
-			phone,
-			password
-		})
+		try {
+			const registerUseCase = makeRegisterUseCase()
 
+			await registerUseCase.execute({
+				name,
+				cpf,
+				phone,
+				birthdate,
+				username,
+				email,
+				password
+			})
+		} catch (err) {
+			if (err instanceof UserAlreadyExistsError) {
+				return reply.status(409).send({ message: err.message })
+			}
+
+			throw err
+		}
 		return reply.status(201).send({ message: 'User created successfully.' })
 	})
 

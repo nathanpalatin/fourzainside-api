@@ -1,38 +1,48 @@
 import { hash } from 'bcrypt'
-import { prisma } from '../lib/prisma'
 import { RegisterUseCaseRequest } from '../@types/use-cases/users'
-import { BadRequestError } from '../routes/_errors/bad-request-error'
 
-export async function registerUseCase({
-	name,
-	cpf,
-	email,
-	username,
-	birthdate,
-	phone,
-	password
-}: RegisterUseCaseRequest) {
-	const userExists = await prisma.users.findMany({
-		where: {
-			OR: [{ email }, { username }, { cpf }, { phone }]
+import { Users } from '@prisma/client'
+import type { UsersRepository } from '../repositories/users-repository'
+import { UserAlreadyExistsError } from './errors/user-already-exists-error'
+
+interface RegisterUseCaseResponse {
+	user: Users
+}
+
+export class RegisterUseCase {
+	constructor(private usersRepository: UsersRepository) {}
+
+	async execute({
+		name,
+		email,
+		password,
+		phone,
+		username,
+		cpf,
+		birthdate
+	}: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
+		const userWithSameEmail = await this.usersRepository.findByEmail(email)
+
+		if (userWithSameEmail) {
+			throw new UserAlreadyExistsError()
 		}
-	})
 
-	if (userExists) {
-		throw new BadRequestError('User already exists.')
-	}
+		const password_hash = await hash(password, 6)
 
-	const password_hash = await hash(password, 6)
-
-	await prisma.users.create({
-		data: {
+		const user = await this.usersRepository.create({
 			name,
+			email,
+			password: password_hash,
+			phone,
+			username,
 			cpf,
 			birthdate,
-			username,
-			email,
-			phone,
-			password: password_hash
+			createdAt: new Date(),
+			updatedAt: new Date()
+		})
+
+		return {
+			user
 		}
-	})
+	}
 }

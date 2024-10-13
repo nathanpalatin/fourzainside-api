@@ -17,7 +17,7 @@ describe('Upload files routes (e2e)', () => {
 	it('should be able to upload a file', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 		const tokenDecoded = jwt.decode(token) as JwtPayload
-		const response = await request(app.server).post('/users/uploads').set('Authorization', `${token}`).send({
+		const response = await request(app.server).post('/uploads').set('Authorization', `${token}`).send({
 			name: 'video.mp4',
 			contentType: 'video/mp4',
 			userId: tokenDecoded?.userId

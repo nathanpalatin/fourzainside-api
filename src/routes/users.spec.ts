@@ -1,10 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import request from 'supertest'
-import { createReadStream } from 'node:fs'
-import path from 'node:path'
-
 import { app } from '../app'
+import request from 'supertest'
+
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import path from 'node:path'
+import { createReadStream } from 'node:fs'
+
 import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
+import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users-repository'
 
 describe('Users routes (e2e)', () => {
 	beforeAll(async () => {
@@ -15,7 +17,12 @@ describe('Users routes (e2e)', () => {
 		await app.close()
 	})
 
-	it('should be able to create a new user', async () => {
+	beforeEach(() => {
+		const usersRepository = new InMemoryUsersRepository()
+		//registerUseCase(usersRepository)
+	})
+
+	it.only('should be able to create a new user', async () => {
 		const response = await request(app.server).post('/users').send({
 			name: 'Nathan Palatin',
 			email: 'email@email.com',
