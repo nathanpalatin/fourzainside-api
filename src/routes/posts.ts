@@ -32,7 +32,6 @@ export async function postsRoutes(app: FastifyInstance) {
 					user: {
 						select: {
 							name: true,
-							username: true,
 							avatar: true
 						}
 					}

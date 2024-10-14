@@ -8,8 +8,7 @@ export const createMessageSchemaBody = z.object({
 	receiveUserId: z.string().uuid(),
 	chatId: z.string().uuid(),
 	messageText: z.string(),
-	messageType: z.string(),
-	userName: z.string()
+	messageType: z.string()
 })
 
 export const createMessageIdSchemaBody = z.object({

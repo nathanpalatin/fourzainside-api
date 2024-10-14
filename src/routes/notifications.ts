@@ -1,4 +1,3 @@
-
 import { FastifyInstance } from 'fastify'
 import { prisma } from '../lib/prisma'
 import { checkSessionIdExists } from '../middlewares/auth-token'
@@ -27,7 +26,6 @@ export async function notificationsRoutes(app: FastifyInstance) {
 					senderUserId: {
 						select: {
 							id: true,
-							username: true,
 							name: true,
 							avatar: true
 						}

@@ -35,7 +35,7 @@ interface QueryParams {
 
 export async function usersRoutes(app: FastifyInstance) {
 	app.post('/', async (request, reply) => {
-		const { name, email, password, username, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
+		const { name, email, password, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
 		try {
 			const registerUseCase = makeRegisterUseCase()
 
@@ -44,7 +44,6 @@ export async function usersRoutes(app: FastifyInstance) {
 				cpf,
 				phone,
 				birthdate,
-				username,
 				email,
 				password
 			})
@@ -66,7 +65,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
-			const { name, username, phone, avatar } = updateUserSchemaBody.parse(request.body)
+			const { name, phone, avatar } = updateUserSchemaBody.parse(request.body)
 
 			try {
 				await prisma.users.update({
@@ -75,7 +74,6 @@ export async function usersRoutes(app: FastifyInstance) {
 					},
 					data: {
 						name,
-						username,
 						updatedAt: new Date(),
 						phone,
 						avatar
@@ -98,7 +96,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const user = await prisma.users.findFirst({
 			where: {
-				OR: [{ email: credential }, { username: credential }, { cpf: credential }]
+				OR: [{ email: credential }, { cpf: credential }]
 			}
 		})
 
@@ -128,7 +126,6 @@ export async function usersRoutes(app: FastifyInstance) {
 				token,
 				refreshToken,
 				user: {
-					username: user.username,
 					role: user.role,
 					email: user.email,
 					id: user.id,
@@ -185,7 +182,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			const users = await prisma.users.findMany({
 				select: {
 					id: true,
-					username: true,
 					name: true,
 					avatar: true
 				},
@@ -283,20 +279,19 @@ export async function usersRoutes(app: FastifyInstance) {
 	)
 
 	app.get(
-		'/:username',
+		'/:name',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { username } = getUserParamsSchema.parse(request.params)
+			const { name } = getUserParamsSchema.parse(request.params)
 
 			const user = await prisma.users.findFirst({
 				where: {
-					username
+					name
 				},
 				select: {
 					id: true,
-					username: true,
 					avatar: true,
 					name: true
 				}
@@ -315,7 +310,7 @@ export async function usersRoutes(app: FastifyInstance) {
 
 		const user = await prisma.users.findFirst({
 			where: {
-				OR: [{ email: credential }, { username: credential }]
+				email: credential
 			},
 			select: {
 				email: true
@@ -342,7 +337,6 @@ export async function usersRoutes(app: FastifyInstance) {
 							id: z.string().uuid(),
 							role: z.enum(['ADMIN', 'USER', 'SELLER']),
 							name: z.string(),
-							username: z.string(),
 							avatar: z.string().url().nullable()
 						})
 					}),
@@ -367,7 +361,6 @@ export async function usersRoutes(app: FastifyInstance) {
 						id: true,
 						name: true,
 						role: true,
-						username: true,
 						avatar: true
 					}
 				})

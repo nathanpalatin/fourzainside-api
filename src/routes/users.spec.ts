@@ -26,7 +26,6 @@ describe('Users routes (e2e)', () => {
 		const response = await request(app.server).post('/users').send({
 			name: 'Nathan Palatin',
 			email: 'email@email.com',
-			username: 'nathan',
 			cpf: '999.999.999-99',
 			birthdate: '1993-06-14T00:00:00.000Z',
 			password: '123456',
@@ -37,7 +36,7 @@ describe('Users routes (e2e)', () => {
 
 	it('should be able to log in', async () => {
 		const response = await request(app.server).post('/users/login').send({
-			credential: 'nathanpalatin',
+			credential: 'email@email.com',
 			password: '123456'
 		})
 		expect(response.statusCode).toEqual(200)
@@ -91,8 +90,8 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('should be able to list a user by nickname', async () => {
-		const { token, username } = await createAndAuthenticateUser(app)
-		const response = await request(app.server).get(`/users/${username}`).set('Authorization', `${token}`)
+		const { token, name } = await createAndAuthenticateUser(app)
+		const response = await request(app.server).get(`/users/${name}`).set('Authorization', `${token}`)
 		expect(response.statusCode).toEqual(200)
 	})
 
@@ -113,7 +112,6 @@ describe('Users routes (e2e)', () => {
 		const { token } = await createAndAuthenticateUser(app)
 		const response = await request(app.server).put('/users').set('Authorization', `${token}`).send({
 			name: 'John Doe2',
-			username: 'johndoe',
 			password: '123456',
 			phone: '1233333'
 		})

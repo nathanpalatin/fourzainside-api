@@ -80,16 +80,13 @@ export async function chatsRoutes(app: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const { userId: sendUserId } = getTokenHeaderSchema.parse(request.headers)
-			const { receiveUserId, userName, messageText, messageType, chatId } = createMessageSchemaBody.parse(
-				request.body
-			)
+			const { receiveUserId, messageText, messageType, chatId } = createMessageSchemaBody.parse(request.body)
 
 			const message = await prisma.messages.create({
 				data: {
 					chatId,
 					sendUserId,
 					receiveUserId,
-					userName,
 					messageText,
 					messageType
 				}

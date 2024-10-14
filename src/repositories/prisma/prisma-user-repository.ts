@@ -1,16 +1,31 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, type Users } from '@prisma/client'
 
 import { UsersRepository } from '../users-repository'
 import { prisma } from '../../lib/prisma'
 
 export class PrismaUsersRepository implements UsersRepository {
+	async findByPhone(phone: string): Promise<Users | null> {
+		const user = await prisma.users.findFirst({
+			where: {
+				phone
+			}
+		})
+		return user
+	}
+	async findByCPF(cpf: string): Promise<Users | null> {
+		const user = await prisma.users.findFirst({
+			where: {
+				cpf
+			}
+		})
+		return user
+	}
 	async findById(id: string) {
 		const user = await prisma.users.findUnique({
 			where: {
 				id
 			}
 		})
-
 		return user
 	}
 
@@ -20,7 +35,6 @@ export class PrismaUsersRepository implements UsersRepository {
 				email
 			}
 		})
-
 		return user
 	}
 
@@ -28,7 +42,6 @@ export class PrismaUsersRepository implements UsersRepository {
 		const user = await prisma.users.create({
 			data
 		})
-
 		return user
 	}
 }

@@ -9,7 +9,6 @@ export async function createAndAuthenticateUser(app: FastifyInstance) {
 		data: {
 			name: faker.person.fullName(),
 			email: 'email@example.com',
-			username: faker.internet.displayName().toLocaleLowerCase(),
 			avatar: faker.image.avatarGitHub(),
 			phone: faker.phone.number(),
 			cpf: faker.string.numeric(11),
@@ -25,12 +24,12 @@ export async function createAndAuthenticateUser(app: FastifyInstance) {
 
 	const {
 		token,
-		user: { username, userId }
+		user: { userId, name }
 	} = authResponse.body
 
 	return {
 		token,
-		username,
+		name,
 		userId
 	}
 }

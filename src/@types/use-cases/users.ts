@@ -1,9 +1,14 @@
+import type { Users } from '@prisma/client'
+
 export interface RegisterUseCaseRequest {
 	name: string
 	cpf: string
 	birthdate: string
-	username: string
 	email: string
 	password: string
 	phone: string
+}
+
+export interface RegisterUseCaseResponse {
+	user: Users
 }

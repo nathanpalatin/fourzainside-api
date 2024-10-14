@@ -25,7 +25,6 @@ model Users {
   updatedAt          DateTime        @updatedAt
   avatar             String?
   phone              String          @unique
-  username           String          @unique
   role               Role            @default(USER)
   emailVerified      Boolean         @default(false)
 
@@ -123,7 +122,6 @@ model Messages {
   id            String   @id @default(uuid())
   sendUserId    String
   receiveUserId String
-  userName      String
   messageText   String
   messageType   String
   createdAt     DateTime @default(now()) @map("created_at")
