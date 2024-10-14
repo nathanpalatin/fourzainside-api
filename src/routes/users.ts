@@ -90,10 +90,6 @@ export async function usersRoutes(app: FastifyInstance) {
 	app.post('/login', async (request, reply) => {
 		const { credential, password } = createLoginSchemaBody.parse(request.body)
 
-		if (!credential || !password) {
-			return reply.status(400).send({ message: 'Invalid credentials or password' })
-		}
-
 		const user = await prisma.users.findFirst({
 			where: {
 				OR: [{ email: credential }, { cpf: credential }]
@@ -180,13 +176,13 @@ export async function usersRoutes(app: FastifyInstance) {
 			const offset = (page - 1) * limit
 
 			const users = await prisma.users.findMany({
+				orderBy: {
+					name: 'desc'
+				},
 				select: {
 					id: true,
 					name: true,
 					avatar: true
-				},
-				orderBy: {
-					createdAt: 'desc'
 				},
 				take: limit,
 				skip: offset
@@ -274,21 +270,27 @@ export async function usersRoutes(app: FastifyInstance) {
 				}
 			})
 
-			reply.status(204).send({ message: 'User deleted successfully.' })
+			reply.status(204).send({ message: 'Account deleted successfully.' })
 		}
 	)
 
 	app.get(
-		'/:name',
+		'/:query',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { name } = getUserParamsSchema.parse(request.params)
+			const { query } = getUserParamsSchema.parse(request.params)
 
 			const user = await prisma.users.findFirst({
+				orderBy: {
+					name: 'desc'
+				},
 				where: {
-					name
+					name: {
+						contains: query,
+						mode: 'insensitive'
+					}
 				},
 				select: {
 					id: true,

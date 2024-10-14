@@ -18,7 +18,7 @@ export const createUserSchemaBody = z.object({
 })
 
 export const getUserParamsSchema = z.object({
-	name: z.string()
+	query: z.string()
 })
 
 export const getUserCredentialSchema = z.object({
