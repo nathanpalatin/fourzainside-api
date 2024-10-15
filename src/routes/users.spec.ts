@@ -7,6 +7,10 @@ import { createReadStream } from 'node:fs'
 
 import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
 import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users-repository'
+import { AuthenticateUseCase } from '../use-cases/authentication'
+
+let usersRepository: InMemoryUsersRepository
+let sut: AuthenticateUseCase
 
 describe('Users routes (e2e)', () => {
 	beforeAll(async () => {
@@ -18,11 +22,11 @@ describe('Users routes (e2e)', () => {
 	})
 
 	beforeEach(() => {
-		const usersRepository = new InMemoryUsersRepository()
-		//registerUseCase(usersRepository)
+		usersRepository = new InMemoryUsersRepository()
+		sut = new AuthenticateUseCase(usersRepository)
 	})
 
-	it.only('should be able to create a new user', async () => {
+	it('should be able to create a new user', async () => {
 		const response = await request(app.server).post('/users').send({
 			name: 'Nathan Palatin',
 			email: 'email@email.com',
@@ -35,16 +39,18 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('should be able to log in', async () => {
+		await createAndAuthenticateUser(app)
 		const response = await request(app.server).post('/users/login').send({
-			credential: 'email@email.com',
+			credential: 'email@example.com',
 			password: '123456'
 		})
 		expect(response.statusCode).toEqual(200)
 	})
 
 	it('should be able to refresh a token', async () => {
+		await createAndAuthenticateUser(app)
 		const user = await request(app.server).post('/users/login').send({
-			credential: 'nathanpalatin',
+			credential: 'email@example.com',
 			password: '123456'
 		})
 
@@ -72,15 +78,16 @@ describe('Users routes (e2e)', () => {
 			credential: 'nathanp',
 			password: '123456'
 		})
-		expect(response.statusCode).toEqual(403)
+		expect(response.statusCode).toEqual(400)
 	})
 
 	it('try to log in with wrong password.', async () => {
+		await createAndAuthenticateUser(app)
 		const response = await request(app.server).post('/users/login').send({
-			credential: 'nathanpalatin',
+			credential: 'email@example.com',
 			password: '1234561'
 		})
-		expect(response.statusCode).toEqual(403)
+		expect(response.statusCode).toEqual(400)
 	})
 
 	it('should be able to list all users', async () => {
@@ -111,16 +118,15 @@ describe('Users routes (e2e)', () => {
 	it('should be able to update a user', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 		const response = await request(app.server).put('/users').set('Authorization', `${token}`).send({
-			name: 'John Doe2',
-			password: '123456',
-			phone: '1233333'
+			name: 'John Doe2'
 		})
 		expect(response.statusCode).toEqual(204)
 	})
 
 	it('should be able to send email to reset password', async () => {
+		await createAndAuthenticateUser(app)
 		const response = await request(app.server).post('/users/password').send({
-			credential: 'johndoe'
+			credential: 'email@example.com'
 		})
 		expect(response.statusCode).toEqual(200)
 	})

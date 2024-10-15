@@ -13,7 +13,7 @@ export async function createAndAuthenticateUser(app: FastifyInstance) {
 			phone: faker.phone.number(),
 			cpf: faker.string.numeric(11),
 			birthdate: faker.date.anytime(),
-			password: await hash('123456', 6)
+			password: await hash('123456', 1)
 		}
 	})
 
