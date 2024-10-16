@@ -3,7 +3,7 @@ name: Run Unit Tests
 on: [pull_request]
 
 jobs:
-  run-unit-tests:
+  run-e2e-tests:
     name: Run E2E Tests
     runs-on: ubuntu-latest
 
