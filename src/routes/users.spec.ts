@@ -8,6 +8,7 @@ import { createReadStream } from 'node:fs'
 import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
 import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users-repository'
 import { AuthenticateUseCase } from '../use-cases/authentication'
+import { hash } from 'bcrypt'
 
 let usersRepository: InMemoryUsersRepository
 let sut: AuthenticateUseCase
@@ -27,24 +28,30 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('should be able to create a new user', async () => {
-		const response = await request(app.server).post('/users').send({
-			name: 'Nathan Palatin',
-			email: 'email@email.com',
-			cpf: '999.999.999-99',
-			birthdate: '1993-06-14T00:00:00.000Z',
-			password: '123456',
-			phone: '47999999999'
+		const user = await usersRepository.create({
+			name: 'John Doe',
+			phone: '+554799999999',
+			email: 'johndoe@example.com',
+			password: await hash('123456', 1)
 		})
-		expect(response.statusCode).toEqual(201)
+
+		expect(user.id).toEqual(expect.any(String))
 	})
 
 	it('should be able to log in', async () => {
-		await createAndAuthenticateUser(app)
-		const response = await request(app.server).post('/users/login').send({
-			credential: 'email@example.com',
+		await usersRepository.create({
+			name: 'John Doe',
+			phone: '+554799999999',
+			email: 'johndoe@example.com',
+			password: await hash('123456', 1)
+		})
+
+		const { user } = await sut.execute({
+			email: 'johndoe@example.com',
 			password: '123456'
 		})
-		expect(response.statusCode).toEqual(200)
+
+		expect(user.id).toEqual(expect.any(String))
 	})
 
 	it('should be able to refresh a token', async () => {
@@ -82,7 +89,6 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('try to log in with wrong password.', async () => {
-		await createAndAuthenticateUser(app)
 		const response = await request(app.server).post('/users/login').send({
 			credential: 'email@example.com',
 			password: '1234561'

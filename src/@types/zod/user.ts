@@ -35,6 +35,9 @@ export const createLoginSchemaBody = z.object({
 	credential: z.string(),
 	password: z.string().min(6)
 })
+export const createCryptoBodySchema = z.object({
+	amount: z.string()
+})
 
 export const createWalletSchema = z.object({
 	balance: z.number(),

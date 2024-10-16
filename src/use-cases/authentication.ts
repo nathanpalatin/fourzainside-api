@@ -2,6 +2,7 @@ import { compare } from 'bcrypt'
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
 import type { UsersRepository } from '../repositories/users-repository'
 import type { Users } from '@prisma/client'
+import { sign } from 'jsonwebtoken'
 
 interface AuthenticateUseCaseRequest {
 	email: string

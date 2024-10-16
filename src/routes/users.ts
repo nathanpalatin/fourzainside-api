@@ -123,7 +123,6 @@ export async function usersRoutes(app: FastifyInstance) {
 				refreshToken,
 				user: {
 					role: user.role,
-					email: user.email,
 					id: user.id,
 					name: user.name,
 					avatar: user.avatar
