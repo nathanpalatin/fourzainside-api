@@ -1,4 +1,4 @@
-name: Run Unit Tests
+name: Run E2E Tests
 
 on: [pull_request]
 
@@ -8,27 +8,31 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      api-montvenue-pg:
+      postgres:
         image: bitnami/postgresql:latest
         ports:
         - 5432:5432
-        environment:
-        - POSTGRESQL_PASSWORD=docker
-        - POSTGRESQL_USERNAME=docker
-        - POSTGRESQL_DATABASE=montvenue
+        env:
+          POSTGRESQL_PASSWORD: docker
+          POSTGRESQL_USERNAME: docker
+          POSTGRESQL_DATABASE: montvenue
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
 
       - run: npm ci
+      - run: npm run test:e2e        
 
-      - run: npm run test:e2e
         env:
           JWT_SECRET_KEY: testing
-          DATABASE_URL: "postgresql://docker:docker@localhost:5432/montvenue?schema=public"
-        
+          DATABASE_URL: postgresql://docker:docker@localhost:5432/montvenue?schema=public
+          CLOUDFLARE_ENDPOINT: https://cloudflare.com
+          CLOUDFLARE_ACCESS_KEY_ID: access_key
+          CLOUDFLARE_SECRET_ACCESS_KEY: d12312f5g34g34odas
+          BLOB_READ_WRITE_TOKEN: vercel_blob_rw_82OEukJshSYAuuIB_E3333333aNa1bVztSUEzKyOnoUg9B5T
+
+
