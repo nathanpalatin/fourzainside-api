@@ -1,7 +1,7 @@
 {
   "name": "montvenue-api",
   "version": "1.0.0",
-  "description": "API Rest Node.JS with Typescript, Zod, Prisma and PostgreSQL",
+  "description": "API montvenue",
   "main": "src/server.ts",
   "scripts": {
     "dev": "tsx watch src/server.ts",

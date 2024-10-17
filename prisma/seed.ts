@@ -12,7 +12,7 @@ async function seed() {
 			avatar: faker.image.avatarGitHub(),
 			phone: faker.phone.number(),
 			cpf: faker.string.numeric(11),
-			birthdate: faker.date.anytime(),
+			birthdate: faker.date.anytime().toISOString(),
 			password: await hash('123456', 1)
 		}
 	})
