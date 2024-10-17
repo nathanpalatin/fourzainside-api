@@ -1,13 +1,13 @@
-import { app } from '../app'
+import { app } from '../../app'
 
 import request from 'supertest'
 import { hash } from 'bcrypt'
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
-import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users-repository'
-import { AuthenticateUseCase } from '../use-cases/authentication'
-import { createAndAuthenticateUser } from '../utils/tests/create-and-authenticate'
+import { InMemoryUsersRepository } from '../../repositories/in-memory/in-memory-users-repository'
+import { AuthenticateUseCase } from '../../use-cases/authentication'
+import { createAndAuthenticateUser } from '../../utils/tests/create-and-authenticate'
 
 let usersRepository: InMemoryUsersRepository
 let sut: AuthenticateUseCase
@@ -37,7 +37,6 @@ describe('Users routes (e2e)', () => {
 				birthdate: '1993-06-14',
 				password: await hash('123456', 1)
 			})
-
 
 		expect(userResponse.statusCode).toEqual(201)
 	})
@@ -79,7 +78,10 @@ describe('Users routes (e2e)', () => {
 	it('should be able to list all users', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 
-		const updateResponse = await request(app.server).get('/users').set('Authorization', `${token}`).send()
+		const updateResponse = await request(app.server)
+			.get('/users')
+			.set('Authorization', `${token}`)
+			.send()
 
 		expect(updateResponse.status).toBe(200)
 	})
@@ -87,7 +89,10 @@ describe('Users routes (e2e)', () => {
 	it('should be able to delete a user', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 
-		const updateResponse = await request(app.server).delete('/users').set('Authorization', `${token}`).send()
+		const updateResponse = await request(app.server)
+			.delete('/users')
+			.set('Authorization', `${token}`)
+			.send()
 
 		expect(updateResponse.status).toBe(204)
 	})
@@ -106,18 +111,9 @@ describe('Users routes (e2e)', () => {
 	it('should be able to recovery user password', async () => {
 		const { email } = await createAndAuthenticateUser(app)
 
-		const updateResponse = await request(app.server).post('/users/password').send({ credential: email })
-
-		expect(updateResponse.status).toBe(200)
-	})
-
-	it('should be able to get my profile', async () => {
-		const { token } = await createAndAuthenticateUser(app)
-
 		const updateResponse = await request(app.server)
-			.get('/users/profile')
-			.set('Authorization', `${token}`)
-			.send()
+			.post('/users/password')
+			.send({ credential: email })
 
 		expect(updateResponse.status).toBe(200)
 	})

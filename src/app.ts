@@ -15,6 +15,7 @@ import {
 } from 'fastify-type-provider-zod'
 
 import { usersRoutes } from './routes/controllers/users'
+import { profileRoutes } from './routes/controllers/profile'
 
 import { errorHandler } from './utils/error-handlers'
 
@@ -80,4 +81,8 @@ app.register(multipart)
 
 app.register(usersRoutes, {
 	prefix: 'users'
+})
+
+app.register(profileRoutes, {
+	prefix: 'profile'
 })

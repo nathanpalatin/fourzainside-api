@@ -387,46 +387,4 @@ export async function usersRoutes(app: FastifyInstance) {
 			reply.status(200).send({ user })
 		}
 	)
-
-	app.withTypeProvider<ZodTypeProvider>().get(
-		'/profile',
-		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Users'],
-				summary: 'Get authenticated user profile',
-				response: {
-					200: z.object({
-						user: z.object({
-							id: z.string().uuid(),
-							role: z.enum(['ADMIN', 'USER', 'SELLER']),
-							name: z.string(),
-							avatar: z.string().url().nullable()
-						})
-					})
-				}
-			}
-		},
-		async (request, reply) => {
-			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
-
-			const user = await prisma.users.findUnique({
-				where: {
-					id
-				},
-				select: {
-					id: true,
-					name: true,
-					role: true,
-					avatar: true
-				}
-			})
-
-			if (!user) {
-				throw new BadRequestError('User not found.')
-			}
-
-			return reply.status(200).send({ user })
-		}
-	)
 }
