@@ -3,11 +3,11 @@ import { z } from 'zod'
 
 import { FastifyInstance } from 'fastify'
 
-import { prisma } from '../lib/prisma'
+import { prisma } from '../../lib/prisma'
 
 import { compare } from 'bcrypt'
 
-import { checkSessionIdExists } from '../middlewares/auth-token'
+import { checkSessionIdExists } from '../../middlewares/auth-token'
 import {
 	createLoginSchemaBody,
 	createUserSchemaBody,
@@ -16,12 +16,11 @@ import {
 	getUserCredentialSchema,
 	getUserParamsSchema,
 	updateUserSchemaBody
-} from '../@types/zod/user'
+} from '../../@types/zod/user'
 
-import { makeRegisterUseCase } from '../use-cases/factories/make-register-use-case'
-
-import { BadRequestError } from './_errors/bad-request-error'
-import { UserAlreadyExistsError } from '../use-cases/errors/user-already-exists-error'
+import { makeRegisterUseCase } from '../../use-cases/factories/make-register-use-case'
+import { UserAlreadyExistsError } from '../../use-cases/errors/user-already-exists-error'
+import { BadRequestError } from '../_errors/bad-request-error'
 
 interface QueryParams {
 	limit?: string
@@ -44,7 +43,8 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { name, email, password, phone, cpf, birthdate } = createUserSchemaBody.parse(request.body)
+			const { name, email, password, phone, cpf, birthdate } =
+				createUserSchemaBody.parse(request.body)
 			try {
 				const registerUseCase = makeRegisterUseCase()
 
@@ -141,9 +141,15 @@ export async function usersRoutes(app: FastifyInstance) {
 				throw new BadRequestError('Invalid password.')
 			}
 
-			const token = await reply.jwtSign({ userId: user.id, role: user.role }, { expiresIn: '1h' })
+			const token = await reply.jwtSign(
+				{ userId: user.id, role: user.role },
+				{ expiresIn: '1h' }
+			)
 
-			const refreshToken = await reply.jwtSign({ userId: user.id, role: user.role }, { expiresIn: '7d' })
+			const refreshToken = await reply.jwtSign(
+				{ userId: user.id, role: user.role },
+				{ expiresIn: '7d' }
+			)
 
 			return reply
 				.setCookie('refreshToken', refreshToken, {
@@ -171,7 +177,7 @@ export async function usersRoutes(app: FastifyInstance) {
 		{
 			schema: {
 				tags: ['Authentication'],
-				summary: 'Refresh JWT token',
+				summary: 'Refresh token',
 				response: {
 					200: z.object({
 						token: z.string(),
@@ -187,20 +193,32 @@ export async function usersRoutes(app: FastifyInstance) {
 				throw new BadRequestError('Refresh token not found.')
 			}
 			try {
-				const decoded = (await app.jwt.verify(refreshToken)) as { userId: string; role: string }
+				const decoded = (await app.jwt.verify(refreshToken)) as {
+					userId: string
+					role: string
+				}
 
-				const token = await reply.jwtSign({ userId: decoded.userId, role: decoded.role }, { expiresIn: '1h' })
+				const token = await reply.jwtSign(
+					{ userId: decoded.userId, role: decoded.role },
+					{ expiresIn: '1h' }
+				)
 
 				return reply.status(200).send({ token, refreshToken })
 			} catch (error) {
-				const decoded = (await app.jwt.verify(refreshToken)) as { userId: string; role: string }
+				const decoded = (await app.jwt.verify(refreshToken)) as {
+					userId: string
+					role: string
+				}
 
 				const newRefreshToken = await reply.jwtSign(
 					{ userId: decoded.userId, role: decoded.role },
 					{ expiresIn: '7d' }
 				)
 
-				const token = await reply.jwtSign({ userId: decoded.userId, role: decoded.role }, { expiresIn: '1h' })
+				const token = await reply.jwtSign(
+					{ userId: decoded.userId, role: decoded.role },
+					{ expiresIn: '1h' }
+				)
 
 				return reply
 					.setCookie('refreshToken', newRefreshToken, {
@@ -221,7 +239,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists],
 			schema: {
 				tags: ['Users'],
-				summary: 'List users',
+				summary: 'List all users',
 				response: {
 					200: z.object({
 						users: z.array(
@@ -261,10 +279,17 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.delete(
+	app.withTypeProvider<ZodTypeProvider>().delete(
 		'/',
 		{
-			preHandler: [checkSessionIdExists]
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Users'],
+				summary: 'Delete account',
+				response: {
+					204: z.object({})
+				}
+			}
 		},
 		async (request, reply) => {
 			const getUserParamsSchema = z.object({
@@ -283,10 +308,26 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.get(
+	app.withTypeProvider<ZodTypeProvider>().get(
 		'/:query',
 		{
-			preHandler: [checkSessionIdExists]
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Users'],
+				summary: 'Search user by name',
+				params: z.object({
+					query: z.string()
+				}),
+				response: {
+					200: z.object({
+						user: z.object({
+							id: z.string(),
+							name: z.string(),
+							avatar: z.string().nullable()
+						})
+					})
+				}
+			}
 		},
 		async (request, reply) => {
 			const { query } = getUserParamsSchema.parse(request.params)
@@ -316,31 +357,43 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.post('/password', async (request, reply) => {
-		const { credential } = getUserCredentialSchema.parse(request.body)
-
-		const user = await prisma.users.findFirst({
-			where: {
-				email: credential
-			},
-			select: {
-				email: true
+	app.withTypeProvider<ZodTypeProvider>().post(
+		'/password',
+		{
+			schema: {
+				tags: ['Authentication'],
+				summary: 'Change password',
+				body: z.object({
+					credential: z.string()
+				})
 			}
-		})
+		},
+		async (request, reply) => {
+			const { credential } = getUserCredentialSchema.parse(request.body)
 
-		if (!user) {
-			throw new BadRequestError('User not found.')
+			const user = await prisma.users.findFirst({
+				where: {
+					email: credential
+				},
+				select: {
+					email: true
+				}
+			})
+
+			if (!user) {
+				throw new BadRequestError('User not found.')
+			}
+
+			reply.status(200).send({ user })
 		}
-
-		reply.status(200).send({ user })
-	})
+	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
 		'/profile',
 		{
 			preHandler: [checkSessionIdExists],
 			schema: {
-				tags: ['Authentication'],
+				tags: ['Users'],
 				summary: 'Get authenticated user profile',
 				response: {
 					200: z.object({
@@ -350,40 +403,30 @@ export async function usersRoutes(app: FastifyInstance) {
 							name: z.string(),
 							avatar: z.string().url().nullable()
 						})
-					}),
-					404: z.object({
-						message: z.string()
-					}),
-					500: z.object({
-						message: z.string()
 					})
 				}
 			}
 		},
 		async (request, reply) => {
-			try {
-				const { userId } = request.headers
+			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
 
-				const user = await prisma.users.findUnique({
-					where: {
-						id: String(userId)
-					},
-					select: {
-						id: true,
-						name: true,
-						role: true,
-						avatar: true
-					}
-				})
-
-				if (!user) {
-					throw new BadRequestError('User not found.')
+			const user = await prisma.users.findUnique({
+				where: {
+					id
+				},
+				select: {
+					id: true,
+					name: true,
+					role: true,
+					avatar: true
 				}
+			})
 
-				return reply.status(200).send({ user })
-			} catch (error) {
-				return reply.status(500).send({ message: 'An error occurred while fetching the profile.' })
+			if (!user) {
+				throw new BadRequestError('User not found.')
 			}
+
+			return reply.status(200).send({ user })
 		}
 	)
 }

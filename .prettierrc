@@ -2,10 +2,10 @@
   "arrowParens": "avoid",
   "editor.formatOnSave": true,
   "endOfLine": "lf",
-  "printWidth": 110,
+  "printWidth": 80,
   "semi": false,
   "singleQuote": true,
-  "tabWidth": 1,
+  "tabWidth": 2,
   "trailingComma": "none",
   "useTabs": true
 }

@@ -14,7 +14,7 @@ import {
 	ZodTypeProvider
 } from 'fastify-type-provider-zod'
 
-import { usersRoutes } from './routes/users'
+import { usersRoutes } from './routes/controllers/users'
 
 import { errorHandler } from './utils/error-handlers'
 
