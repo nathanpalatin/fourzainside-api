@@ -29,7 +29,8 @@ model Users {
   emailVerified      Boolean         @default(false)
 
   
-  Transactions       Transactions[]
+  transactions       Transactions[]
+  notifications      Notifications[]
 
   @@map("users")
 }
@@ -46,3 +47,19 @@ model Transactions {
 
   @@map("transactions")
 }
+
+model Notifications {
+  id               String    @id @default(uuid())
+  notificationType String
+  sendUserId       String  
+  receiveUserId    String
+  status           String    @default("unread")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  usersId          String  
+
+  receiveUser      Users     @relation(fields: [usersId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+

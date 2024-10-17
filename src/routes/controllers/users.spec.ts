@@ -52,7 +52,7 @@ describe('Users routes (e2e)', () => {
 		})
 
 		const { user } = await sut.execute({
-			email: 'johndoe@example.com',
+			credential: 'johndoe@example.com',
 			password: '123456'
 		})
 

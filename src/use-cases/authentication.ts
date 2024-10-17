@@ -1,11 +1,11 @@
+import type { Users } from '@prisma/client'
 import { compare } from 'bcrypt'
+
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
 import type { UsersRepository } from '../repositories/users-repository'
-import type { Users } from '@prisma/client'
-import { sign } from 'jsonwebtoken'
 
 interface AuthenticateUseCaseRequest {
-	email: string
+	credential: string
 	password: string
 }
 
@@ -16,8 +16,15 @@ interface AuthenticateUseCaseResponse {
 export class AuthenticateUseCase {
 	constructor(private usersRepository: UsersRepository) {}
 
-	async execute({ email, password }: AuthenticateUseCaseRequest): Promise<AuthenticateUseCaseResponse> {
-		const user = await this.usersRepository.findByEmail(email)
+	async execute({
+		credential,
+		password
+	}: AuthenticateUseCaseRequest): Promise<AuthenticateUseCaseResponse> {
+		let user = await this.usersRepository.findByEmail(credential)
+
+		if (!user) {
+			user = await this.usersRepository.findByCPF(credential)
+		}
 
 		if (!user) {
 			throw new InvalidCredentialsError()

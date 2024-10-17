@@ -16,6 +16,7 @@ import {
 
 import { usersRoutes } from './routes/controllers/users'
 import { profileRoutes } from './routes/controllers/profile'
+import { notifcationsRoutes } from './routes/controllers/notifications'
 
 import { errorHandler } from './utils/error-handlers'
 
@@ -85,4 +86,8 @@ app.register(usersRoutes, {
 
 app.register(profileRoutes, {
 	prefix: 'profile'
+})
+
+app.register(notifcationsRoutes, {
+	prefix: 'notifications'
 })
