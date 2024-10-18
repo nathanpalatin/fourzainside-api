@@ -59,6 +59,21 @@ describe('Users routes (e2e)', () => {
 		expect(user.id).toEqual(expect.any(String))
 	})
 
+	it('should be able to refresh token from user authenticated', async () => {
+		const { refreshToken } = await createAndAuthenticateUser(app)
+
+		const response = await request(app.server)
+			.patch('/users/token/refresh')
+			.set('Cookie', 'refreshToken=' + refreshToken)
+			.send()
+
+		expect(response.status).toEqual(200)
+		expect(response.body).toEqual({
+			token: expect.any(String),
+			refreshToken: expect.any(String)
+		})
+	})
+
 	it('should be able to update a user', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 

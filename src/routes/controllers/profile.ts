@@ -1,13 +1,11 @@
 import type { FastifyInstance } from 'fastify'
-import { prisma } from '../../lib/prisma'
-
-import { z } from 'zod'
-
-import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
-import { getTokenHeaderSchema } from '../../@types/zod/user'
+import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+
+import { getTokenHeaderSchema, userProfileSchema } from '../../@types/zod/user'
 
 import { BadRequestError } from '../_errors/bad-request-error'
+import { makeGetUserProfileUseCase } from '../../use-cases/factories/make-get-user-profile-use-case'
 
 export async function profileRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
@@ -18,31 +16,15 @@ export async function profileRoutes(app: FastifyInstance) {
 				tags: ['Users'],
 				summary: 'Get authenticated user profile',
 				response: {
-					200: z.object({
-						user: z.object({
-							id: z.string().uuid(),
-							role: z.enum(['ADMIN', 'USER', 'SELLER']),
-							name: z.string(),
-							avatar: z.string().url().nullable()
-						})
-					})
+					200: userProfileSchema
 				}
 			}
 		},
 		async (request, reply) => {
-			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
+			const getUserProfile = makeGetUserProfileUseCase()
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const user = await prisma.users.findUnique({
-				where: {
-					id
-				},
-				select: {
-					id: true,
-					name: true,
-					role: true,
-					avatar: true
-				}
-			})
+			const { user } = await getUserProfile.execute({ userId })
 
 			if (!user) {
 				throw new BadRequestError('User not found.')

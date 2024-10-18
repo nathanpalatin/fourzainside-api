@@ -44,3 +44,12 @@ export const createWalletSchema = z.object({
 	coinType: z.string(),
 	country: z.string()
 })
+
+export const userProfileSchema = z.object({
+	user: z.object({
+		id: z.string().uuid(),
+		role: z.enum(['ADMIN', 'USER', 'SELLER']),
+		name: z.string(),
+		avatar: z.string().url().nullable()
+	})
+})
