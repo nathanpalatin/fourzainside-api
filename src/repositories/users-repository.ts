@@ -8,4 +8,5 @@ export interface UsersRepository {
 	findByPhone(phone: string): Promise<Users | null>
 
 	create(data: Prisma.UsersCreateInput): Promise<Users>
+	delete(id: string): Promise<Users | null>
 }

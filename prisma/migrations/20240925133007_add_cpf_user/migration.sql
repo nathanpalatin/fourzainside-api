@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "users" ADD COLUMN     "cpf" TEXT NOT NULL DEFAULT '99999999999';

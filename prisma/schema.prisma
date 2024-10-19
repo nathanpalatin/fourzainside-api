@@ -31,8 +31,9 @@ model Users {
   
   transactions       Transactions[]
   notifications      Notifications[]
-
+  
   @@map("users")
+
 }
 
 model Transactions {
@@ -51,14 +52,15 @@ model Transactions {
 model Notifications {
   id               String    @id @default(uuid())
   notificationType String
+  notificationText String?
   sendUserId       String  
+  userId           String  
   receiveUserId    String
   status           String    @default("unread")
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
-  usersId          String  
 
-  receiveUser      Users     @relation(fields: [usersId], references: [id], onDelete: Cascade)
+  user            Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }

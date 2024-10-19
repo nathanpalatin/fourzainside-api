@@ -5,7 +5,8 @@ import type { UsersRepository } from '../users-repository'
 
 export class InMemoryUsersRepository implements UsersRepository {
 	public items: Users[] = []
-	async findByPhone(phone: string): Promise<Users | null> {
+
+	async findByPhone(phone: string) {
 		const user = this.items.find(item => item.phone === phone)
 
 		if (!user) {
@@ -15,7 +16,7 @@ export class InMemoryUsersRepository implements UsersRepository {
 		return user
 	}
 
-	async findByCPF(cpf: string): Promise<Users | null> {
+	async findByCPF(cpf: string) {
 		const user = this.items.find(item => item.cpf === cpf)
 
 		if (!user) {
@@ -63,6 +64,14 @@ export class InMemoryUsersRepository implements UsersRepository {
 
 		this.items.push(user)
 
+		return user
+	}
+
+	async delete(id: string) {
+		const user = this.items.find(item => item.id === id)
+		if (!user) {
+			return null
+		}
 		return user
 	}
 }

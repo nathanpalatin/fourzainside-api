@@ -53,3 +53,8 @@ export const userProfileSchema = z.object({
 		avatar: z.string().url().nullable()
 	})
 })
+
+export const responseRefreshTokenSchema = z.object({
+	token: z.string(),
+	refreshToken: z.string()
+})

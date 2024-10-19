@@ -8,10 +8,13 @@ async function seed() {
 	await prisma.users.create({
 		data: {
 			name: faker.person.fullName(),
-			email: faker.internet.email(),
+			email: faker.internet.email().toLocaleLowerCase(),
 			avatar: faker.image.avatarGitHub(),
-			phone: faker.phone.number(),
-			cpf: faker.string.numeric(11),
+			phone: faker.phone.number({ style: 'international' }),
+			cpf:
+				faker.string.numeric(9).padStart(9, '0') +
+				'-' +
+				faker.string.numeric(2),
 			birthdate: faker.date.anytime().toISOString(),
 			password: await hash('123456', 1)
 		}

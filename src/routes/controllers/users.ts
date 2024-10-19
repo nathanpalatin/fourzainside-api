@@ -15,12 +15,15 @@ import {
 	getTokenHeaderSchema,
 	getUserCredentialSchema,
 	getUserParamsSchema,
+	responseRefreshTokenSchema,
 	updateUserSchemaBody
 } from '../../@types/zod/user'
 
 import { makeRegisterUseCase } from '../../use-cases/factories/make-register-use-case'
 import { UserAlreadyExistsError } from '../../use-cases/errors/user-already-exists-error'
 import { BadRequestError } from '../_errors/bad-request-error'
+import { deleteAccountUseCase } from '@/use-cases/delete-account'
+import { makeDeleteAccountUseCase } from '@/use-cases/factories/make-delete-account-use-case'
 
 interface QueryParams {
 	limit?: string
@@ -177,12 +180,9 @@ export async function usersRoutes(app: FastifyInstance) {
 		{
 			schema: {
 				tags: ['Authentication'],
-				summary: 'Refresh token',
+				summary: 'Refresh token from authenticated user',
 				response: {
-					200: z.object({
-						token: z.string(),
-						refreshToken: z.string()
-					})
+					200: responseRefreshTokenSchema
 				}
 			}
 		},
@@ -292,19 +292,10 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const getUserParamsSchema = z.object({
-				userId: z.string()
-			})
-
-			const { userId: id } = getUserParamsSchema.parse(request.headers)
-
-			await prisma.users.delete({
-				where: {
-					id
-				}
-			})
-
-			reply.status(204).send({ message: 'Account deleted successfully.' })
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
+			const deleteUseCase = makeDeleteAccountUseCase()
+			deleteUseCase.execute({ userId })
+			reply.status(204).send()
 		}
 	)
 
