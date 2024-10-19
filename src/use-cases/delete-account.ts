@@ -11,7 +11,7 @@ interface DeleteAccountUseCaseResponse {
 	user: Users | null
 }
 
-export class deleteAccountUseCase {
+export class DeleteAccountUseCase {
 	constructor(private usersRepository: UsersRepository) {}
 
 	async execute({
