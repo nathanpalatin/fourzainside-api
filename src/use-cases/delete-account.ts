@@ -1,7 +1,7 @@
 import type { Users } from '@prisma/client'
 import type { UsersRepository } from '../repositories/users-repository'
 
-import { BadRequestError } from '@/routes/_errors/bad-request-error'
+import { BadRequestError } from '../routes/_errors/bad-request-error'
 
 interface DeleteAccountUseCaseRequest {
 	userId: string

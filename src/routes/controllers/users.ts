@@ -22,8 +22,7 @@ import {
 import { makeRegisterUseCase } from '../../use-cases/factories/make-register-use-case'
 import { UserAlreadyExistsError } from '../../use-cases/errors/user-already-exists-error'
 import { BadRequestError } from '../_errors/bad-request-error'
-import { deleteAccountUseCase } from '@/use-cases/delete-account'
-import { makeDeleteAccountUseCase } from '@/use-cases/factories/make-delete-account-use-case'
+import { makeDeleteAccountUseCase } from '../../use-cases/factories/make-delete-account-use-case'
 
 interface QueryParams {
 	limit?: string
