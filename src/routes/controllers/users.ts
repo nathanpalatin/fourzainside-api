@@ -287,7 +287,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				tags: ['Users'],
 				summary: 'Delete account',
 				response: {
-					204: z.object({})
+					204: z.null()
 				}
 			}
 		},

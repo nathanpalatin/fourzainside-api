@@ -17,11 +17,13 @@ export class deleteAccountUseCase {
 	async execute({
 		userId
 	}: DeleteAccountUseCaseRequest): Promise<DeleteAccountUseCaseResponse> {
-		const user = await this.usersRepository.delete(userId)
+		const user = await this.usersRepository.findById(userId)
 
 		if (!user) {
 			throw new BadRequestError('User not found')
 		}
+
+		await this.usersRepository.delete(userId)
 
 		return {
 			user
