@@ -63,7 +63,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 
 			const createNotification = makeCreateNotificationUseCase()
 
-			await createNotification.execute({
+			const { notification } = await createNotification.execute({
 				notificationType: notificationType,
 				notificationText: notificationText ?? '',
 				sendUserId: userId,
@@ -72,7 +72,10 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 
 			return reply
 				.status(200)
-				.send({ message: 'Notification sent successfully.' })
+				.send({
+					id: notification.id,
+					message: 'Notification sent successfully.'
+				})
 		}
 	)
 

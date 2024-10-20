@@ -18,18 +18,18 @@ describe('Notifications (e2e)', () => {
 	it('should be able to get user notifications', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 
-		const profileResponse = await request(app.server)
+		const notificationResponse = await request(app.server)
 			.get('/notifications')
 			.set('Authorization', `${token}`)
 			.send()
 
-		expect(profileResponse.statusCode).toEqual(200)
+		expect(notificationResponse.statusCode).toEqual(200)
 	})
 
 	it('should be able to send a notification', async () => {
 		const { token } = await createAndAuthenticateUser(app)
 
-		const profileResponse = await request(app.server)
+		const notificationResponse = await request(app.server)
 			.post('/notifications')
 			.set('Authorization', `${token}`)
 			.send({
@@ -38,6 +38,26 @@ describe('Notifications (e2e)', () => {
 				notificationText: 'Check out the new feature!'
 			})
 
-		expect(profileResponse.statusCode).toEqual(200)
+		expect(notificationResponse.statusCode).toEqual(200)
+	})
+
+	it('should be able to read a notification', async () => {
+		const { token } = await createAndAuthenticateUser(app)
+
+		const notificationId = await request(app.server)
+			.post('/notifications')
+			.set('Authorization', `${token}`)
+			.send({
+				notificationType: 'NEWS',
+				receiveUserId: randomUUID(),
+				notificationText: 'Check out the new feature!'
+			})
+
+		const notificationUpdateResponse = await request(app.server)
+			.patch(`/notifications/${notificationId.body.id}`)
+			.set('Authorization', `${token}`)
+			.send()
+
+		expect(notificationUpdateResponse.statusCode).toEqual(204)
 	})
 })
