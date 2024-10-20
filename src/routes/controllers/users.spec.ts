@@ -7,6 +7,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { InMemoryUsersRepository } from '../../repositories/in-memory/in-memory-users-repository'
 import { AuthenticateUseCase } from '../../use-cases/authentication'
+
 import { createAndAuthenticateUser } from '../../utils/tests/create-and-authenticate'
 
 let usersRepository: InMemoryUsersRepository

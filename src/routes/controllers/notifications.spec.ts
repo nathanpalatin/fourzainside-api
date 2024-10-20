@@ -1,8 +1,10 @@
 import request from 'supertest'
 import { app } from '../../app'
+
+import { randomUUID } from 'crypto'
+
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createAndAuthenticateUser } from '../../utils/tests/create-and-authenticate'
-import { randomUUID } from 'crypto'
 
 describe('Notifications (e2e)', () => {
 	beforeAll(async () => {
@@ -31,7 +33,7 @@ describe('Notifications (e2e)', () => {
 			.post('/notifications')
 			.set('Authorization', `${token}`)
 			.send({
-				notificationType: 'Test',
+				notificationType: 'NEWS',
 				receiveUserId: randomUUID(),
 				notificationText: 'Check out the new feature!'
 			})

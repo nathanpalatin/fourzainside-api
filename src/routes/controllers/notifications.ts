@@ -10,7 +10,7 @@ import {
 	createNotificationSchema,
 	createNotificationsSchema
 } from '../../@types/zod/notification'
-import { makeCreateNotificationUseCase } from '@/use-cases/factories/make-create-notification-use-case'
+import { makeCreateNotificationUseCase } from '../../use-cases/factories/make-create-notification-use-case'
 
 export async function notifcationsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
