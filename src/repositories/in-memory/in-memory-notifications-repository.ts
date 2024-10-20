@@ -9,13 +9,13 @@ export class InMemoryNotificationsRepository
 	public items: Notifications[] = []
 
 	async findById(id: string) {
-		const user = this.items.find(item => item.id === id)
+		const notification = this.items.find(item => item.id === id)
 
-		if (!user) {
+		if (!notification) {
 			return null
 		}
 
-		return user
+		return notification
 	}
 
 	async create(data: Prisma.NotificationsCreateInput) {
@@ -37,10 +37,18 @@ export class InMemoryNotificationsRepository
 	}
 
 	async delete(id: string) {
-		const user = this.items.find(item => item.id === id)
-		if (!user) {
+		const notification = this.items.find(item => item.id === id)
+		if (!notification) {
 			return null
 		}
-		return user
+		return notification
+	}
+
+	async update(id: string) {
+		const notification = this.items.find(item => item.id === id)
+		if (!notification) {
+			return null
+		}
+		return notification
 	}
 }

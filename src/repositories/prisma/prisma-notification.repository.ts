@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
+
 import type { NotificationsRepository } from '../notifications-repository'
 
 export class PrismaNotificationRepository implements NotificationsRepository {
@@ -24,6 +25,18 @@ export class PrismaNotificationRepository implements NotificationsRepository {
 		const notification = await prisma.notifications.delete({
 			where: {
 				id
+			}
+		})
+		return notification
+	}
+
+	async update(id: string) {
+		const notification = await prisma.notifications.update({
+			where: {
+				id
+			},
+			data: {
+				status: 'read'
 			}
 		})
 		return notification

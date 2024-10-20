@@ -19,3 +19,7 @@ export const createNotificationSchema = z.object({
 	receiveUserId: z.string().uuid(),
 	notificationText: z.string().optional()
 })
+
+export const updateNotificationSchema = z.object({
+	id: z.string().uuid()
+})

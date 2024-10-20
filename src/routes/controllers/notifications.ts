@@ -8,9 +8,12 @@ import { getTokenHeaderSchema } from '../../@types/zod/user'
 import { BadRequestError } from '../_errors/bad-request-error'
 import {
 	createNotificationSchema,
-	createNotificationsSchema
+	createNotificationsSchema,
+	updateNotificationSchema
 } from '../../@types/zod/notification'
+
 import { makeCreateNotificationUseCase } from '../../use-cases/factories/make-create-notification-use-case'
+import { makeUpdateNotificationUseCase } from '../../use-cases/factories/make-update-notification-use-case'
 
 export async function notifcationsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
@@ -70,6 +73,25 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			return reply
 				.status(200)
 				.send({ message: 'Notification sent successfully.' })
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().patch(
+		'/:id',
+		{
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Notifications'],
+				summary: 'Read a notification'
+			}
+		},
+		async (request, reply) => {
+			const { id } = updateNotificationSchema.parse(request.params)
+
+			const updateNotification = makeUpdateNotificationUseCase()
+			updateNotification.execute({ notificationId: id })
+
+			reply.status(204).send()
 		}
 	)
 }

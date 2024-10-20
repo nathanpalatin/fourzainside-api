@@ -7,6 +7,10 @@ export interface NotificationUseCaseRequest {
 	receiveUserId: string
 }
 
+export interface NotificationUpdateUseCaseRequest {
+	notificationId: string
+}
+
 export interface NotificationUseCaseResponse {
 	notification: Notifications
 }
