@@ -25,8 +25,6 @@ export class DeleteAccountUseCase {
 
 		await this.usersRepository.delete(userId)
 
-		return {
-			user
-		}
+		return { user }
 	}
 }

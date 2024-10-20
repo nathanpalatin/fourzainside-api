@@ -72,6 +72,9 @@ export class InMemoryUsersRepository implements UsersRepository {
 		if (!user) {
 			return null
 		}
+
+		this.items = this.items.filter(item => item.id !== id)
+
 		return user
 	}
 }

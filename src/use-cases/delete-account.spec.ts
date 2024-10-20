@@ -2,19 +2,19 @@ import { expect, describe, it, beforeEach } from 'vitest'
 import { hash } from 'bcrypt'
 
 import { DeleteAccountUseCase } from './delete-account'
-import { PrismaUsersRepository } from '@/repositories/prisma/prisma-user-repository'
+import { InMemoryUsersRepository } from '@/repositories/in-memory/in-memory-users-repository'
 
-let usersRepository: PrismaUsersRepository
+let usersRepository: InMemoryUsersRepository
 let sut: DeleteAccountUseCase
 
 describe('Delete account Use Case', () => {
 	beforeEach(() => {
-		usersRepository = new PrismaUsersRepository()
+		usersRepository = new InMemoryUsersRepository()
 		sut = new DeleteAccountUseCase(usersRepository)
 	})
 
 	it('should be able to delete account', async () => {
-		const user = await usersRepository.create({
+		const { id: userId } = await usersRepository.create({
 			name: 'John Doe',
 			email: 'johndoe@example.com',
 			cpf: '999.999.999-99',
@@ -22,7 +22,10 @@ describe('Delete account Use Case', () => {
 			birthdate: '1993-06-14T00:00:00Z',
 			password: await hash('123456', 1)
 		})
-		const deletedUser = await sut.execute({ userId: user.id })
+
+		await sut.execute({ userId })
+
+		const deletedUser = await usersRepository.findById(userId)
 
 		expect(deletedUser).toBe(null)
 	})

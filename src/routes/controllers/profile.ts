@@ -1,5 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
+
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { getTokenHeaderSchema, userProfileSchema } from '../../@types/zod/user'
