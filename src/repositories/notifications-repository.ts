@@ -5,5 +5,4 @@ export interface NotificationsRepository {
 
 	create(data: Prisma.NotificationsCreateInput): Promise<Notifications>
 	update(id: string): Promise<Notifications | null>
-	delete(id: string): Promise<Notifications | null>
 }

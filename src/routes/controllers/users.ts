@@ -8,6 +8,7 @@ import { prisma } from '../../lib/prisma'
 import { compare } from 'bcrypt'
 
 import { checkSessionIdExists } from '../../middlewares/auth-token'
+
 import {
 	createLoginSchemaBody,
 	createUserSchemaBody,

@@ -36,19 +36,18 @@ export class InMemoryNotificationsRepository
 		return notification
 	}
 
-	async delete(id: string) {
-		const notification = this.items.find(item => item.id === id)
-		if (!notification) {
-			return null
-		}
-		return notification
-	}
-
 	async update(id: string) {
-		const notification = this.items.find(item => item.id === id)
-		if (!notification) {
+		const notificationIndex = this.items.findIndex(item => item.id === id)
+
+		if (notificationIndex === -1) {
 			return null
 		}
-		return notification
+
+		this.items[notificationIndex] = {
+			...this.items[notificationIndex],
+			status: 'read'
+		}
+
+		return null
 	}
 }

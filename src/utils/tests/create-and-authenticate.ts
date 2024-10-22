@@ -4,7 +4,10 @@ import { hash } from 'bcrypt'
 import { FastifyInstance } from 'fastify'
 import request from 'supertest'
 
-export async function createAndAuthenticateUser(app: FastifyInstance) {
+export async function createAndAuthenticateUser(
+	app: FastifyInstance,
+	isAdmin = false
+) {
 	const email = faker.internet.email()
 	await prisma.users.create({
 		data: {
@@ -14,7 +17,7 @@ export async function createAndAuthenticateUser(app: FastifyInstance) {
 			phone: faker.phone.number(),
 			email,
 			password: await hash('123456', 1),
-			role: 'USER'
+			role: isAdmin ? 'ADMIN' : 'USER'
 		}
 	})
 

@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
-
 import type { NotificationsRepository } from '../notifications-repository'
 
 export class PrismaNotificationRepository implements NotificationsRepository {

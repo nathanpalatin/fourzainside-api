@@ -8,7 +8,7 @@ export interface NotificationUseCaseRequest {
 }
 
 export interface NotificationUpdateUseCaseRequest {
-	notificationId: string
+	id: string
 }
 
 export interface NotificationUseCaseResponse {

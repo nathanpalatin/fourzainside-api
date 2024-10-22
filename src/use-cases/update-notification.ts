@@ -9,16 +9,15 @@ export class UpdateNotificationUseCase {
 	constructor(private notificationRepository: NotificationsRepository) {}
 
 	async execute({
-		notificationId
+		id
 	}: NotificationUpdateUseCaseRequest): Promise<NotificationUseCaseResponse> {
-		const notification =
-			await this.notificationRepository.findById(notificationId)
+		const notification = await this.notificationRepository.findById(id)
 
 		if (!notification) {
 			throw new BadRequestError('Notification not found.')
 		}
 
-		await this.notificationRepository.update(notificationId)
+		await this.notificationRepository.update(id)
 
 		return {
 			notification

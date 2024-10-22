@@ -1,10 +1,16 @@
 import request from 'supertest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+
 import { app } from '../../app'
 
 import { randomUUID } from 'crypto'
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { createAndAuthenticateUser } from '../../utils/tests/create-and-authenticate'
+import { InMemoryNotificationsRepository } from '../../repositories/in-memory/in-memory-notifications-repository'
+import { NotificationUseCase } from '../../use-cases/create-notification'
+
+let notificationsRepository: InMemoryNotificationsRepository
+let sut: NotificationUseCase
 
 describe('Notifications (e2e)', () => {
 	beforeAll(async () => {
@@ -13,6 +19,11 @@ describe('Notifications (e2e)', () => {
 
 	afterAll(async () => {
 		await app.close()
+	})
+
+	beforeEach(() => {
+		notificationsRepository = new InMemoryNotificationsRepository()
+		sut = new NotificationUseCase(notificationsRepository)
 	})
 
 	it('should be able to get user notifications', async () => {
@@ -27,7 +38,7 @@ describe('Notifications (e2e)', () => {
 	})
 
 	it('should be able to send a notification', async () => {
-		const { token } = await createAndAuthenticateUser(app)
+		const { token, userId } = await createAndAuthenticateUser(app)
 
 		const notificationResponse = await request(app.server)
 			.post('/notifications')
@@ -37,7 +48,6 @@ describe('Notifications (e2e)', () => {
 				receiveUserId: randomUUID(),
 				notificationText: 'Check out the new feature!'
 			})
-
 		expect(notificationResponse.statusCode).toEqual(200)
 	})
 

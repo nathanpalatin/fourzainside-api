@@ -22,6 +22,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists],
 			schema: {
 				tags: ['Notifications'],
+
 				summary: 'Get authenticated user notifications',
 				response: {
 					200: createNotificationsSchema
@@ -34,6 +35,9 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			)
 
 			const notifications = await prisma.notifications.findMany({
+				orderBy: {
+					createdAt: 'desc'
+				},
 				where: { receiveUserId }
 			})
 
@@ -70,12 +74,10 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 				receiveUserId
 			})
 
-			return reply
-				.status(200)
-				.send({
-					id: notification.id,
-					message: 'Notification sent successfully.'
-				})
+			return reply.status(200).send({
+				id: notification.id,
+				message: 'Notification sent successfully.'
+			})
 		}
 	)
 
@@ -92,7 +94,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			const { id } = updateNotificationSchema.parse(request.params)
 
 			const updateNotification = makeUpdateNotificationUseCase()
-			updateNotification.execute({ notificationId: id })
+			updateNotification.execute({ id })
 
 			reply.status(204).send()
 		}

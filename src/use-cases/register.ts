@@ -1,5 +1,8 @@
 import { hash } from 'bcrypt'
-import { RegisterUseCaseRequest, type RegisterUseCaseResponse } from '../@types/use-cases/users'
+import {
+	RegisterUseCaseRequest,
+	type RegisterUseCaseResponse
+} from '../@types/use-cases/users'
 
 import type { UsersRepository } from '../repositories/users-repository'
 
