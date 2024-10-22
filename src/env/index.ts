@@ -2,7 +2,9 @@ import 'dotenv/config'
 import { z } from 'zod'
 
 const envSchema = z.object({
-	NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+	NODE_ENV: z
+		.enum(['development', 'test', 'production'])
+		.default('development'),
 	DATABASE_CLIENT: z.enum(['mysql', 'pg']).default('pg'),
 	DATABASE_URL: z.string().url(),
 	JWT_SECRET_KEY: z.string(),
@@ -10,7 +12,6 @@ const envSchema = z.object({
 	CLOUDFLARE_ACCESS_KEY_ID: z.string(),
 	CLOUDFLARE_SECRET_ACCESS_KEY: z.string(),
 	BLOB_READ_WRITE_TOKEN: z.string(),
-
 	PORT: z.coerce.number().default(3333)
 })
 

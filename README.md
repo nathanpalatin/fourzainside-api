@@ -6,6 +6,7 @@
 - [x] It must be possible to search for users by name
 - [x] It must be possible to list all notifications
 - [x] It must be possible to create transaction
+- [x] It must be possible to list all transactions
 - [x] It must be possible to list read a notification
 - [x] It must be possible to send a notification
 

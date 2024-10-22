@@ -14,6 +14,7 @@ import {
 
 import { makeCreateNotificationUseCase } from '../../use-cases/factories/make-create-notification-use-case'
 import { makeUpdateNotificationUseCase } from '../../use-cases/factories/make-update-notification-use-case'
+import { makeGetNotificationsUseCase } from '../../use-cases/factories/make-get-notifications-use-case'
 
 export async function notifcationsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
@@ -30,20 +31,11 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { userId: receiveUserId } = getTokenHeaderSchema.parse(
-				request.headers
-			)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const notifications = await prisma.notifications.findMany({
-				orderBy: {
-					createdAt: 'desc'
-				},
-				where: { receiveUserId }
-			})
+			const notificationsList = makeGetNotificationsUseCase()
 
-			if (!notifications) {
-				throw new BadRequestError('Notifications not found.')
-			}
+			const { notifications } = await notificationsList.execute({ userId })
 
 			return reply.status(200).send({ notifications })
 		}

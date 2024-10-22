@@ -4,7 +4,7 @@ import type {
 } from '../@types/use-cases/notifications'
 import type { NotificationsRepository } from '../repositories/notifications-repository'
 
-export class NotificationUseCase {
+export class CreateNotificationUseCase {
 	constructor(private notificationRepository: NotificationsRepository) {}
 
 	async execute({

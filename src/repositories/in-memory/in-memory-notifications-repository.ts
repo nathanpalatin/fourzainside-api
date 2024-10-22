@@ -18,6 +18,15 @@ export class InMemoryNotificationsRepository
 		return notification
 	}
 
+	async findMany(userId: string) {
+		const notifications = {
+			...this.items,
+			userId
+		}
+
+		return notifications
+	}
+
 	async create(data: Prisma.NotificationsCreateInput) {
 		const notification = {
 			id: randomUUID(),
