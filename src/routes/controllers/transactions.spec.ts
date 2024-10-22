@@ -1,4 +1,5 @@
 import request from 'supertest'
+
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { app } from '../../app'
@@ -6,8 +7,10 @@ import { app } from '../../app'
 import { randomUUID } from 'crypto'
 
 import { createAndAuthenticateUser } from '../../utils/tests/create-and-authenticate'
+import { InMemoryTransactionsRepository } from '../../repositories/in-memory/in-memory-transactions-repository'
+import { TransactionUseCase } from '../../use-cases/create-transaction'
 
-describe('Notifications (e2e)', () => {
+describe('Transactions (e2e)', () => {
 	beforeAll(async () => {
 		await app.ready()
 	})
@@ -16,19 +19,8 @@ describe('Notifications (e2e)', () => {
 		await app.close()
 	})
 
-	it('should be able to get user notifications', async () => {
-		const { token } = await createAndAuthenticateUser(app)
-
-		const notificationResponse = await request(app.server)
-			.get('/notifications')
-			.set('Authorization', `${token}`)
-			.send()
-
-		expect(notificationResponse.statusCode).toEqual(200)
-	})
-
 	it('should be able to send a notification', async () => {
-		const { token, userId } = await createAndAuthenticateUser(app)
+		const { token } = await createAndAuthenticateUser(app)
 
 		const notificationResponse = await request(app.server)
 			.post('/notifications')

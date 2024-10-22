@@ -5,6 +5,9 @@
 - [x] It must be possible to retrieve the profile of a logged-in user
 - [x] It must be possible to search for users by name
 - [x] It must be possible to list all notifications
+- [x] It must be possible to create transaction
+- [x] It must be possible to list read a notification
+- [x] It must be possible to send a notification
 
 ## Business Rules (BRs)
 

@@ -1,4 +1,4 @@
-import { PrismaNotificationRepository } from '../../repositories/prisma/prisma-notification.repository'
+import { PrismaNotificationRepository } from '../../repositories/prisma/prisma-notification-repository'
 import { UpdateNotificationUseCase } from '../update-notification'
 
 export function makeUpdateNotificationUseCase() {

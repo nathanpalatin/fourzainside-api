@@ -19,6 +19,7 @@ import { profileRoutes } from './routes/controllers/profile'
 import { notifcationsRoutes } from './routes/controllers/notifications'
 
 import { errorHandler } from './utils/error-handlers'
+import { transactionsRoutes } from './routes/controllers/transactions'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -90,4 +91,8 @@ app.register(profileRoutes, {
 
 app.register(notifcationsRoutes, {
 	prefix: 'notifications'
+})
+
+app.register(transactionsRoutes, {
+	prefix: 'transactions'
 })
