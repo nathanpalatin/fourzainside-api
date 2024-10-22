@@ -2,15 +2,15 @@ import { expect, describe, it, beforeEach } from 'vitest'
 
 import { InMemoryNotificationsRepository } from '../repositories/in-memory/in-memory-notifications-repository'
 import { randomUUID } from 'crypto'
-import { NotificationUseCase } from './create-notification'
+import { CreateNotificationUseCase } from './create-notification'
 
 let notificationRepository: InMemoryNotificationsRepository
-let sut: NotificationUseCase
+let sut: CreateNotificationUseCase
 
 describe('Notification Use Case', () => {
 	beforeEach(() => {
 		notificationRepository = new InMemoryNotificationsRepository()
-		sut = new NotificationUseCase(notificationRepository)
+		sut = new CreateNotificationUseCase(notificationRepository)
 	})
 
 	it('should be able to send a notification', async () => {
