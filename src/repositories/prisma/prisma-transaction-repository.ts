@@ -13,6 +13,15 @@ export class PrismaTransactionRepository implements TransactionsRepository {
 		return notification
 	}
 
+	async findMany(userId: string) {
+		const transactions = await prisma.transactions.findMany({
+			where: {
+				userId
+			}
+		})
+		return transactions
+	}
+
 	async create(data: Prisma.TransactionsCreateInput) {
 		const notification = await prisma.transactions.create({
 			data

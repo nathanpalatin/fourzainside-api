@@ -6,7 +6,7 @@ export const getNotificationBodySchema = z.object({
 })
 
 export const getTransactionParamsSchema = z.object({
-	id: z.string().uuid()
+	transactionId: z.string().uuid()
 })
 
 export const createTransactionBodySchema = z.object({

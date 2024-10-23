@@ -1,11 +1,9 @@
 import type { FastifyInstance } from 'fastify'
-import { prisma } from '../../lib/prisma'
 
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 import { getTokenHeaderSchema } from '../../@types/zod/user'
 
-import { BadRequestError } from '../_errors/bad-request-error'
 import {
 	createNotificationSchema,
 	createNotificationsSchema,
@@ -52,7 +50,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { userId } = getTokenHeaderSchema.parse(request.headers)
+			const { userId: sendUserId } = getTokenHeaderSchema.parse(request.headers)
 
 			const { notificationType, receiveUserId, notificationText } =
 				createNotificationSchema.parse(request.body)
@@ -62,7 +60,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			const { notification } = await createNotification.execute({
 				notificationType: notificationType,
 				notificationText: notificationText ?? '',
-				sendUserId: userId,
+				sendUserId,
 				receiveUserId
 			})
 

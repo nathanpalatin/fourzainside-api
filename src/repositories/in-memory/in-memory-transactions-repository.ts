@@ -16,6 +16,15 @@ export class InMemoryTransactionsRepository implements TransactionsRepository {
 		return transaction
 	}
 
+	async findMany(userId: string) {
+		const transactions = {
+			...this.items,
+			userId
+		}
+
+		return transactions
+	}
+
 	async create(data: Prisma.TransactionsCreateInput, userId: string) {
 		const transaction = {
 			id: randomUUID(),
