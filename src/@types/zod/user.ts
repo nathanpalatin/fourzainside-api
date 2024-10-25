@@ -11,6 +11,7 @@ export const getRefreshTokenSchema = z.object({
 export const createUserSchemaBody = z.object({
 	name: z.string(),
 	cpf: z.string(),
+	username: z.string(),
 	birthdate: z.string(),
 	password: z.string().min(6),
 	email: z.string().email(),
@@ -48,7 +49,7 @@ export const createWalletSchema = z.object({
 export const userProfileSchema = z.object({
 	user: z.object({
 		id: z.string().uuid(),
-		role: z.enum(['ADMIN', 'USER', 'SELLER']),
+		role: z.enum(['ADMIN', 'USER', 'MENTOR']),
 		name: z.string(),
 		avatar: z.string().url().nullable()
 	})

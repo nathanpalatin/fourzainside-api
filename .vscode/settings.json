@@ -190,4 +190,7 @@
   },
   "workbench.editor.enablePreview": false,
   "workbench.editor.editorActionsLocation": "titleBar",
+  "[markdown]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
 }

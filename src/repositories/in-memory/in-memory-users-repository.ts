@@ -50,6 +50,13 @@ export class InMemoryUsersRepository implements UsersRepository {
 		const user = {
 			id: randomUUID(),
 			name: data.name,
+			address: data.address ?? null,
+			gender: data.gender ?? 'male',
+			city: data.city ?? null,
+			state: data.state ?? null,
+			zipCode: data.zipCode ?? null,
+			occupation: data.occupation ?? null,
+			username: data.username,
 			birthdate: data.birthdate,
 			cpf: data.cpf,
 			avatar: null,

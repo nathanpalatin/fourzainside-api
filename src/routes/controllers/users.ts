@@ -46,7 +46,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { name, email, password, phone, cpf, birthdate } =
+			const { name, email, password, username, phone, cpf, birthdate } =
 				createUserSchemaBody.parse(request.body)
 			try {
 				const registerUseCase = makeRegisterUseCase()
@@ -55,6 +55,7 @@ export async function usersRoutes(app: FastifyInstance) {
 					name,
 					cpf,
 					phone,
+					username,
 					birthdate,
 					email,
 					password

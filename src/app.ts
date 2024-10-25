@@ -17,9 +17,11 @@ import {
 import { usersRoutes } from './routes/controllers/users'
 import { profileRoutes } from './routes/controllers/profile'
 import { notifcationsRoutes } from './routes/controllers/notifications'
+import { transactionsRoutes } from './routes/controllers/transactions'
+
+import { coursesRoutes } from './routes/controllers/courses'
 
 import { errorHandler } from './utils/error-handlers'
-import { transactionsRoutes } from './routes/controllers/transactions'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -28,7 +30,7 @@ app.route({
 	url: '/',
 	handler: () => {
 		return {
-			montvenue: 'API Route montvenue.'
+			api: 'API Route Fourza Members.'
 		}
 	}
 })
@@ -52,8 +54,8 @@ app.setErrorHandler(errorHandler)
 app.register(fastifySwagger, {
 	openapi: {
 		info: {
-			title: 'Montvenue',
-			description: 'Montvenue API Routes.',
+			title: 'Fourza Members',
+			description: 'Fourza Members API Routes.',
 			version: '1.0',
 			contact: {
 				name: 'Nathan Palatin',
@@ -95,4 +97,8 @@ app.register(notifcationsRoutes, {
 
 app.register(transactionsRoutes, {
 	prefix: 'transactions'
+})
+
+app.register(coursesRoutes, {
+	prefix: 'courses'
 })

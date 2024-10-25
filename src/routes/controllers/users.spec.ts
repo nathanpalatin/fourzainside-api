@@ -32,6 +32,11 @@ describe('Users routes (e2e)', () => {
 			.post('/users')
 			.send({
 				name: 'John Doe',
+				username: 'johndoe',
+				address: 'Rua 123, 1234',
+				city: 'Cidade do Teste',
+				state: 'SP',
+				zipCode: '12345-678',
 				phone: '+554799999999',
 				email: 'johndoe@example.com',
 				cpf: '426.315.238-73',
@@ -45,6 +50,7 @@ describe('Users routes (e2e)', () => {
 	it('should be able to log in', async () => {
 		await usersRepository.create({
 			name: 'John Doe',
+			username: 'johndoe',
 			phone: '+554799999999',
 			cpf: '999.999.999-99',
 			birthdate: '1993-06-14',

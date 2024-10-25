@@ -1,9 +1,9 @@
 services:
- api-montvenue-pg:
+ api-fourzamembers-pg:
   image: bitnami/postgresql:latest
   ports:
    - 5432:5432
   environment:
    - POSTGRESQL_PASSWORD=docker
    - POSTGRESQL_USERNAME=docker
-   - POSTGRESQL_DATABASE=montvenue
+   - POSTGRESQL_DATABASE=fourzamembers

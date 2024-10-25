@@ -1,7 +1,7 @@
 {
-  "name": "montvenue-api",
+  "name": "fourzamembers-api",
   "version": "1.0.0",
-  "description": "API montvenue",
+  "description": "API Fourza Members",
   "main": "src/server.ts",
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -20,9 +20,13 @@
     "build": "tsup src --out-dir build",
     "postinstall": "prisma generate"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathandpalatin/fourzamembers-api.git"
+  },
   "keywords": [],
   "author": "Nathan Palatin",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.6",

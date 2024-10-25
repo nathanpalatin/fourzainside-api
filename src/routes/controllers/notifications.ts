@@ -84,7 +84,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			const { id } = updateNotificationSchema.parse(request.params)
 
 			const updateNotification = makeUpdateNotificationUseCase()
-			updateNotification.execute({ id })
+			await updateNotification.execute({ id })
 
 			reply.status(204).send()
 		}

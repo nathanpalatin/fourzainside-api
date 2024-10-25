@@ -12,12 +12,13 @@ export async function createAndAuthenticateUser(
 	await prisma.users.create({
 		data: {
 			name: 'John Doe',
+			username: faker.person.lastName(),
 			cpf: faker.phone.number(),
 			birthdate: '1993-06-14',
 			phone: faker.phone.number(),
 			email,
 			password: await hash('123456', 1),
-			role: isAdmin ? 'ADMIN' : 'USER'
+			role: isAdmin ? 'MENTOR' : 'USER'
 		}
 	})
 

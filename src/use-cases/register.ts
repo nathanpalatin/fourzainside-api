@@ -15,6 +15,7 @@ export class RegisterUseCase {
 		name,
 		email,
 		password,
+		username,
 		phone,
 		cpf,
 		birthdate
@@ -32,6 +33,7 @@ export class RegisterUseCase {
 		const user = await this.usersRepository.create({
 			name,
 			email,
+			username,
 			cpf,
 			password: password_hash,
 			phone,
