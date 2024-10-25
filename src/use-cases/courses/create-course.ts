@@ -12,6 +12,7 @@ export class CreateCourseUseCase {
 		description,
 		image,
 		level,
+		tags,
 		duration,
 		type,
 		userId
@@ -20,10 +21,11 @@ export class CreateCourseUseCase {
 			title,
 			description,
 			image,
+			tags,
 			level,
 			duration,
 			type,
-			users: {
+			user: {
 				connect: { id: userId }
 			},
 			createdAt: new Date(),

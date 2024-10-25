@@ -12,7 +12,13 @@ export class InMemoryCoursesRepository implements CoursesRepository {
 			tags: Array.isArray(data.tags) ? data.tags : [],
 			type: data.type,
 			title: data.title,
+			userId: data.user.connect?.id ? data.user.connect.id : '',
 			image: data.image,
+			user: {
+				connect: {
+					id: data.user.connect?.id
+				}
+			},
 			level: data.level ?? 'easy',
 			duration: data.duration,
 			description: data.description,
@@ -21,5 +27,13 @@ export class InMemoryCoursesRepository implements CoursesRepository {
 		}
 
 		return course
+	}
+	async findMany(userId: string) {
+		const courses = {
+			...this.items,
+			userId
+		}
+
+		return courses
 	}
 }

@@ -17,7 +17,6 @@ import {
 import { usersRoutes } from './routes/controllers/users'
 import { profileRoutes } from './routes/controllers/profile'
 import { notifcationsRoutes } from './routes/controllers/notifications'
-import { transactionsRoutes } from './routes/controllers/transactions'
 
 import { coursesRoutes } from './routes/controllers/courses'
 
@@ -93,10 +92,6 @@ app.register(profileRoutes, {
 
 app.register(notifcationsRoutes, {
 	prefix: 'notifications'
-})
-
-app.register(transactionsRoutes, {
-	prefix: 'transactions'
 })
 
 app.register(coursesRoutes, {

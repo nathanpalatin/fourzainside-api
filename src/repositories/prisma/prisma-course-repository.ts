@@ -8,9 +8,20 @@ export class PrismaCourseRepository implements CoursesRepository {
 		const course = await prisma.courses.create({
 			data: {
 				...data,
-				tags: Array.isArray(data.tags) ? data.tags : []
+				user: { connect: { id: data.user.connect?.id } },
+				tags: data.tags ?? []
 			}
 		})
 		return course
+	}
+
+	async findMany(userId: string): Promise<Courses[]> {
+		const courses = await prisma.courses.findMany({
+			where: {
+				userId
+			}
+		})
+
+		return courses
 	}
 }
