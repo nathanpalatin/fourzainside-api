@@ -45,7 +45,8 @@
   "gitlens.codeLens.recentChange.enabled": false,
   "terminal.integrated.showExitAlert": false,
   "[prisma]": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "Prisma.prisma"
   },
   "typescript.suggest.autoImports": true,
   "typescript.preferences.preferTypeOnlyAutoImports": true,

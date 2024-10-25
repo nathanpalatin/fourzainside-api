@@ -16,9 +16,9 @@ import {
 
 import { usersRoutes } from './routes/controllers/users'
 import { profileRoutes } from './routes/controllers/profile'
-import { notifcationsRoutes } from './routes/controllers/notifications'
-
 import { coursesRoutes } from './routes/controllers/courses'
+import { lessonsRoutes } from './routes/controllers/lessons'
+import { notifcationsRoutes } from './routes/controllers/notifications'
 
 import { errorHandler } from './utils/error-handlers'
 
@@ -96,4 +96,8 @@ app.register(notifcationsRoutes, {
 
 app.register(coursesRoutes, {
 	prefix: 'courses'
+})
+
+app.register(lessonsRoutes, {
+	prefix: 'lessons'
 })

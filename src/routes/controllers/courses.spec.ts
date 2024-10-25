@@ -35,12 +35,10 @@ describe('Courses (e2e)', () => {
 			.send({
 				title: 'Introduction to JavaScript',
 				description: 'This course will teach you the basics of JavaScript.',
-				startDate: '2022-01-01',
 				image: 'teste.png',
 				type: 'image/png',
 				level: 'advanced',
 				tags: ['JavaScript', 'programming'],
-				endDate: '2022-06-30',
 				duration: 180
 			})
 

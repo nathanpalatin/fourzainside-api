@@ -26,6 +26,8 @@ export class InMemoryCoursesRepository implements CoursesRepository {
 			updatedAt: new Date()
 		}
 
+		this.items.push(course)
+
 		return course
 	}
 	async findMany(userId: string) {
