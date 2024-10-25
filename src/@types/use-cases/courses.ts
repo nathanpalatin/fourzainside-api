@@ -11,12 +11,20 @@ export interface CourseUseCaseRequest {
 	userId: string
 }
 
+export interface DeleteCourseUseCaseRequest {
+	courseId: string
+}
+
 export interface ListCoursesUseCaseRequest {
 	userId: string
 }
 
 export interface CourseUseCaseResponse {
 	courses: Courses
+}
+
+export interface DeleteCourseUseCaseResponse {
+	course: Courses | null
 }
 
 export interface ListCoursesUseCaseResponse {

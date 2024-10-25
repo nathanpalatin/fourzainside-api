@@ -11,7 +11,6 @@ const envSchema = z.object({
 	CLOUDFLARE_ENDPOINT: z.string().url(),
 	CLOUDFLARE_ACCESS_KEY_ID: z.string(),
 	CLOUDFLARE_SECRET_ACCESS_KEY: z.string(),
-	BLOB_READ_WRITE_TOKEN: z.string(),
 	PORT: z.coerce.number().default(3333)
 })
 

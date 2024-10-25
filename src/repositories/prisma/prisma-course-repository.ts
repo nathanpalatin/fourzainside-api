@@ -34,4 +34,12 @@ export class PrismaCourseRepository implements CoursesRepository {
 
 		return courses
 	}
+	async delete(id: string) {
+		const course = await prisma.courses.delete({
+			where: {
+				id
+			}
+		})
+		return course
+	}
 }

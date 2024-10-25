@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto'
 
 import { Prisma, type Lessons } from '@prisma/client'
 import type { LessonsRepository } from '../lessons-repository'
-import { CONNREFUSED } from 'node:dns'
 
 export class InMemoryLessonsRepository implements LessonsRepository {
 	public items: Lessons[] = []
@@ -18,6 +17,8 @@ export class InMemoryLessonsRepository implements LessonsRepository {
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}
+
+		this.items.push(lesson)
 
 		return lesson
 	}

@@ -38,4 +38,15 @@ export class InMemoryCoursesRepository implements CoursesRepository {
 
 		return courses
 	}
+
+	async delete(id: string) {
+		const course = this.items.find(item => item.id === id)
+		if (!course) {
+			return null
+		}
+
+		this.items = this.items.filter(item => item.id !== id)
+
+		return course
+	}
 }

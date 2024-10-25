@@ -4,11 +4,15 @@ import {
 	getParamsUserSchema,
 	getTokenHeaderSchema
 } from '../../@types/zod/user'
-import { createCourseSchemaBody } from '../../@types/zod/course'
+import {
+	createCourseSchemaBody,
+	getParamsCourseSchema
+} from '../../@types/zod/course'
 import { makeCreateCourseUseCase } from '../../use-cases/factories/make-create-course-use-case'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 import { z } from 'zod'
 import { makeGetCourseByUserUseCase } from '../../use-cases/factories/make-get-courses-by-user-use-case'
+import { makeDeleteCourseUseCase } from '../../use-cases/factories/make-delete-course-use-case'
 
 export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -67,6 +71,26 @@ export async function coursesRoutes(app: FastifyInstance) {
 			const getUserCourses = makeGetCourseByUserUseCase()
 
 			const courses = await getUserCourses.execute({ userId })
+
+			return reply.status(200).send(courses)
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().delete(
+		'/:courseId',
+		{
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Courses'],
+				summary: 'Delete a course'
+			}
+		},
+		async (request, reply) => {
+			const { courseId } = getParamsCourseSchema.parse(request.params)
+
+			const deleteCourseFromUser = makeDeleteCourseUseCase()
+
+			const courses = await deleteCourseFromUser.execute({ courseId })
 
 			return reply.status(200).send(courses)
 		}

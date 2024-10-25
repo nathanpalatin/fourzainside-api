@@ -6,5 +6,5 @@ export interface CoursesRepository {
 
 	create(data: Prisma.CoursesCreateInput): Promise<Courses>
 	//update(id: string): Promise<Courses | null>
-	//delete(id: string): Promise<Courses | null>
+	delete(id: string): Promise<Courses | null>
 }
