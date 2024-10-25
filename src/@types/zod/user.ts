@@ -4,6 +4,10 @@ export const getTokenHeaderSchema = z.object({
 	userId: z.string()
 })
 
+export const getParamsUserSchema = z.object({
+	userId: z.string()
+})
+
 export const getRefreshTokenSchema = z.object({
 	refreshToken: z.string()
 })

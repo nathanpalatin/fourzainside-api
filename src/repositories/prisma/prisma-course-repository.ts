@@ -17,6 +17,9 @@ export class PrismaCourseRepository implements CoursesRepository {
 
 	async findMany(userId: string): Promise<Courses[]> {
 		const courses = await prisma.courses.findMany({
+			orderBy: {
+				createdAt: 'desc'
+			},
 			where: {
 				userId
 			}

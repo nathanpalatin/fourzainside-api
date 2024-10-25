@@ -14,6 +14,18 @@ describe('Courses (e2e)', () => {
 		await app.close()
 	})
 
+	it('should be able to list all courses from user', async () => {
+		const { token, userId } = await createAndAuthenticateUser(app)
+
+		const coursesResponse = await request(app.server)
+			.get(`/courses/${userId}`)
+			.set('Authorization', `${token}`)
+			.send()
+
+		expect(coursesResponse.statusCode).toEqual(200)
+		expect(coursesResponse.body.courses.length).toBeGreaterThanOrEqual(0)
+	})
+
 	it('should be able to create a course', async () => {
 		const { token } = await createAndAuthenticateUser(app, true)
 

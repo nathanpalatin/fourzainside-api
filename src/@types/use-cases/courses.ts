@@ -11,6 +11,14 @@ export interface CourseUseCaseRequest {
 	userId: string
 }
 
+export interface ListCoursesUseCaseRequest {
+	userId: string
+}
+
 export interface CourseUseCaseResponse {
 	courses: Courses
+}
+
+export interface ListCoursesUseCaseResponse {
+	courses: Courses[]
 }
