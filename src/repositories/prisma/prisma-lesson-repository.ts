@@ -1,6 +1,7 @@
-import { Prisma, type Lessons } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
+
 import type { LessonsRepository } from '../lessons-repository'
 
 export class PrismaLessonRepository implements LessonsRepository {

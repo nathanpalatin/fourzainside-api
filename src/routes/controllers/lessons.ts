@@ -11,6 +11,7 @@ import { makeCreateLessonUseCase } from '../../use-cases/factories/make-create-l
 import { makeDeleteLessonUseCase } from '../../use-cases/factories/make-delete-lesson-use-case'
 import { makeGetLessonsCourseUseCase } from '../../use-cases/factories/make-get-lesson-from-course'
 import { getParamsCourseSchema } from '../../@types/zod/course'
+import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
 
 export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -84,4 +85,14 @@ export async function lessonsRoutes(app: FastifyInstance) {
 			return reply.status(204).send()
 		}
 	)
+
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.get('/comments/:lessonId', async (request, reply) => {
+			const { lessonId } = getParamsLessonSchema.parse(request.params)
+
+			const getMakeComments = makeGetCommentsLessonCourseUseCase()
+			const comments = await getMakeComments.execute({ lessonId })
+			return reply.status(200).send(comments)
+		})
 }

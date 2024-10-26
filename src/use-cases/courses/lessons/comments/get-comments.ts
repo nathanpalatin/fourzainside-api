@@ -6,7 +6,7 @@ import type { CommentsRepository } from '../../../../repositories/comments-repos
 import type { LessonsRepository } from '../../../../repositories/lessons-repository'
 import { BadRequestError } from '../../../../routes/_errors/bad-request-error'
 
-export class CreateCommentLessonUseCase {
+export class GetCommentsLessonUseCase {
 	constructor(
 		private lessonRepository: LessonsRepository,
 		private commentRepository: CommentsRepository
@@ -18,7 +18,7 @@ export class CreateCommentLessonUseCase {
 		const lessons = await this.lessonRepository.findById(lessonId)
 
 		if (!lessons) {
-			throw new BadRequestError('lessons not found')
+			throw new BadRequestError('lesson not found')
 		}
 
 		const comments = await this.commentRepository.findMany(lessons.id)
