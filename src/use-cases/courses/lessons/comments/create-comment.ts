@@ -1,33 +1,44 @@
 import type {
+	CreateCommentUseCaseRequest,
+	CreateCommentUseCaseResponse,
 	LessonUseCaseRequest,
-	LessonUseCaseResponse
-} from '../../../@types/use-cases/lessons'
-import type { LessonsRepository } from '../../../repositories/lessons-repository'
+	ListCommentsUseCaseRequest
+} from '../../../../@types/use-cases/lessons'
+import type { CommentsRepository } from '../../../../repositories/comments-repository'
+import type { LessonsRepository } from '../../../../repositories/lessons-repository'
+import { BadRequestError } from '../../../../routes/_errors/bad-request-error'
 
 export class CreateCommentLessonUseCase {
-	constructor(private lessonRepository: LessonsRepository) {}
+	constructor(
+		private lessonRepository: LessonsRepository,
+		private commentRepository: CommentsRepository
+	) {}
 
 	async execute({
-		title,
-		description,
-		duration,
-		video,
-		courseId
-	}: LessonUseCaseRequest): Promise<LessonUseCaseResponse> {
-		const lessons = await this.lessonRepository.create({
-			title,
-			description,
-			duration,
-			video,
-			course: {
-				connect: { id: courseId }
-			},
-			createdAt: new Date(),
-			updatedAt: new Date()
+		lessonId,
+		content,
+		userId,
+		answer
+	}: CreateCommentUseCaseRequest): Promise<CreateCommentUseCaseResponse> {
+		const lesson = await this.lessonRepository.findById(lessonId)
+
+		if (!lesson) {
+			throw new BadRequestError('Lesson not found')
+		}
+
+		const comment = await this.commentRepository.create({
+			content,
+			userId,
+			answer,
+			lesson: {
+				connect: {
+					id: lessonId
+				}
+			}
 		})
 
 		return {
-			lessons
+			comment
 		}
 	}
 }

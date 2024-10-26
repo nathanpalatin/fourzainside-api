@@ -4,6 +4,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 import { z } from 'zod'
 import {
+	createCommentLessonSchemaBody,
 	createLessonSchemaBody,
 	getParamsLessonSchema
 } from '../../@types/zod/lesson'
@@ -12,6 +13,8 @@ import { makeDeleteLessonUseCase } from '../../use-cases/factories/make-delete-l
 import { makeGetLessonsCourseUseCase } from '../../use-cases/factories/make-get-lesson-from-course'
 import { getParamsCourseSchema } from '../../@types/zod/course'
 import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
+import { getTokenHeaderSchema } from '../../@types/zod/user'
+import { makeCreateCommentLessonCourseUseCase } from '../../use-cases/factories/make-create-comment-use-case'
 
 export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -86,13 +89,45 @@ export async function lessonsRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app
-		.withTypeProvider<ZodTypeProvider>()
-		.get('/comments/:lessonId', async (request, reply) => {
+	app.withTypeProvider<ZodTypeProvider>().get(
+		'/comments/:lessonId',
+		{
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Lessons'],
+				summary: 'List all comments from lesson'
+			}
+		},
+		async (request, reply) => {
 			const { lessonId } = getParamsLessonSchema.parse(request.params)
 
 			const getMakeComments = makeGetCommentsLessonCourseUseCase()
 			const comments = await getMakeComments.execute({ lessonId })
 			return reply.status(200).send(comments)
-		})
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().post(
+		'/comments',
+		{
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Lessons'],
+				summary: 'Create comment into lesson'
+			}
+		},
+		async (request, reply) => {
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
+			const { content, lessonId, answer } = createCommentLessonSchemaBody.parse(
+				request.body
+			)
+
+			const makeCreateComment = makeCreateCommentLessonCourseUseCase()
+			await makeCreateComment.execute({ content, lessonId, userId, answer })
+
+			return reply
+				.status(201)
+				.send({ message: 'Comment created successfully.' })
+		}
+	)
 }

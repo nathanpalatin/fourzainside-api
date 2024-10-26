@@ -6,22 +6,22 @@ import type { CommentsRepository } from '../comments-repository'
 
 export class PrismaCommentRepository implements CommentsRepository {
 	async findById(id: string) {
-		const lesson = await prisma.comments.findUnique({
+		const comment = await prisma.comments.findUnique({
 			where: {
 				id
 			}
 		})
-		return lesson
+		return comment
 	}
 	async create(data: Prisma.CommentsCreateInput) {
-		const lesson = await prisma.comments.create({
+		const comment = await prisma.comments.create({
 			data
 		})
-		return lesson
+		return comment
 	}
 
 	async findMany(lessonId: string) {
-		const lessons = await prisma.comments.findMany({
+		const comments = await prisma.comments.findMany({
 			orderBy: {
 				createdAt: 'desc'
 			},
@@ -30,15 +30,15 @@ export class PrismaCommentRepository implements CommentsRepository {
 			}
 		})
 
-		return lessons
+		return comments
 	}
 
 	async delete(id: string) {
-		const lesson = await prisma.comments.delete({
+		const comment = await prisma.comments.delete({
 			where: {
 				id
 			}
 		})
-		return lesson
+		return comment
 	}
 }

@@ -36,6 +36,17 @@ export interface ListCommentsUseCaseRequest {
 	lessonId: string
 }
 
+export interface CreateCommentUseCaseRequest {
+	lessonId: string
+	content: string
+	userId: string
+	answer: boolean
+}
+
 export interface ListCommentsUseCaseResponse {
 	comments: Comments[]
+}
+
+export interface CreateCommentUseCaseResponse {
+	comment: Comments
 }

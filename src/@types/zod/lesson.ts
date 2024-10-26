@@ -10,3 +10,9 @@ export const createLessonSchemaBody = z.object({
 export const getParamsLessonSchema = z.object({
 	lessonId: z.string()
 })
+
+export const createCommentLessonSchemaBody = z.object({
+	content: z.string(),
+	lessonId: z.string(),
+	answer: z.boolean().default(false)
+})
