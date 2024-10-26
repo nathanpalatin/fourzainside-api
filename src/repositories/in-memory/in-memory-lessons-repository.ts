@@ -22,6 +22,16 @@ export class InMemoryLessonsRepository implements LessonsRepository {
 
 		return lesson
 	}
+
+	async findById(id: string) {
+		const lesson = this.items.find(item => item.id === id)
+
+		if (!lesson) {
+			return null
+		}
+
+		return lesson
+	}
 	async findMany(userId: string) {
 		const lessons = {
 			...this.items,

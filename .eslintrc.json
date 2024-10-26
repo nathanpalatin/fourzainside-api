@@ -5,7 +5,8 @@
   },
   "extends": [
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "simple-import-sort"
   ],
   "ignorePatterns": [
     ".eslintrc.js"
@@ -26,6 +27,7 @@
   ],
   "root": true,
   "rules": {
+    "simple-import-sort/imports": "error",
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",

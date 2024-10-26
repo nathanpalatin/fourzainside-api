@@ -6,6 +6,16 @@ import type { CoursesRepository } from '../courses-repository'
 export class InMemoryCoursesRepository implements CoursesRepository {
 	public items: Courses[] = []
 
+	async findById(id: string) {
+		const course = this.items.find(item => item.id === id)
+
+		if (!course) {
+			return null
+		}
+
+		return course
+	}
+
 	async create(data: Prisma.CoursesCreateInput) {
 		const course = {
 			id: randomUUID(),

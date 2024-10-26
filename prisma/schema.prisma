@@ -14,27 +14,6 @@ enum Role {
   USER
 }
 
-model Lessons {
-  id             String      @id @default(uuid())
-  title          String
-  description    String
-  duration       Int
-  video          String
-  watched        Boolean     @default(false)
-  classification Int         @default(0)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  transcription  String?
-  courseId       String
-  materials      Materials[]
-  comments       Comments[]
-  course         Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  Progress Progress[]
-
-  @@map("lessons")
-}
-
 model Users {
   id            String   @id @default(uuid())
   name          String
@@ -56,7 +35,6 @@ model Users {
   role          Role     @default(USER)
   emailVerified Boolean  @default(false)
 
-  transactions  Transactions[]
   notifications Notifications[]
   certificates  Certificates[]
   courses       Courses[]
@@ -100,6 +78,27 @@ model Courses {
   @@map("courses")
 }
 
+model Lessons {
+  id             String      @id @default(uuid())
+  title          String
+  description    String
+  duration       Int
+  video          String
+  watched        Boolean     @default(false)
+  classification Int         @default(0)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  transcription  String?
+  courseId       String
+  materials      Materials[]
+  comments       Comments[]
+  course         Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  Progress Progress[]
+
+  @@map("lessons")
+}
+
 model Progress {
   id        String   @id @default(uuid())
   userId    String
@@ -114,19 +113,6 @@ model Progress {
   lesson Lessons @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@map("progress")
-}
-
-model Transactions {
-  id        String   @id @default(uuid())
-  title     String
-  userId    String
-  amount    Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  type      String
-  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("transactions")
 }
 
 model Notifications {

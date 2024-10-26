@@ -3,6 +3,7 @@ import type {
 	DeleteCourseUseCaseResponse
 } from '../../@types/use-cases/courses'
 import type { CoursesRepository } from '../../repositories/courses-repository'
+import { BadRequestError } from '../../routes/_errors/bad-request-error'
 
 export class DeleteCourseUseCase {
 	constructor(private courseRepository: CoursesRepository) {}
@@ -10,7 +11,13 @@ export class DeleteCourseUseCase {
 	async execute({
 		courseId
 	}: DeleteCourseUseCaseRequest): Promise<DeleteCourseUseCaseResponse> {
-		const course = await this.courseRepository.delete(courseId)
+		const course = await this.courseRepository.findById(courseId)
+
+		if (!course) {
+			throw new BadRequestError('Course not found')
+		}
+
+		await this.courseRepository.delete(courseId)
 
 		return {
 			course

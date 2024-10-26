@@ -72,7 +72,7 @@ app.register(fastifySwagger, {
 app.register(fastifySwaggerUI, {
 	routePrefix: '/docs',
 	staticCSP: true,
-	transformSpecification: (swaggerObject, req, reply) => {
+	transformSpecification: (swaggerObject, _req, _reply) => {
 		return swaggerObject
 	},
 	transformSpecificationClone: true

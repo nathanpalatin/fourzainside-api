@@ -1,4 +1,4 @@
-import type { Lessons } from '@prisma/client'
+import type { Comments, Lessons } from '@prisma/client'
 
 export interface LessonUseCaseRequest {
 	title: string
@@ -23,9 +23,6 @@ export interface ListLessonsFromCourseUseCaseRequest {
 export interface LessonUseCaseResponse {
 	lessons: Lessons
 }
-export interface ListLessonUseCaseResponse {
-	lessons: Lessons[]
-}
 
 export interface LessonDeleteUseCaseResponse {
 	lesson: Lessons | null
@@ -33,4 +30,12 @@ export interface LessonDeleteUseCaseResponse {
 
 export interface ListLessonsUseCaseResponse {
 	lessons: Lessons[]
+}
+
+export interface ListCommentsUseCaseRequest {
+	lessonId: string
+}
+
+export interface ListCommentsUseCaseResponse {
+	comments: Comments[]
 }

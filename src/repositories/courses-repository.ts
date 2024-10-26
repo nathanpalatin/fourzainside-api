@@ -1,7 +1,7 @@
 import { Prisma, type Courses } from '@prisma/client'
 
 export interface CoursesRepository {
-	//findById(id: string): Promise<Courses | null>
+	findById(id: string): Promise<Courses | null>
 	findMany(userId: string): Promise<Courses[]>
 
 	create(data: Prisma.CoursesCreateInput): Promise<Courses>
