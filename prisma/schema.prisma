@@ -105,13 +105,13 @@ model Progress {
   courseId  String
   lessonId  String
   completed Boolean  @default(false)
-  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lesson Lessons @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, lessonId])
   @@map("progress")
 }
 

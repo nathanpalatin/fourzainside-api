@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto'
-
 import { Prisma, type Lessons } from '@prisma/client'
 import type { LessonsRepository } from '../lessons-repository'
 
@@ -19,36 +18,39 @@ export class InMemoryLessonsRepository implements LessonsRepository {
 		}
 
 		this.items.push(lesson)
-
 		return lesson
 	}
 
 	async findById(id: string) {
-		const lesson = this.items.find(item => item.id === id)
-
-		if (!lesson) {
-			return null
-		}
-
-		return lesson
+		return this.items.find(item => item.id === id) || null
 	}
-	async findMany(userId: string) {
-		const lessons = {
-			...this.items,
-			userId
-		}
 
-		return lessons
+	async findMany() {
+		return this.items
 	}
 
 	async delete(id: string) {
-		const lesson = this.items.find(item => item.id === id)
-		if (!lesson) {
+		const lessonIndex = this.items.findIndex(item => item.id === id)
+		if (lessonIndex === -1) {
 			return null
 		}
 
-		this.items = this.items.filter(item => item.id !== id)
+		const [deletedLesson] = this.items.splice(lessonIndex, 1)
+		return deletedLesson
+	}
 
-		return lesson
+	async update(id: string, data: Partial<Lessons>) {
+		const lessonIndex = this.items.findIndex(item => item.id === id)
+		if (lessonIndex === -1) {
+			return null
+		}
+
+		this.items[lessonIndex] = {
+			...this.items[lessonIndex],
+			...data,
+			updatedAt: new Date()
+		}
+
+		return this.items[lessonIndex]
 	}
 }

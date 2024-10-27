@@ -5,6 +5,17 @@ import { prisma } from '../../lib/prisma'
 import type { LessonsRepository } from '../lessons-repository'
 
 export class PrismaLessonRepository implements LessonsRepository {
+	async update(id: string, data: Prisma.LessonsUpdateInput) {
+		const lesson = await prisma.lessons.update({
+			where: {
+				id
+			},
+			data
+		})
+
+		return lesson
+	}
+
 	async findById(id: string) {
 		const lesson = await prisma.lessons.findUnique({
 			where: {

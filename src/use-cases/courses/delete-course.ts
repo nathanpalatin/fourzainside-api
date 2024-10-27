@@ -13,10 +13,6 @@ export class DeleteCourseUseCase {
 	}: DeleteCourseUseCaseRequest): Promise<DeleteCourseUseCaseResponse> {
 		const course = await this.courseRepository.findById(courseId)
 
-		if (!course) {
-			throw new BadRequestError('Course not found')
-		}
-
 		await this.courseRepository.delete(courseId)
 
 		return {

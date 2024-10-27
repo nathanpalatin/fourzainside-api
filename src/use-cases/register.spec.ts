@@ -16,6 +16,7 @@ describe('Register Use Case', () => {
 	it('should to register', async () => {
 		const { user } = await sut.execute({
 			name: 'John Doe',
+			username: 'johndoe',
 			cpf: '999.999.999-99',
 			phone: '+5547999999999',
 			birthdate: '1993-06-14T00:00:00Z',
@@ -31,6 +32,7 @@ describe('Register Use Case', () => {
 			name: 'John Doe',
 			cpf: '999.999.999-99',
 			phone: '+5547999999999',
+			username: 'johndoe',
 			birthdate: '1993-06-14T00:00:00Z',
 			email: 'johndoe@example.com',
 			password: '123456'
@@ -47,6 +49,7 @@ describe('Register Use Case', () => {
 		await sut.execute({
 			name: 'John Doe',
 			cpf: '999.999.999-99',
+			username: 'johndoe',
 			phone: '+5547999999999',
 			birthdate: '1993-06-14T00:00:00Z',
 			email,
@@ -56,6 +59,7 @@ describe('Register Use Case', () => {
 		await expect(() =>
 			sut.execute({
 				name: 'John Doe',
+				username: 'johndoe',
 				cpf: '999.999.999-99',
 				phone: '+5547999999999',
 				birthdate: '1993-06-14T00:00:00Z',

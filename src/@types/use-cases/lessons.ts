@@ -1,4 +1,4 @@
-import type { Comments, Lessons } from '@prisma/client'
+import type { Comments, Lessons, Progress } from '@prisma/client'
 
 export interface LessonUseCaseRequest {
 	title: string
@@ -28,8 +28,18 @@ export interface LessonDeleteUseCaseResponse {
 	lesson: Lessons | null
 }
 
+export interface LessonUpdateUseCaseResponse {
+	progress: Progress | null
+}
+
 export interface ListLessonsUseCaseResponse {
 	lessons: Lessons[]
+}
+
+export interface GetLessonUseCaseRequest {
+	courseId: string
+	userId: string
+	lessonId: string
 }
 
 export interface ListCommentsUseCaseRequest {

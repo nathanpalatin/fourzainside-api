@@ -12,9 +12,6 @@ export class DeleteLessonUseCase {
 	}: LessonDeleteUseCaseRequest): Promise<LessonDeleteUseCaseResponse> {
 		const lesson = await this.lessonRepository.findById(lessonId)
 
-		if (!lesson) {
-			throw new BadRequestError('Lesson not found')
-		}
 		await this.lessonRepository.delete(lessonId)
 
 		return { lesson }

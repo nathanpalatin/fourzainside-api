@@ -6,7 +6,8 @@ import { z } from 'zod'
 import {
 	createCommentLessonSchemaBody,
 	createLessonSchemaBody,
-	getParamsLessonSchema
+	getParamsLessonSchema,
+	updateProgressLessonSchema
 } from '../../@types/zod/lesson'
 import { makeCreateLessonUseCase } from '../../use-cases/factories/make-create-lesson-use-case'
 import { makeDeleteLessonUseCase } from '../../use-cases/factories/make-delete-lesson-use-case'
@@ -15,6 +16,8 @@ import { getParamsCourseSchema } from '../../@types/zod/course'
 import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
 import { getTokenHeaderSchema } from '../../@types/zod/user'
 import { makeCreateCommentLessonCourseUseCase } from '../../use-cases/factories/make-create-comment-use-case'
+import { prisma } from '../../lib/prisma'
+import { makeProgressUseCase } from '../../use-cases/factories/make-set-lesson-watched-use-case'
 
 export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -128,6 +131,30 @@ export async function lessonsRoutes(app: FastifyInstance) {
 			return reply
 				.status(201)
 				.send({ message: 'Comment created successfully.' })
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().patch(
+		'/',
+		{
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Lessons'],
+				summary: 'Set lesson watched'
+			}
+		},
+		async (request, reply) => {
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
+
+			const { lessonId, courseId } = updateProgressLessonSchema.parse(
+				request.body
+			)
+
+			const progressUpdate = makeProgressUseCase()
+
+			await progressUpdate.execute({ userId, lessonId, courseId })
+
+			return reply.status(200).send({ message: 'Lesson watched successfully.' })
 		}
 	)
 }

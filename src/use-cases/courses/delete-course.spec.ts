@@ -13,9 +13,8 @@ describe('Delete course Use Case', () => {
 		sut = new DeleteCourseUseCase(lessonRepository)
 	})
 
-	it('should be able to delete a lesson', async () => {
-		const courseId = randomUUID()
-		const { course } = await sut.execute({ courseId })
+	it('should be able to delete a course', async () => {
+		const { course } = await sut.execute({ courseId: randomUUID() })
 
 		expect(course).toBe(null)
 	})

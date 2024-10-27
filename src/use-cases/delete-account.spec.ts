@@ -16,6 +16,7 @@ describe('Delete account Use Case', () => {
 	it('should be able to delete account', async () => {
 		const { id: userId } = await usersRepository.create({
 			name: 'John Doe',
+			username: 'jhondoe',
 			email: 'johndoe@example.com',
 			cpf: '999.999.999-99',
 			phone: '+5547999999999',
