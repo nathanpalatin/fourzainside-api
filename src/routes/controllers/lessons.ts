@@ -2,22 +2,25 @@ import type { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { checkSessionIdExists } from '../../middlewares/auth-token'
+
 import { z } from 'zod'
+
 import {
 	createCommentLessonSchemaBody,
 	createLessonSchemaBody,
 	getParamsLessonSchema,
 	updateProgressLessonSchema
 } from '../../@types/zod/lesson'
+
+import { getTokenHeaderSchema } from '../../@types/zod/user'
+import { getParamsCourseSchema } from '../../@types/zod/course'
+
 import { makeCreateLessonUseCase } from '../../use-cases/factories/make-create-lesson-use-case'
 import { makeDeleteLessonUseCase } from '../../use-cases/factories/make-delete-lesson-use-case'
-import { makeGetLessonsCourseUseCase } from '../../use-cases/factories/make-get-lesson-from-course'
-import { getParamsCourseSchema } from '../../@types/zod/course'
-import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
-import { getTokenHeaderSchema } from '../../@types/zod/user'
-import { makeCreateCommentLessonCourseUseCase } from '../../use-cases/factories/make-create-comment-use-case'
-import { prisma } from '../../lib/prisma'
 import { makeProgressUseCase } from '../../use-cases/factories/make-set-lesson-watched-use-case'
+import { makeGetLessonsCourseUseCase } from '../../use-cases/factories/make-get-lesson-from-course'
+import { makeCreateCommentLessonCourseUseCase } from '../../use-cases/factories/make-create-comment-use-case'
+import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
 
 export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -154,7 +157,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 
 			await progressUpdate.execute({ userId, lessonId, courseId })
 
-			return reply.status(200).send({ message: 'Lesson watched successfully.' })
+			return reply.status(200).send({ message: 'Lesson updated successfully.' })
 		}
 	)
 }

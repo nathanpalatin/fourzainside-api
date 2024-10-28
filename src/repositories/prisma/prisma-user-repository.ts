@@ -4,7 +4,28 @@ import { UsersRepository } from '../users-repository'
 import { prisma } from '../../lib/prisma'
 
 export class PrismaUsersRepository implements UsersRepository {
-	async findByPhone(phone: string): Promise<Users | null> {
+	async findMany(courseId: string, take: number, skip: number) {
+		const students = await prisma.users.findMany({
+			orderBy: {
+				name: 'desc'
+			},
+			where: {
+				courses: {
+					some: {
+						id: courseId
+					}
+				}
+			},
+			include: {
+				courses: true
+			},
+			take,
+			skip
+		})
+		return students
+	}
+
+	async findByPhone(phone: string) {
 		const user = await prisma.users.findFirst({
 			where: {
 				phone
@@ -12,7 +33,7 @@ export class PrismaUsersRepository implements UsersRepository {
 		})
 		return user
 	}
-	async findByCPF(cpf: string): Promise<Users | null> {
+	async findByCPF(cpf: string) {
 		const user = await prisma.users.findFirst({
 			where: {
 				cpf

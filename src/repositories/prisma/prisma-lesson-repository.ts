@@ -41,7 +41,25 @@ export class PrismaLessonRepository implements LessonsRepository {
 			}
 		})
 
-		return lessons
+		const progresses = await prisma.progress.findMany({
+			where: {
+				courseId
+			},
+			select: {
+				lessonId: true,
+				completed: true
+			}
+		})
+
+		const result = lessons.map(lesson => {
+			const progress = progresses.find(p => p.lessonId === lesson.id)
+			return {
+				...lesson,
+				watched: progress ? progress.completed : false
+			}
+		})
+
+		return result
 	}
 
 	async delete(id: string) {

@@ -3,8 +3,6 @@ import { z } from 'zod'
 
 import { FastifyInstance } from 'fastify'
 
-import { prisma } from '../../lib/prisma'
-
 import { compare } from 'bcrypt'
 
 import { checkSessionIdExists } from '../../middlewares/auth-token'
@@ -24,6 +22,10 @@ import { makeRegisterUseCase } from '../../use-cases/factories/make-register-use
 import { UserAlreadyExistsError } from '../../use-cases/errors/user-already-exists-error'
 import { BadRequestError } from '../_errors/bad-request-error'
 import { makeDeleteAccountUseCase } from '../../use-cases/factories/make-delete-account-use-case'
+import { makeGetUsersCourseUseCase } from '../../use-cases/factories/make-get-users-from-course'
+import { prisma } from '../../lib/prisma'
+import { getParamsCourseSchema } from '../../@types/zod/course'
+import { makeAuthenticateUserUseCase } from '../../use-cases/factories/make-authenticate-use-case'
 
 interface QueryParams {
 	limit?: string
@@ -129,11 +131,9 @@ export async function usersRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { credential, password } = createLoginSchemaBody.parse(request.body)
 
-			const user = await prisma.users.findFirst({
-				where: {
-					OR: [{ email: credential }, { cpf: credential }]
-				}
-			})
+			const authUser = makeAuthenticateUserUseCase()
+
+			const { user } = await authUser.execute({ credential, password })
 
 			if (!user) {
 				throw new BadRequestError('Invalid credentials.')
@@ -235,7 +235,7 @@ export async function usersRoutes(app: FastifyInstance) {
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get<{ Querystring: QueryParams }>(
-		'/',
+		'/:courseId',
 		{
 			preHandler: [checkSessionIdExists],
 			schema: {
@@ -243,7 +243,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				summary: 'List all users',
 				response: {
 					200: z.object({
-						users: z.array(
+						students: z.array(
 							z.object({
 								id: z.string(),
 								name: z.string(),
@@ -255,28 +255,16 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const limit = parseInt(request.query.limit || '10', 10)
+			const { courseId } = getParamsCourseSchema.parse(request.params)
+			const take = parseInt(request.query.limit || '10', 10)
 			const page = parseInt(request.query.page || '1', 10)
-			const offset = (page - 1) * limit
+			const skip = (page - 1) * take
 
-			const users = await prisma.users.findMany({
-				orderBy: {
-					name: 'desc'
-				},
-				select: {
-					id: true,
-					name: true,
-					avatar: true
-				},
-				take: limit,
-				skip: offset
-			})
+			const listUsers = makeGetUsersCourseUseCase()
 
-			if (!users) {
-				throw new BadRequestError('No users found.')
-			}
+			const students = await listUsers.execute({ courseId, take, skip })
 
-			return reply.status(200).send({ users })
+			return reply.status(200).send(students)
 		}
 	)
 
@@ -297,55 +285,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			const deleteUseCase = makeDeleteAccountUseCase()
 			deleteUseCase.execute({ userId })
 			reply.status(204).send()
-		}
-	)
-
-	app.withTypeProvider<ZodTypeProvider>().get(
-		'/:query',
-		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Users'],
-				summary: 'Search user by name',
-				params: z.object({
-					query: z.string()
-				}),
-				response: {
-					200: z.object({
-						user: z.object({
-							id: z.string(),
-							name: z.string(),
-							avatar: z.string().nullable()
-						})
-					})
-				}
-			}
-		},
-		async (request, reply) => {
-			const { query } = getUserParamsSchema.parse(request.params)
-
-			const user = await prisma.users.findFirst({
-				orderBy: {
-					name: 'desc'
-				},
-				where: {
-					name: {
-						contains: query,
-						mode: 'insensitive'
-					}
-				},
-				select: {
-					id: true,
-					avatar: true,
-					name: true
-				}
-			})
-
-			if (!user) {
-				throw new BadRequestError('User not found.')
-			}
-
-			return reply.status(200).send({ user })
 		}
 	)
 
