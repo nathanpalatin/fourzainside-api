@@ -188,7 +188,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { refreshToken } = getRefreshTokenSchema.parse(request.cookies)
+			const { refreshToken } = getRefreshTokenSchema.parse(request.body)
 
 			if (!refreshToken) {
 				throw new BadRequestError('Refresh token not found.')

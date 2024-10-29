@@ -59,6 +59,7 @@ model Certificates {
 model Courses {
   id          String   @id @default(uuid())
   title       String
+  slug        String
   description String
   image       String
   tags        String[]
@@ -81,6 +82,7 @@ model Courses {
 model Lessons {
   id             String      @id @default(uuid())
   title          String
+  slug           String
   description    String
   duration       Int
   video          String

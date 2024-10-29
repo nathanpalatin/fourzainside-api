@@ -4,6 +4,8 @@ import type {
 } from '../../@types/use-cases/courses'
 import type { CoursesRepository } from '../../repositories/courses-repository'
 
+import { createSlug } from '../../utils/functions'
+
 export class CreateCourseUseCase {
 	constructor(private courseRepository: CoursesRepository) {}
 
@@ -19,6 +21,7 @@ export class CreateCourseUseCase {
 	}: CourseUseCaseRequest): Promise<CourseUseCaseResponse> {
 		const courses = await this.courseRepository.create({
 			title,
+			slug: createSlug(title),
 			description,
 			image,
 			tags,

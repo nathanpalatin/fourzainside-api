@@ -3,6 +3,7 @@ import type {
 	LessonUseCaseResponse
 } from '../../../@types/use-cases/lessons'
 import type { LessonsRepository } from '../../../repositories/lessons-repository'
+import { createSlug } from '../../../utils/functions'
 
 export class CreateLessonUseCase {
 	constructor(private lessonRepository: LessonsRepository) {}
@@ -16,6 +17,7 @@ export class CreateLessonUseCase {
 	}: LessonUseCaseRequest): Promise<LessonUseCaseResponse> {
 		const lessons = await this.lessonRepository.create({
 			title,
+			slug: createSlug(title),
 			description,
 			duration,
 			video,

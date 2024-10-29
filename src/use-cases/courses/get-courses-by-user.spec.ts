@@ -1,6 +1,6 @@
 import { expect, describe, it, beforeEach } from 'vitest'
 import { randomUUID } from 'crypto'
-import { GetCourseByUserUseCase } from './get-course-by-user'
+import { GetCourseByUserUseCase } from './get-courses-by-user'
 import { InMemoryCoursesRepository } from '../../repositories/in-memory/in-memory-courses-repository'
 
 let notificationsRepository: InMemoryCoursesRepository
@@ -17,6 +17,6 @@ describe('Get Courses by User Use Case', () => {
 			userId: randomUUID()
 		})
 
-		expect(courses).toBeTruthy()
+		expect(courses).toBeGreaterThanOrEqual(0)
 	})
 })

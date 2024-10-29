@@ -1,5 +1,5 @@
 import { PrismaCourseRepository } from '../../repositories/prisma/prisma-course-repository'
-import { GetCourseByUserUseCase } from '../courses/get-course-by-user'
+import { GetCourseByUserUseCase } from '../courses/get-courses-by-user'
 
 export function makeGetCourseByUserUseCase() {
 	const courseRepository = new PrismaCourseRepository()
