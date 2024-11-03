@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, type Courses } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
 import type { CoursesRepository } from '../courses-repository'
@@ -12,11 +12,20 @@ export class PrismaCourseRepository implements CoursesRepository {
 		})
 		return course
 	}
-	async create(data: Prisma.CoursesCreateInput) {
+
+	async findBySlug(slug: string) {
+		const course = await prisma.courses.findFirst({
+			where: {
+				slug
+			}
+		})
+		return course
+	}
+
+	async create(data: Prisma.CoursesUncheckedCreateInput) {
 		const course = await prisma.courses.create({
 			data: {
 				...data,
-				user: { connect: { id: data.user.connect?.id } },
 				tags: data.tags ?? []
 			}
 		})

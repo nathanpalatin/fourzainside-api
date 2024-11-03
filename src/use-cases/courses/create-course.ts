@@ -28,9 +28,7 @@ export class CreateCourseUseCase {
 			level,
 			duration,
 			type,
-			user: {
-				connect: { id: userId }
-			},
+			userId,
 			createdAt: new Date(),
 			updatedAt: new Date()
 		})

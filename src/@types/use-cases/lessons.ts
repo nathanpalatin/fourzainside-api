@@ -20,6 +20,10 @@ export interface ListLessonsFromCourseUseCaseRequest {
 	courseId: string
 }
 
+export interface CreateLessonUseCaseResponse {
+	lesson: Lessons
+}
+
 export interface LessonUseCaseResponse {
 	lessons: Lessons
 }

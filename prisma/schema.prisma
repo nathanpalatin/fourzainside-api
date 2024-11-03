@@ -35,25 +35,13 @@ model Users {
   role          Role     @default(USER)
   emailVerified Boolean  @default(false)
 
-  notifications Notifications[]
-  certificates  Certificates[]
-  courses       Courses[]
-  progresses    Progress[]
+  notifications    Notifications[]
+  certificates     Certificates[]
+  courses          Courses[]
+  progresses       Progress[]
+  CourseEnrollment CourseEnrollment[]
 
   @@map("users")
-}
-
-model Certificates {
-  id        String   @id @default(uuid())
-  courseId  String
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@map("certificates")
 }
 
 model Courses {
@@ -72,11 +60,25 @@ model Courses {
   userId String
   user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  lessons      Lessons[]
-  certificates Certificates[]
-  progresses   Progress[]
+  lessons          Lessons[]
+  certificates     Certificates[]
+  progresses       Progress[]
+  courseEnrollment CourseEnrollment[]
 
   @@map("courses")
+}
+
+model CourseEnrollment {
+  id         String   @id @default(uuid())
+  userId     String
+  courseId   String
+  enrolledAt DateTime @default(now())
+
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("course_enrollments")
 }
 
 model Lessons {
@@ -115,6 +117,19 @@ model Progress {
 
   @@unique([userId, lessonId])
   @@map("progress")
+}
+
+model Certificates {
+  id        String   @id @default(uuid())
+  courseId  String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("certificates")
 }
 
 model Notifications {

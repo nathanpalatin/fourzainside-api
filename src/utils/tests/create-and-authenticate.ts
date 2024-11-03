@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker'
 import { hash } from 'bcrypt'
 import { FastifyInstance } from 'fastify'
 import request from 'supertest'
+import { createSlug } from '../functions'
 
 export async function createAndAuthenticateUser(
 	app: FastifyInstance,
@@ -11,10 +12,10 @@ export async function createAndAuthenticateUser(
 	const email = faker.internet.email()
 	await prisma.users.create({
 		data: {
-			name: 'John Doe',
-			username: faker.person.lastName(),
+			name: faker.person.fullName(),
+			username: createSlug(faker.person.fullName()),
 			cpf: faker.phone.number(),
-			birthdate: '1993-06-14',
+			birthdate: faker.date.birthdate.toString(),
 			phone: faker.phone.number(),
 			email,
 			password: await hash('123456', 1),

@@ -16,6 +16,7 @@ describe('Get User Profile Use Case', () => {
 	it('should be able to get user profile', async () => {
 		const createdUser = await usersRepository.create({
 			name: 'John Doe',
+			username: 'johndoe',
 			phone: '+554799999999999',
 			cpf: '999.999.999-99',
 			birthdate: '1993-06-14',

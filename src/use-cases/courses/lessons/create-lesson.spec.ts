@@ -14,7 +14,7 @@ describe('Lesson Use Case', () => {
 	})
 
 	it('should be able to create a lesson', async () => {
-		const { lessons } = await sut.execute({
+		const { lesson } = await sut.execute({
 			title: 'teste',
 			video: 'video.mp4',
 			courseId: randomUUID(),
@@ -22,6 +22,6 @@ describe('Lesson Use Case', () => {
 			duration: 10
 		})
 
-		expect(lessons.id).toEqual(expect.any(String))
+		expect(lesson.id).toEqual(expect.any(String))
 	})
 })

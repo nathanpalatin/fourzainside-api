@@ -21,6 +21,7 @@ import { lessonsRoutes } from './routes/controllers/lessons'
 import { notifcationsRoutes } from './routes/controllers/notifications'
 
 import { errorHandler } from './utils/error-handlers'
+import { uploadRoutes } from './routes/controllers/uploads'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -100,4 +101,8 @@ app.register(coursesRoutes, {
 
 app.register(lessonsRoutes, {
 	prefix: 'lessons'
+})
+
+app.register(uploadRoutes, {
+	prefix: 'uploads'
 })

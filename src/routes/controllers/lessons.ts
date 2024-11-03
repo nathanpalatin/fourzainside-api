@@ -33,6 +33,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 				body: createLessonSchemaBody,
 				response: {
 					201: z.object({
+						id: z.string(),
 						message: z.string()
 					})
 				}
@@ -44,7 +45,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 
 			const createLesson = makeCreateLessonUseCase()
 
-			await createLesson.execute({
+			const { lesson } = await createLesson.execute({
 				title,
 				description,
 				duration,
@@ -52,7 +53,9 @@ export async function lessonsRoutes(app: FastifyInstance) {
 				courseId
 			})
 
-			return reply.status(201).send({ message: 'Lesson created successfully.' })
+			return reply
+				.status(201)
+				.send({ id: lesson.id, message: 'Lesson created successfully.' })
 		}
 	)
 

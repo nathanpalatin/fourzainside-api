@@ -1,6 +1,6 @@
 import type {
-	LessonUseCaseRequest,
-	LessonUseCaseResponse
+	CreateLessonUseCaseResponse,
+	LessonUseCaseRequest
 } from '../../../@types/use-cases/lessons'
 import type { LessonsRepository } from '../../../repositories/lessons-repository'
 import { createSlug } from '../../../utils/functions'
@@ -14,8 +14,8 @@ export class CreateLessonUseCase {
 		duration,
 		video,
 		courseId
-	}: LessonUseCaseRequest): Promise<LessonUseCaseResponse> {
-		const lessons = await this.lessonRepository.create({
+	}: LessonUseCaseRequest): Promise<CreateLessonUseCaseResponse> {
+		const lesson = await this.lessonRepository.create({
 			title,
 			slug: createSlug(title),
 			description,
@@ -29,7 +29,7 @@ export class CreateLessonUseCase {
 		})
 
 		return {
-			lessons
+			lesson
 		}
 	}
 }

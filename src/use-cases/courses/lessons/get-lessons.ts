@@ -1,5 +1,4 @@
 import type {
-	LessonUseCaseResponse,
 	ListLessonsFromCourseUseCaseRequest,
 	ListLessonsUseCaseResponse
 } from '../../../@types/use-cases/lessons'

@@ -1,8 +1,6 @@
 import type {
 	CreateCommentUseCaseRequest,
-	CreateCommentUseCaseResponse,
-	LessonUseCaseRequest,
-	ListCommentsUseCaseRequest
+	CreateCommentUseCaseResponse
 } from '../../../../@types/use-cases/lessons'
 import type { CommentsRepository } from '../../../../repositories/comments-repository'
 import type { LessonsRepository } from '../../../../repositories/lessons-repository'

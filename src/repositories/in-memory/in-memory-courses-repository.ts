@@ -8,27 +8,23 @@ export class InMemoryCoursesRepository implements CoursesRepository {
 
 	async findById(id: string) {
 		const course = this.items.find(item => item.id === id)
-
-		if (!course) {
-			return null
-		}
-
-		return course
+		return course || null
 	}
 
-	async create(data: Prisma.CoursesCreateInput) {
+	async findBySlug(slug: string) {
+		const course = this.items.find(item => item.slug === slug)
+		return course || null
+	}
+
+	async create(data: Prisma.CoursesUncheckedCreateInput) {
 		const course = {
 			id: randomUUID(),
 			tags: Array.isArray(data.tags) ? data.tags : [],
 			type: data.type,
 			title: data.title,
-			userId: data.user.connect?.id ? data.user.connect.id : '',
+			slug: data.slug,
 			image: data.image,
-			user: {
-				connect: {
-					id: data.user.connect?.id
-				}
-			},
+			userId: data.userId,
 			level: data.level ?? 'easy',
 			duration: data.duration,
 			description: data.description,

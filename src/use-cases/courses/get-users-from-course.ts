@@ -1,7 +1,6 @@
 import { Users } from '@prisma/client'
 
 import { UsersRepository } from '../../repositories/users-repository'
-import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 
 interface GetUserCourseUseCaseRequest {
 	courseId: string
@@ -10,7 +9,7 @@ interface GetUserCourseUseCaseRequest {
 }
 
 interface GetUsersCourseUseCaseResponse {
-	students: Users[]
+	students: Users[] | null
 }
 
 export class GetUsersCourseUseCase {
@@ -22,10 +21,6 @@ export class GetUsersCourseUseCase {
 		skip
 	}: GetUserCourseUseCaseRequest): Promise<GetUsersCourseUseCaseResponse> {
 		const students = await this.usersRepository.findMany(courseId, take, skip)
-
-		if (!students) {
-			throw new ResourceNotFoundError()
-		}
 
 		return {
 			students

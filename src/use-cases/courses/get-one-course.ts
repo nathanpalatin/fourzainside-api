@@ -1,9 +1,9 @@
 import type { Courses } from '@prisma/client'
 import type { CoursesRepository } from '../../repositories/courses-repository'
-import { ResourceNotFoundError } from '../errors/resource-not-found-error'
+import { BadRequestError } from '../../routes/_errors/bad-request-error'
 
 interface ListCourseUseCaseRequest {
-	courseId: string
+	slug: string
 }
 
 interface ListCourseUseCaseResponse {
@@ -14,12 +14,12 @@ export class GetCourseUseCase {
 	constructor(private courseRepository: CoursesRepository) {}
 
 	async execute({
-		courseId
+		slug
 	}: ListCourseUseCaseRequest): Promise<ListCourseUseCaseResponse> {
-		const course = await this.courseRepository.findById(courseId)
+		const course = await this.courseRepository.findBySlug(slug)
 
 		if (!course) {
-			throw new ResourceNotFoundError()
+			throw new BadRequestError('Course not found')
 		}
 
 		return {

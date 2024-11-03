@@ -16,6 +16,7 @@ describe('Authenticate Use Case', () => {
 	it('should be able to authenticate', async () => {
 		await usersRepository.create({
 			name: 'John Doe',
+			username: 'johndoe',
 			email: 'johndoe@example.com',
 			cpf: '999.999.999-99',
 			phone: '+5547999999999',
@@ -43,6 +44,7 @@ describe('Authenticate Use Case', () => {
 	it('should not be able to authenticate with wrong email', async () => {
 		await usersRepository.create({
 			name: 'John Doe',
+			username: 'johndoe',
 			cpf: '999.999.999-99',
 			phone: '+5547999999999',
 			birthdate: '1993-06-14T00:00:00Z',

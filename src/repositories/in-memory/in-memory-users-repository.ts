@@ -16,6 +16,15 @@ export class InMemoryUsersRepository implements UsersRepository {
 		return user
 	}
 
+	async findMany(
+		courseId: string,
+		take: number,
+		skip: number
+	): Promise<Users[]> {
+		const students = this.items.filter(course => course.id === courseId)
+		return students.slice(skip, skip + take)
+	}
+
 	async findByCPF(cpf: string) {
 		const user = this.items.find(item => item.cpf === cpf)
 
@@ -46,7 +55,7 @@ export class InMemoryUsersRepository implements UsersRepository {
 		return user
 	}
 
-	async create(data: Prisma.UsersCreateInput) {
+	async create(data: Prisma.UsersUncheckedCreateInput) {
 		const user = {
 			id: randomUUID(),
 			name: data.name,
@@ -72,6 +81,23 @@ export class InMemoryUsersRepository implements UsersRepository {
 		this.items.push(user)
 
 		return user
+	}
+
+	async update(
+		id: string,
+		data: Partial<Prisma.UsersUncheckedUpdateManyInput>
+	) {
+		const userIndex = this.items.findIndex(item => item.id === id)
+		if (userIndex === -1) {
+			return null
+		}
+		//@ts-ignore
+		this.items[userIndex] = {
+			...this.items[userIndex],
+			...data
+		}
+
+		return this.items[userIndex]
 	}
 
 	async delete(id: string) {

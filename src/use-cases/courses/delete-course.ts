@@ -3,7 +3,6 @@ import type {
 	DeleteCourseUseCaseResponse
 } from '../../@types/use-cases/courses'
 import type { CoursesRepository } from '../../repositories/courses-repository'
-import { BadRequestError } from '../../routes/_errors/bad-request-error'
 
 export class DeleteCourseUseCase {
 	constructor(private courseRepository: CoursesRepository) {}

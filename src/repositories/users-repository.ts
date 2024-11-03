@@ -7,11 +7,10 @@ export interface UsersRepository {
 		take: number,
 		skip: number
 	): Promise<Users[] | null>
-
 	findByEmail(email: string): Promise<Users | null>
 	findByCPF(cpf: string): Promise<Users | null>
 	findByPhone(phone: string): Promise<Users | null>
 
-	create(data: Prisma.UsersCreateInput): Promise<Users>
+	create(data: Prisma.UsersUncheckedCreateInput): Promise<Users>
 	delete(id: string): Promise<Users | null>
 }

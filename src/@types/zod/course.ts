@@ -13,3 +13,7 @@ export const createCourseSchemaBody = z.object({
 export const getParamsCourseSchema = z.object({
 	courseId: z.string()
 })
+
+export const getParamsSlugCourseSchema = z.object({
+	slug: z.string()
+})

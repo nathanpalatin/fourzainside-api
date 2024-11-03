@@ -6,7 +6,8 @@ import {
 } from '../../@types/zod/user'
 import {
 	createCourseSchemaBody,
-	getParamsCourseSchema
+	getParamsCourseSchema,
+	getParamsSlugCourseSchema
 } from '../../@types/zod/course'
 import { makeCreateCourseUseCase } from '../../use-cases/factories/make-create-course-use-case'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
@@ -78,7 +79,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
-		'/course/:courseId',
+		'/c/:slug',
 		{
 			preHandler: [checkSessionIdExists],
 			schema: {
@@ -87,11 +88,11 @@ export async function coursesRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { courseId } = getParamsCourseSchema.parse(request.params)
+			const { slug } = getParamsSlugCourseSchema.parse(request.params)
 
 			const getUserCourses = makeGetCourseUseCase()
 
-			const course = await getUserCourses.execute({ courseId })
+			const course = await getUserCourses.execute({ slug })
 
 			return reply.status(200).send(course)
 		}

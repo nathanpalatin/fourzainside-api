@@ -13,7 +13,6 @@ import {
 	getRefreshTokenSchema,
 	getTokenHeaderSchema,
 	getUserCredentialSchema,
-	getUserParamsSchema,
 	responseRefreshTokenSchema,
 	updateUserSchemaBody
 } from '../../@types/zod/user'
