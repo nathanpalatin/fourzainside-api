@@ -15,6 +15,8 @@ import { z } from 'zod'
 import { makeGetCourseByUserUseCase } from '../../use-cases/factories/make-get-courses-by-user-use-case'
 import { makeDeleteCourseUseCase } from '../../use-cases/factories/make-delete-course-use-case'
 import { makeGetCourseUseCase } from '../../use-cases/factories/make-get-one-course-use-case'
+import { makeEnrollUserCOurseUseCase } from '../../use-cases/factories/make-enroll-user-course-use-case'
+import { StudentAlreadyEnrolledError } from '../../use-cases/errors/student-already-enrolled'
 
 export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -115,6 +117,39 @@ export async function coursesRoutes(app: FastifyInstance) {
 			const courses = await deleteCourseFromUser.execute({ courseId })
 
 			return reply.status(200).send(courses)
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().post(
+		'/enroll',
+		{
+			preHandler: [checkSessionIdExists],
+			schema: {
+				tags: ['Courses'],
+				summary: 'Delete a course'
+			}
+		},
+		async (request, reply) => {
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
+			const { courseId } = getParamsCourseSchema.parse(request.body)
+
+			try {
+				const enrollUser = makeEnrollUserCOurseUseCase()
+				await enrollUser.execute({
+					userId,
+					courseId
+				})
+			} catch (error) {
+				if (error instanceof StudentAlreadyEnrolledError) {
+					return reply.status(409).send({ message: error.message })
+				}
+
+				throw error
+			}
+
+			return reply
+				.status(200)
+				.send({ message: 'User enrolled in course successfully.' })
 		}
 	)
 }

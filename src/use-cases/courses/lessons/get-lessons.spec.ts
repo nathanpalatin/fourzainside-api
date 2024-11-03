@@ -14,7 +14,6 @@ describe('Get Lessons Use Case', () => {
 	})
 
 	it('should be able to list all lessons from course', async () => {
-		const lessons = await sut.execute({ courseId: randomUUID() })
-		console.log(lessons)
+		await sut.execute({ courseId: randomUUID() })
 	})
 })

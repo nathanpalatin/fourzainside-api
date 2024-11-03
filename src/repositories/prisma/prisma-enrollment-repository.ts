@@ -1,20 +1,15 @@
-import { PrismaClient, CourseEnrollment } from '@prisma/client'
+import { CourseEnrollment } from '@prisma/client'
 import type { CourseEnrollmentsRepository } from '../enrollments-repository'
+import { prisma } from '../../lib/prisma'
 
 export class PrismaCourseEnrollmentsRepository
 	implements CourseEnrollmentsRepository
 {
-	private prisma: PrismaClient
-
-	constructor(prisma: PrismaClient) {
-		this.prisma = prisma
-	}
-
 	async enrollUserInCourse(
 		userId: string,
 		courseId: string
 	): Promise<CourseEnrollment> {
-		const enrollment = await this.prisma.courseEnrollment.create({
+		const enrollment = await prisma.courseEnrollment.create({
 			data: {
 				userId,
 				courseId,
@@ -25,11 +20,23 @@ export class PrismaCourseEnrollmentsRepository
 		return enrollment
 	}
 
+	async findUserInCourse(
+		userId: string,
+		courseId: string
+	): Promise<CourseEnrollment | null> {
+		return await prisma.courseEnrollment.findFirst({
+			where: {
+				userId,
+				courseId
+			}
+		})
+	}
+
 	async unenrollUserFromCourse(
 		userId: string,
 		courseId: string
 	): Promise<void> {
-		await this.prisma.courseEnrollment.deleteMany({
+		await prisma.courseEnrollment.deleteMany({
 			where: {
 				userId,
 				courseId
@@ -38,7 +45,7 @@ export class PrismaCourseEnrollmentsRepository
 	}
 
 	async findCoursesByUser(userId: string): Promise<CourseEnrollment[]> {
-		return this.prisma.courseEnrollment.findMany({
+		return prisma.courseEnrollment.findMany({
 			where: {
 				userId
 			},
@@ -48,14 +55,20 @@ export class PrismaCourseEnrollmentsRepository
 		})
 	}
 
-	async findUsersByCourse(courseId: string): Promise<CourseEnrollment[]> {
-		return this.prisma.courseEnrollment.findMany({
+	async findUsersByCourse(
+		courseId: string,
+		take = 10,
+		skip: number
+	): Promise<CourseEnrollment[]> {
+		return prisma.courseEnrollment.findMany({
 			where: {
 				courseId
 			},
 			include: {
 				user: true
-			}
+			},
+			take,
+			skip
 		})
 	}
 }

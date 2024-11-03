@@ -1,12 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { CourseEnrollmentsRepository } from '../enrollments-repository'
-
-type CourseEnrollment = {
-	id: string
-	userId: string
-	courseId: string
-	enrolledAt: Date
-}
+import type { CourseEnrollment } from '@prisma/client'
 
 export class InMemoryCourseEnrollmentsRepository
 	implements CourseEnrollmentsRepository
@@ -23,7 +17,7 @@ export class InMemoryCourseEnrollmentsRepository
 			throw new Error('User is already enrolled in this course')
 		}
 
-		const enrollment: CourseEnrollment = {
+		const enrollment = {
 			id: randomUUID(),
 			userId,
 			courseId,
@@ -47,11 +41,28 @@ export class InMemoryCourseEnrollmentsRepository
 		this.items.splice(enrollmentIndex, 1)
 	}
 
+	async findUserInCourse(userId: string, courseId: string) {
+		const enroll = this.items.find(
+			enrollment =>
+				enrollment.userId === userId && enrollment.courseId === courseId
+		)
+
+		if (!enroll) {
+			return null
+		}
+
+		return enroll
+	}
+
 	async findCoursesByUser(userId: string) {
 		return this.items.filter(enrollment => enrollment.userId === userId)
 	}
 
 	async findUsersByCourse(courseId: string) {
-		return this.items.filter(enrollment => enrollment.courseId === courseId)
+		const filteredItems = this.items.filter(
+			enrollment => enrollment.courseId === courseId
+		)
+
+		return filteredItems
 	}
 }
