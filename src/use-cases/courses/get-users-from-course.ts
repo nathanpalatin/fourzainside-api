@@ -1,26 +1,23 @@
-import { Users } from '@prisma/client'
+import { CourseEnrollment } from '@prisma/client'
 
-import { UsersRepository } from '../../repositories/users-repository'
+import type { CourseEnrollmentsRepository } from '../../repositories/enrollments-repository'
 
 interface GetUserCourseUseCaseRequest {
 	courseId: string
-	take: number
-	skip: number
 }
 
 interface GetUsersCourseUseCaseResponse {
-	students: Users[] | null
+	students: CourseEnrollment[] | null
 }
 
 export class GetUsersCourseUseCase {
-	constructor(private usersRepository: UsersRepository) {}
+	constructor(private enrollmentsRepository: CourseEnrollmentsRepository) {}
 
 	async execute({
-		courseId,
-		take,
-		skip
+		courseId
 	}: GetUserCourseUseCaseRequest): Promise<GetUsersCourseUseCaseResponse> {
-		const students = await this.usersRepository.findMany(courseId, take, skip)
+		const students =
+			await this.enrollmentsRepository.findUsersByCourse(courseId)
 
 		return {
 			students

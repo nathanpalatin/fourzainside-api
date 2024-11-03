@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import type { CourseEnrollmentsRepository } from '../enrollments-repository'
 
 type CourseEnrollment = {
 	id: string
@@ -7,7 +8,9 @@ type CourseEnrollment = {
 	enrolledAt: Date
 }
 
-export class InMemoryCourseEnrollmentsRepository {
+export class InMemoryCourseEnrollmentsRepository
+	implements CourseEnrollmentsRepository
+{
 	public items: CourseEnrollment[] = []
 
 	async enrollUserInCourse(userId: string, courseId: string) {

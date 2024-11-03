@@ -16,7 +16,7 @@ describe('Get Course Use Case', () => {
 		enrollmentRepository = new InMemoryCourseEnrollmentsRepository()
 		coursesRepository = new InMemoryCoursesRepository()
 		userRepository = new InMemoryUsersRepository()
-		sut = new GetUsersCourseUseCase(userRepository)
+		sut = new GetUsersCourseUseCase(enrollmentRepository)
 	})
 
 	it('should be able to get all students from course', async () => {
@@ -34,7 +34,6 @@ describe('Get Course Use Case', () => {
 		})
 
 		const user = await userRepository.create({
-			id: userId,
 			name: 'John Doe',
 			password: await hash('123456', 1),
 			username: 'johndoe',
@@ -44,12 +43,10 @@ describe('Get Course Use Case', () => {
 			email: 'johndoe@example.com'
 		})
 
-		await enrollmentRepository.enrollUserInCourse(userId, course.id)
+		await enrollmentRepository.enrollUserInCourse(user.id, course.id)
 
 		const students = await sut.execute({
-			courseId: course.id,
-			take: 10,
-			skip: 1
+			courseId: course.id
 		})
 
 		expect(students).toEqual({
