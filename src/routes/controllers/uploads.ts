@@ -11,36 +11,40 @@ export async function uploadRoutes(app: FastifyInstance) {
 		const file = await request.file()
 		const uploadId = randomUUID()
 		const uniqueFilename = `${uploadId}-${file?.filename}`
-
 		const chunks: Buffer[] = []
 
-		file?.file.on('data', chunk => {
-			chunks.push(chunk)
-		})
+		return new Promise<void>((resolve, reject) => {
+			file?.file.on('data', chunk => {
+				chunks.push(chunk)
+			})
 
-		file?.file.on('end', async () => {
-			const fileBuffer = Buffer.concat(chunks)
+			file?.file.on('end', async () => {
+				const fileBuffer = Buffer.concat(chunks)
 
-			try {
-				await r2.send(
-					new PutObjectCommand({
-						Bucket: env.CLOUDFLARE_BUCKET_NAME,
-						Key: uniqueFilename,
-						ContentType: file?.mimetype,
-						Body: fileBuffer
-					})
-				)
+				try {
+					await r2.send(
+						new PutObjectCommand({
+							Bucket: env.CLOUDFLARE_BUCKET_NAME,
+							Key: uniqueFilename,
+							ContentType: file?.mimetype,
+							Body: fileBuffer
+						})
+					)
 
-				reply.status(200).send({ url: uniqueFilename })
-			} catch (error) {
-				console.error('Upload failed:', error)
-				reply.status(500).send({ error: 'Upload failed' })
-			}
-		})
+					reply.status(200).send({ url: uniqueFilename })
+					resolve()
+				} catch (error) {
+					console.error('Upload failed:', error)
+					reply.status(500).send({ error: 'Upload failed' })
+					reject(error)
+				}
+			})
 
-		file?.file.on('error', err => {
-			console.error('Error reading file:', err)
-			reply.status(500).send({ error: 'Failed to read file' })
+			file?.file.on('error', err => {
+				console.error('Error reading file:', err)
+				reply.status(500).send({ error: 'Failed to read file' })
+				reject(err)
+			})
 		})
 	})
 }
