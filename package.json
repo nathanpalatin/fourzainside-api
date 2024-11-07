@@ -1,7 +1,7 @@
 {
-  "name": "fourzainsider-api",
+  "name": "fourzainside-api",
   "version": "1.0.0",
-  "description": "API Fourza Insider",
+  "description": "API Fourza Inside",
   "main": "src/server.ts",
   "scripts": {
     "dev": "tsx watch src/server.ts",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nathandpalatin/fourzainsider-api.git"
+    "url": "git+https://github.com/nathandpalatin/fourzainside-api.git"
   },
   "keywords": [],
   "author": "Nathan Palatin",

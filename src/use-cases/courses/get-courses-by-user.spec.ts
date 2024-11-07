@@ -2,6 +2,7 @@ import { expect, describe, it, beforeEach } from 'vitest'
 import { randomUUID } from 'crypto'
 import { GetCourseByUserUseCase } from './get-courses-by-user'
 import { InMemoryCoursesRepository } from '../../repositories/in-memory/in-memory-courses-repository'
+import { InMemoryUsersRepository } from '../../repositories/in-memory/in-memory-users-repository'
 
 let coursesRepository: InMemoryCoursesRepository
 let sut: GetCourseByUserUseCase

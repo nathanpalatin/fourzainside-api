@@ -31,7 +31,6 @@ export class PrismaCourseRepository implements CoursesRepository {
 		})
 		return course
 	}
-
 	async findMany(userId: string) {
 		const courses = await prisma.courses.findMany({
 			orderBy: {
@@ -41,6 +40,7 @@ export class PrismaCourseRepository implements CoursesRepository {
 				userId
 			},
 			include: {
+				user: true,
 				lessons: {
 					orderBy: {
 						createdAt: 'desc'
@@ -51,6 +51,7 @@ export class PrismaCourseRepository implements CoursesRepository {
 
 		return courses
 	}
+
 	async delete(id: string) {
 		const course = await prisma.courses.delete({
 			where: {

@@ -30,7 +30,7 @@ app.route({
 	url: '/',
 	handler: () => {
 		return {
-			api: 'API Route Fourza Insider.'
+			api: 'API Route Fourza Inside.'
 		}
 	}
 })
@@ -54,8 +54,8 @@ app.setErrorHandler(errorHandler)
 app.register(fastifySwagger, {
 	openapi: {
 		info: {
-			title: 'Fourza Insider',
-			description: 'Fourza Insider API Routes.',
+			title: 'Fourza Inside',
+			description: 'Fourza Inside API Routes.',
 			version: '1.0',
 			contact: {
 				name: 'Nathan Palatin',

@@ -61,7 +61,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
-		'/:userId',
+		'/',
 		{
 			preHandler: [checkSessionIdExists],
 			schema: {
@@ -70,7 +70,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { userId } = getParamsUserSchema.parse(request.params)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
 			const getUserCourses = makeGetCourseByUserUseCase()
 

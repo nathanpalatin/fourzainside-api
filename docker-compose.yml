@@ -1,9 +1,9 @@
 services:
- api-fourzainsider-pg:
-  image: bitnami/postgresql:latest
-  ports:
-   - 5432:5432
-  environment:
-   - POSTGRESQL_PASSWORD=docker
-   - POSTGRESQL_USERNAME=docker
-   - POSTGRESQL_DATABASE=fourzainsider
+  api-fourzainside-pg:
+    image: bitnami/postgresql:latest
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_DATABASE=fourzainside
