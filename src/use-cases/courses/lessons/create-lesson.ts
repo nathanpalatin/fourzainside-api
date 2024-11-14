@@ -21,9 +21,7 @@ export class CreateLessonUseCase {
 			description,
 			duration,
 			video,
-			course: {
-				connect: { id: courseId }
-			},
+			courseId,
 			createdAt: new Date(),
 			updatedAt: new Date()
 		})

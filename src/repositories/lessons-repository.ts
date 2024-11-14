@@ -2,8 +2,8 @@ import { Prisma, type Lessons } from '@prisma/client'
 
 export interface LessonsRepository {
 	findById(id: string): Promise<Lessons | null>
-	findMany(courseId: string): Promise<Lessons[]>
-	create(data: Prisma.LessonsCreateInput): Promise<Lessons>
-	update(id: string, data: Prisma.LessonsUpdateInput): Promise<Lessons | null>
+	findBySlug(slug: string): Promise<Lessons | null>
+	findMany(slug: string): Promise<Lessons[] | null>
+	create(data: Prisma.LessonsUncheckedCreateInput): Promise<Lessons>
 	delete(id: string): Promise<Lessons | null>
 }

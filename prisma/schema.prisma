@@ -20,8 +20,8 @@ model Users {
   username      String   @unique
   email         String   @unique
   password      String
-  cpf           String   @unique
-  birthdate     String
+  cpf           String?  @unique
+  birthdate     String?
   gender        String   @default("Male")
   address       String?
   city          String?
@@ -35,11 +35,12 @@ model Users {
   role          Role     @default(USER)
   emailVerified Boolean  @default(false)
 
-  notifications    Notifications[]
-  certificates     Certificates[]
-  courses          Courses[]
-  progresses       Progress[]
-  CourseEnrollment CourseEnrollment[]
+  notifications     Notifications[]
+  certificates      Certificates[]
+  courses           Courses[]
+  progresses        Progress[]
+  courseEnrollments CourseEnrollment[]
+  validationCode    ValidationCode[]
 
   @@map("users")
 }
@@ -50,6 +51,7 @@ model Courses {
   slug        String
   description String
   image       String
+  banner      String?
   tags        String[]
   level       String   @default("easy")
   duration    Int
@@ -88,7 +90,7 @@ model Lessons {
   description    String
   duration       Int
   video          String
-  watched        Boolean     @default(false)
+  cover          String?
   classification Int         @default(0)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
@@ -174,4 +176,15 @@ model Materials {
   lesson Lessons @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@map("materials")
+}
+
+model ValidationCode {
+  id        String   @id @default(uuid())
+  userId    String
+  code      Int
+  expiresAt DateTime
+
+  user Users @relation(fields: [userId], references: [id])
+
+  @@map("validation_code")
 }

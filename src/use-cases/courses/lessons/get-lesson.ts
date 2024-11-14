@@ -1,23 +1,23 @@
 import type {
-	ListLessonsFromCourseUseCaseRequest,
-	ListLessonsUseCaseResponse
+	OneLessonUseCaseRequest,
+	OneLessonUseCaseResponse
 } from '../../../@types/use-cases/lessons'
 import type { LessonsRepository } from '../../../repositories/lessons-repository'
 import { BadRequestError } from '../../../routes/_errors/bad-request-error'
 
-export class GetLessonsCourseUseCase {
+export class GetLessonUseCase {
 	constructor(private lessonRepository: LessonsRepository) {}
 
 	async execute({
 		slug
-	}: ListLessonsFromCourseUseCaseRequest): Promise<ListLessonsUseCaseResponse> {
-		const lessons = await this.lessonRepository.findMany(slug)
+	}: OneLessonUseCaseRequest): Promise<OneLessonUseCaseResponse> {
+		const lesson = await this.lessonRepository.findBySlug(slug)
 
-		if (!lessons) {
-			throw new BadRequestError('Lessons not found.')
+		if (!lesson) {
+			throw new BadRequestError('Lesson not found.')
 		}
 		return {
-			lessons
+			lesson
 		}
 	}
 }

@@ -57,7 +57,7 @@ export class PrismaCourseEnrollmentsRepository
 
 	async findUsersByCourse(
 		courseId: string,
-		take = 10,
+		take: number,
 		skip: number
 	): Promise<CourseEnrollment[]> {
 		return prisma.courseEnrollment.findMany({

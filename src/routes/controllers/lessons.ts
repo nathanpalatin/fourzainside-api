@@ -3,12 +3,11 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 
-import { z } from 'zod'
-
 import {
 	createCommentLessonSchemaBody,
 	createLessonSchemaBody,
 	getParamsLessonSchema,
+	getParamsOneLessonSchema,
 	updateProgressLessonSchema
 } from '../../@types/zod/lesson'
 
@@ -21,23 +20,13 @@ import { makeProgressUseCase } from '../../use-cases/factories/make-set-lesson-w
 import { makeGetLessonsCourseUseCase } from '../../use-cases/factories/make-get-lesson-from-course'
 import { makeCreateCommentLessonCourseUseCase } from '../../use-cases/factories/make-create-comment-use-case'
 import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
+import { makeGetLessonCourseUseCase } from '../../use-cases/factories/make-get-lesson-use-case'
 
 export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Lessons'],
-				summary: 'Create a new lesson',
-				body: createLessonSchemaBody,
-				response: {
-					201: z.object({
-						id: z.string(),
-						message: z.string()
-					})
-				}
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { title, description, video, courseId, duration } =
@@ -60,20 +49,32 @@ export async function lessonsRoutes(app: FastifyInstance) {
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
+		'/lesson/:slug',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const { slug } = getParamsOneLessonSchema.parse(request.params)
+
+			const getLessonCourse = makeGetLessonCourseUseCase()
+
+			const lesson = await getLessonCourse.execute({ slug })
+
+			return reply.status(200).send(lesson)
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().get(
 		'/:courseId',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Lessons'],
-				summary: 'List all lessons from course'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { courseId } = getParamsCourseSchema.parse(request.params)
 
 			const getLessonsCourse = makeGetLessonsCourseUseCase()
 
-			const lessons = await getLessonsCourse.execute({ courseId })
+			const lessons = await getLessonsCourse.execute({ slug: courseId })
 
 			return reply.status(200).send(lessons)
 		}
@@ -82,11 +83,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().delete(
 		'/:lessonId',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Lessons'],
-				summary: 'List all courses'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { lessonId } = getParamsLessonSchema.parse(request.params)
@@ -101,11 +98,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
 		'/comments/:lessonId',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Lessons'],
-				summary: 'List all comments from lesson'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { lessonId } = getParamsLessonSchema.parse(request.params)
@@ -119,11 +112,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		'/comments',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Lessons'],
-				summary: 'Create comment into lesson'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
@@ -143,11 +132,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().patch(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Lessons'],
-				summary: 'Set lesson watched'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)

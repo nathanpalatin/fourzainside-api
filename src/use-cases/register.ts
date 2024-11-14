@@ -16,15 +16,12 @@ export class RegisterUseCase {
 		email,
 		password,
 		username,
-		phone,
-		cpf,
-		birthdate
+		phone
 	}: RegisterUseCaseRequest): Promise<RegisterUseCaseResponse> {
 		const userWithSameEmail = await this.usersRepository.findByEmail(email)
 		const userWithSamePhone = await this.usersRepository.findByPhone(phone)
-		const userWithSameCPF = await this.usersRepository.findByCPF(cpf)
 
-		if (userWithSameEmail || userWithSameCPF || userWithSamePhone) {
+		if (userWithSameEmail || userWithSamePhone) {
 			throw new UserAlreadyExistsError()
 		}
 
@@ -34,10 +31,8 @@ export class RegisterUseCase {
 			name,
 			email,
 			username,
-			cpf,
 			password: password_hash,
 			phone,
-			birthdate,
 			createdAt: new Date(),
 			updatedAt: new Date()
 		})

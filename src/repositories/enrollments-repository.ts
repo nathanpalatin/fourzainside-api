@@ -11,5 +11,9 @@ export interface CourseEnrollmentsRepository {
 	): Promise<CourseEnrollment | null>
 	unenrollUserFromCourse(userId: string, courseId: string): Promise<void>
 	findCoursesByUser(userId: string): Promise<CourseEnrollment[]>
-	findUsersByCourse(courseId: string): Promise<CourseEnrollment[]>
+	findUsersByCourse(
+		courseId: string,
+		take: number,
+		skip: number
+	): Promise<CourseEnrollment[]>
 }

@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 export const getTokenHeaderSchema = z.object({
-	userId: z.string()
+	userId: z.string(),
+	role: z.string()
 })
 
 export const getParamsUserSchema = z.object({
@@ -14,9 +15,6 @@ export const getRefreshTokenSchema = z.object({
 
 export const createUserSchemaBody = z.object({
 	name: z.string(),
-	cpf: z.string(),
-	username: z.string(),
-	birthdate: z.string(),
 	password: z.string().min(6),
 	email: z.string().email(),
 	phone: z.string()

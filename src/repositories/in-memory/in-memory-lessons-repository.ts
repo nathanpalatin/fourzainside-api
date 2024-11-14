@@ -5,19 +5,21 @@ import type { LessonsRepository } from '../lessons-repository'
 export class InMemoryLessonsRepository implements LessonsRepository {
 	public items: Lessons[] = []
 
-	async create(data: Prisma.LessonsCreateInput) {
-		const lesson = {
+	async create(data: Prisma.LessonsUncheckedCreateInput) {
+		const lesson: Lessons = {
 			...data,
 			id: randomUUID(),
-			watched: false,
+			watched: data.watched ?? false,
+			cover: data.cover ?? '',
 			transcription: data.transcription ?? '',
 			classification: data.classification ?? 0,
-			courseId: randomUUID(),
+			courseId: data.courseId ?? randomUUID(),
 			createdAt: new Date(),
 			updatedAt: new Date()
 		}
 
 		this.items.push(lesson)
+
 		return lesson
 	}
 
@@ -25,7 +27,14 @@ export class InMemoryLessonsRepository implements LessonsRepository {
 		return this.items.find(item => item.id === id) || null
 	}
 
-	async findMany() {
+	async findBySlug(slug: string) {
+		return this.items.find(item => item.slug === slug) || null
+	}
+
+	async findMany(slug?: string) {
+		if (slug) {
+			return this.items.filter(item => item.slug === slug) || null
+		}
 		return this.items
 	}
 
@@ -39,18 +48,18 @@ export class InMemoryLessonsRepository implements LessonsRepository {
 		return deletedLesson
 	}
 
-	async update(id: string, data: Partial<Lessons>) {
+	async update(id: string, data: Prisma.LessonsUpdateInput) {
 		const lessonIndex = this.items.findIndex(item => item.id === id)
 		if (lessonIndex === -1) {
 			return null
 		}
 
-		this.items[lessonIndex] = {
-			...this.items[lessonIndex],
+		const updatedLesson: Lessons = {
 			...data,
-			updatedAt: new Date()
+			...this.items[lessonIndex]
 		}
 
-		return this.items[lessonIndex]
+		this.items[lessonIndex] = updatedLesson
+		return updatedLesson
 	}
 }

@@ -4,6 +4,8 @@ import type { CourseEnrollmentsRepository } from '../../repositories/enrollments
 
 interface GetUserCourseUseCaseRequest {
 	courseId: string
+	take: number
+	skip: number
 }
 
 interface GetUsersCourseUseCaseResponse {
@@ -14,10 +16,15 @@ export class GetUsersCourseUseCase {
 	constructor(private enrollmentsRepository: CourseEnrollmentsRepository) {}
 
 	async execute({
-		courseId
+		courseId,
+		take,
+		skip
 	}: GetUserCourseUseCaseRequest): Promise<GetUsersCourseUseCaseResponse> {
-		const students =
-			await this.enrollmentsRepository.findUsersByCourse(courseId)
+		const students = await this.enrollmentsRepository.findUsersByCourse(
+			courseId,
+			take,
+			skip
+		)
 
 		return {
 			students

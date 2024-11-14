@@ -70,11 +70,10 @@ export async function coursesRoutes(app: FastifyInstance) {
 			}
 		},
 		async (request, reply) => {
-			const { userId } = getTokenHeaderSchema.parse(request.headers)
-
+			const { userId, role } = getTokenHeaderSchema.parse(request.headers)
 			const getUserCourses = makeGetCourseByUserUseCase()
 
-			const courses = await getUserCourses.execute({ userId })
+			const courses = await getUserCourses.execute({ userId, role })
 
 			return reply.status(200).send(courses)
 		}

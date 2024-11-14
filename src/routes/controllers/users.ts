@@ -1,5 +1,4 @@
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { z } from 'zod'
 
 import { FastifyInstance } from 'fastify'
 
@@ -13,7 +12,6 @@ import {
 	getRefreshTokenSchema,
 	getTokenHeaderSchema,
 	getUserCredentialSchema,
-	responseRefreshTokenSchema,
 	updateUserSchemaBody
 } from '../../@types/zod/user'
 
@@ -25,6 +23,8 @@ import { makeGetUsersCourseUseCase } from '../../use-cases/factories/make-get-us
 import { prisma } from '../../lib/prisma'
 import { getParamsCourseSchema } from '../../@types/zod/course'
 import { makeAuthenticateUserUseCase } from '../../use-cases/factories/make-authenticate-use-case'
+import { createSlug, generateCode } from '../../utils/functions'
+import { sendMail } from '../../lib/nodemailer'
 
 interface QueryParams {
 	limit?: string
@@ -32,55 +32,53 @@ interface QueryParams {
 }
 
 export async function usersRoutes(app: FastifyInstance) {
-	app.withTypeProvider<ZodTypeProvider>().post(
-		'/',
-		{
-			schema: {
-				tags: ['Authentication'],
-				summary: 'Create new user',
-				body: createUserSchemaBody,
-				response: {
-					201: z.object({
-						message: z.string()
-					})
-				}
-			}
-		},
-		async (request, reply) => {
-			const { name, email, password, username, phone, cpf, birthdate } =
-				createUserSchemaBody.parse(request.body)
-			try {
-				const registerUseCase = makeRegisterUseCase()
+	app.withTypeProvider<ZodTypeProvider>().post('/', async (request, reply) => {
+		const { name, email, password, phone } = createUserSchemaBody.parse(
+			request.body
+		)
+		try {
+			const registerUseCase = makeRegisterUseCase()
 
-				await registerUseCase.execute({
-					name,
-					cpf,
-					phone,
-					username,
-					birthdate,
-					email,
-					password
-				})
-			} catch (error) {
-				if (error instanceof UserAlreadyExistsError) {
-					return reply.status(409).send({ message: error.message })
-				}
+			const { user } = await registerUseCase.execute({
+				name,
+				phone,
+				username: createSlug(name),
+				email,
+				password
+			})
 
-				throw error
+			const code = generateCode()
+
+			await sendMail(
+				email,
+				'Confirme seu cadastro conosco',
+				`Aqui está seu código de confirmação: ${code}`
+			)
+
+			await prisma.validationCode.create({
+				data: {
+					userId: user.id,
+					code,
+					expiresAt: new Date(Date.now() + 1000 * 60 * 5)
+				}
+			})
+
+			return reply
+				.status(201)
+				.send({ userId: user.id, message: 'User created successfully.' })
+		} catch (error) {
+			if (error instanceof UserAlreadyExistsError) {
+				return reply.status(409).send({ message: error.message })
 			}
-			return reply.status(201).send({ message: 'User created successfully.' })
+
+			throw error
 		}
-	)
+	})
 
 	app.withTypeProvider<ZodTypeProvider>().put(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Authentication'],
-				summary: 'Update info user',
-				body: updateUserSchemaBody
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
@@ -106,28 +104,9 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.withTypeProvider<ZodTypeProvider>().post(
-		'/login',
-		{
-			schema: {
-				tags: ['Authentication'],
-				summary: 'Authenticate user',
-				body: createLoginSchemaBody,
-				response: {
-					200: z.object({
-						token: z.string(),
-						refreshToken: z.string(),
-						user: z.object({
-							role: z.string(),
-							id: z.string(),
-							name: z.string(),
-							avatar: z.string().nullable()
-						})
-					})
-				}
-			}
-		},
-		async (request, reply) => {
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.post('/login', async (request, reply) => {
 			const { credential, password } = createLoginSchemaBody.parse(request.body)
 
 			const authUser = makeAuthenticateUserUseCase()
@@ -155,7 +134,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			)
 
 			return reply
-				.setCookie('refreshToken', refreshToken, {
+				.setCookie('refreshToken', String(refreshToken), {
 					path: '/',
 					secure: true,
 					httpOnly: true,
@@ -172,21 +151,11 @@ export async function usersRoutes(app: FastifyInstance) {
 						avatar: user.avatar
 					}
 				})
-		}
-	)
+		})
 
-	app.withTypeProvider<ZodTypeProvider>().patch(
-		'/token/refresh',
-		{
-			schema: {
-				tags: ['Authentication'],
-				summary: 'Refresh token from authenticated user',
-				response: {
-					200: responseRefreshTokenSchema
-				}
-			}
-		},
-		async (request, reply) => {
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.patch('/token/refresh', async (request, reply) => {
 			const { refreshToken } = getRefreshTokenSchema.parse(request.body)
 
 			if (!refreshToken) {
@@ -221,7 +190,7 @@ export async function usersRoutes(app: FastifyInstance) {
 				)
 
 				return reply
-					.setCookie('refreshToken', newRefreshToken, {
+					.setCookie('refreshToken', String(newRefreshToken), {
 						path: '/',
 						secure: true,
 						httpOnly: true,
@@ -230,28 +199,12 @@ export async function usersRoutes(app: FastifyInstance) {
 					.status(200)
 					.send({ token, refreshToken: newRefreshToken })
 			}
-		}
-	)
+		})
 
 	app.withTypeProvider<ZodTypeProvider>().get<{ Querystring: QueryParams }>(
 		'/:courseId',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Users'],
-				summary: 'List all users',
-				response: {
-					200: z.object({
-						students: z.array(
-							z.object({
-								id: z.string(),
-								name: z.string(),
-								avatar: z.string().nullable()
-							})
-						)
-					})
-				}
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { courseId } = getParamsCourseSchema.parse(request.params)
@@ -270,14 +223,7 @@ export async function usersRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().delete(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Users'],
-				summary: 'Delete account',
-				response: {
-					204: z.null()
-				}
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
@@ -287,18 +233,9 @@ export async function usersRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.withTypeProvider<ZodTypeProvider>().post(
-		'/password',
-		{
-			schema: {
-				tags: ['Authentication'],
-				summary: 'Change password',
-				body: z.object({
-					credential: z.string()
-				})
-			}
-		},
-		async (request, reply) => {
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.post('/password', async (request, reply) => {
 			const { credential } = getUserCredentialSchema.parse(request.body)
 
 			const user = await prisma.users.findFirst({
@@ -314,7 +251,12 @@ export async function usersRoutes(app: FastifyInstance) {
 				throw new BadRequestError('User not found.')
 			}
 
+			await sendMail(
+				credential,
+				'Confirme seu cadastro conosco',
+				`Aqui está seu código de confirmação: ${generateCode()}`
+			)
+
 			reply.status(200).send({ user })
-		}
-	)
+		})
 }

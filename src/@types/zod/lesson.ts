@@ -11,6 +11,10 @@ export const getParamsLessonSchema = z.object({
 	lessonId: z.string()
 })
 
+export const getParamsOneLessonSchema = z.object({
+	slug: z.string()
+})
+
 export const updateProgressLessonSchema = z.object({
 	lessonId: z.string(),
 	courseId: z.string()

@@ -1,10 +1,24 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, type Lessons } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
 
 import type { LessonsRepository } from '../lessons-repository'
 
 export class PrismaLessonRepository implements LessonsRepository {
+	async findBySlug(slug: string) {
+		const lesson = await prisma.lessons.findFirst({
+			where: {
+				slug
+			},
+			include: {
+				course: {
+					select: { title: true }
+				}
+			}
+		})
+		return lesson
+	}
+
 	async update(id: string, data: Prisma.LessonsUpdateInput) {
 		const lesson = await prisma.lessons.update({
 			where: {
@@ -22,12 +36,14 @@ export class PrismaLessonRepository implements LessonsRepository {
 				id
 			}
 		})
+
 		return lesson
 	}
-	async create(data: Prisma.LessonsCreateInput) {
+	async create(data: Prisma.LessonsUncheckedCreateInput) {
 		const lesson = await prisma.lessons.create({
 			data
 		})
+
 		return lesson
 	}
 

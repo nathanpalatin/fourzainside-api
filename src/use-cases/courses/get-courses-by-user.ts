@@ -9,9 +9,10 @@ export class GetCourseByUserUseCase {
 	constructor(private courseRepository: CoursesRepository) {}
 
 	async execute({
-		userId
+		userId,
+		role
 	}: ListCoursesUseCaseRequest): Promise<ListCoursesUseCaseResponse> {
-		const courses = await this.courseRepository.findMany(userId)
+		const courses = await this.courseRepository.findMany(userId, role)
 
 		if (!courses) {
 			throw new BadRequestError('Courses not found.')

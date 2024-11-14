@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "cpf" DROP NOT NULL,
+ALTER COLUMN "birthdate" DROP NOT NULL;

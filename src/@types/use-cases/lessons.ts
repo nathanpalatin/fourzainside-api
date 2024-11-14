@@ -17,7 +17,11 @@ export interface ListLessonsUseCaseRequest {
 }
 
 export interface ListLessonsFromCourseUseCaseRequest {
-	courseId: string
+	slug: string
+}
+
+export interface OneLessonUseCaseRequest {
+	slug: string
 }
 
 export interface CreateLessonUseCaseResponse {
@@ -26,6 +30,10 @@ export interface CreateLessonUseCaseResponse {
 
 export interface LessonUseCaseResponse {
 	lessons: Lessons
+}
+
+export interface OneLessonUseCaseResponse {
+	lesson: Lessons | null
 }
 
 export interface LessonDeleteUseCaseResponse {

@@ -17,6 +17,7 @@ export interface DeleteCourseUseCaseRequest {
 
 export interface ListCoursesUseCaseRequest {
 	userId: string
+	role: string
 }
 
 export interface CourseUseCaseResponse {

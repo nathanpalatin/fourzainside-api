@@ -1,4 +1,4 @@
-import { Prisma, type Users } from '@prisma/client'
+import { Prisma, type Users, type ValidationCode } from '@prisma/client'
 
 import { UsersRepository } from '../users-repository'
 import { prisma } from '../../lib/prisma'
@@ -57,6 +57,24 @@ export class PrismaUsersRepository implements UsersRepository {
 			}
 		})
 		return user
+	}
+
+	async createCode(data: Prisma.ValidationCodeUncheckedCreateInput) {
+		await prisma.validationCode.create({
+			data: {
+				...data,
+				expiresAt: new Date(data.expiresAt)
+			}
+		})
+	}
+	async findCode(code: number, userId: string): Promise<ValidationCode | null> {
+		const codeFind = await prisma.validationCode.findFirst({
+			where: {
+				userId,
+				code
+			}
+		})
+		return codeFind
 	}
 
 	async create(data: Prisma.UsersCreateInput) {

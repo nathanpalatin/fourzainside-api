@@ -4,8 +4,6 @@ import fastify from 'fastify'
 import cookie from '@fastify/cookie'
 import fastifyJwt from '@fastify/jwt'
 import multipart from '@fastify/multipart'
-import fastifySwagger from '@fastify/swagger'
-import fastifySwaggerUI from '@fastify/swagger-ui'
 
 import {
 	jsonSchemaTransform,
@@ -50,34 +48,6 @@ app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
 app.setErrorHandler(errorHandler)
-
-app.register(fastifySwagger, {
-	openapi: {
-		info: {
-			title: 'Fourza Inside',
-			description: 'Fourza Inside API Routes.',
-			version: '1.0',
-			contact: {
-				name: 'Nathan Palatin',
-				url: 'https://github.com/nathanpalatin'
-			},
-			license: {
-				name: 'MIT',
-				url: 'https://opensource.org/licenses/MIT'
-			}
-		}
-	},
-	transform: jsonSchemaTransform
-})
-
-app.register(fastifySwaggerUI, {
-	routePrefix: '/docs',
-	staticCSP: true,
-	transformSpecification: (swaggerObject, _req, _reply) => {
-		return swaggerObject
-	},
-	transformSpecificationClone: true
-})
 
 app.register(cookie)
 

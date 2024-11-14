@@ -8,6 +8,8 @@ const envSchema = z.object({
 	DATABASE_CLIENT: z.enum(['mysql', 'pg']).default('pg'),
 	DATABASE_URL: z.string().url(),
 	JWT_SECRET_KEY: z.string(),
+	GMAIL_USER: z.string(),
+	GMAIL_APP_PASS: z.string(),
 	CLOUDFLARE_BUCKET_NAME: z.string(),
 	CLOUDFLARE_ACCOUNT_ID: z.string(),
 	CLOUDFLARE_ACCESS_KEY_ID: z.string(),

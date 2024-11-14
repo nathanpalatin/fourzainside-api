@@ -14,8 +14,6 @@ export async function createAndAuthenticateUser(
 		data: {
 			name: faker.person.fullName(),
 			username: createSlug(faker.person.fullName()),
-			cpf: faker.phone.number(),
-			birthdate: faker.date.birthdate.toString(),
 			phone: faker.phone.number(),
 			email,
 			password: await hash('123456', 1),

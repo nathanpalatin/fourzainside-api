@@ -1,10 +1,11 @@
 import { randomUUID } from 'node:crypto'
 
-import { Users, Prisma } from '@prisma/client'
+import { Users, Prisma, type ValidationCode } from '@prisma/client'
 import type { UsersRepository } from '../users-repository'
 
 export class InMemoryUsersRepository implements UsersRepository {
 	public items: Users[] = []
+	public code: ValidationCode[] = []
 
 	async findByPhone(phone: string) {
 		const user = this.items.find(item => item.phone === phone)
@@ -35,6 +36,27 @@ export class InMemoryUsersRepository implements UsersRepository {
 		return user
 	}
 
+	async createCode(data: ValidationCode) {
+		const code = {
+			id: randomUUID(),
+			code: data.code,
+			userId: data.userId,
+			expiresAt: new Date()
+		}
+		this.code.push(code)
+	}
+
+	async findCode(code: number, userId: string) {
+		const result = this.code.find(
+			item => item.id === userId && item.code === code
+		)
+
+		if (!result) {
+			return null
+		}
+
+		return result
+	}
 	async findById(id: string) {
 		const user = this.items.find(item => item.id === id)
 
@@ -66,8 +88,8 @@ export class InMemoryUsersRepository implements UsersRepository {
 			zipCode: data.zipCode ?? null,
 			occupation: data.occupation ?? null,
 			username: data.username,
-			birthdate: data.birthdate,
-			cpf: data.cpf,
+			birthdate: data.birthdate ?? '',
+			cpf: data.cpf ?? '',
 			avatar: null,
 			role: data.role ?? 'USER',
 			emailVerified: false,

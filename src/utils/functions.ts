@@ -5,3 +5,7 @@ export function createSlug(title: string) {
 		.replace(/[\u0300-\u036f]/g, '')
 		.replace(/\s+/g, '-')
 }
+
+export function generateCode() {
+	return Math.floor(1000 + Math.random() * 9000)
+}
