@@ -47,16 +47,24 @@ export class PrismaLessonRepository implements LessonsRepository {
 		return lesson
 	}
 
-	async findMany(courseId: string) {
+	async findMany(slug: string) {
 		const lessons = await prisma.lessons.findMany({
 			orderBy: {
 				createdAt: 'desc'
 			},
-			where: {
-				courseId
+
+			include: {
+				course: {
+					select: { id: true, slug: true }
+				}
 			}
 		})
 
+		const courseId = lessons.length > 0 ? lessons[0].courseId : null
+
+		if (!courseId) {
+			throw new Error('Course not found for the provided slug.')
+		}
 		const progresses = await prisma.progress.findMany({
 			where: {
 				courseId

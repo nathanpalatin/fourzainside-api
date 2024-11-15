@@ -2,7 +2,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { FastifyInstance } from 'fastify'
 
-import { compare } from 'bcrypt'
+import { compare, hash } from 'bcrypt'
 
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 
@@ -11,6 +11,7 @@ import {
 	createUserSchemaBody,
 	getRefreshTokenSchema,
 	getTokenHeaderSchema,
+	getUserCredentialPasswordSchema,
 	getUserCredentialSchema,
 	updateUserSchemaBody
 } from '../../@types/zod/user'
@@ -241,9 +242,6 @@ export async function usersRoutes(app: FastifyInstance) {
 			const user = await prisma.users.findFirst({
 				where: {
 					email: credential
-				},
-				select: {
-					email: true
 				}
 			})
 
@@ -251,12 +249,59 @@ export async function usersRoutes(app: FastifyInstance) {
 				throw new BadRequestError('User not found.')
 			}
 
+			const reset = await prisma.resetPassword.create({
+				data: {
+					email: user.email
+				}
+			})
+
 			await sendMail(
 				credential,
-				'Confirme seu cadastro conosco',
-				`Aqui está seu código de confirmação: ${generateCode()}`
+				'Redefinir sua senha',
+				`Acesse o link para redefinição de senha: <a href="http://localhost:3000/auth/reset-password/${reset.token}">Cliquei aqui</a>`
 			)
 
-			reply.status(200).send({ user })
+			reply.status(204).send()
+		})
+
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.post('/reset-password', async (request, reply) => {
+			const { credential, password } = getUserCredentialPasswordSchema.parse(
+				request.body
+			)
+
+			const user = await prisma.resetPassword.findFirst({
+				where: {
+					token: credential
+				}
+			})
+
+			if (!user) {
+				throw new BadRequestError('User token not found.')
+			}
+
+			await prisma.users.update({
+				where: {
+					email: user.email
+				},
+				data: {
+					password: await hash(password, 6)
+				}
+			})
+
+			await sendMail(
+				user.email,
+				'[CONTA] Sua senha foi alterada',
+				`Sua senha foi alterada recentemente, se não foi você que fez essa ação, por favor, entre em contato imediatamente com nosso suporte.`
+			)
+
+			await prisma.resetPassword.delete({
+				where: {
+					token: credential
+				}
+			})
+
+			reply.status(204).send()
 		})
 }

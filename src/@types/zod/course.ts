@@ -14,6 +14,10 @@ export const getParamsCourseSchema = z.object({
 	courseId: z.string()
 })
 
+export const getParamsCourseSlugSchema = z.object({
+	slug: z.string()
+})
+
 export const getParamsSlugCourseSchema = z.object({
 	slug: z.string()
 })

@@ -24,6 +24,11 @@ export const getUserParamsSchema = z.object({
 	query: z.string()
 })
 
+export const getUserCredentialPasswordSchema = z.object({
+	credential: z.string(),
+	password: z.string()
+})
+
 export const getUserCredentialSchema = z.object({
 	credential: z.string()
 })

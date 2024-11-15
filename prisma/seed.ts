@@ -38,7 +38,7 @@ async function seed() {
 		data: {
 			title: faker.person.fullName(),
 			duration: 5,
-			video: '',
+			video: 'https://www.youtube.com/watch?v=M11PBJbFApw',
 			courseId: course.id,
 			description: faker.person.fullName().toLocaleLowerCase().replace(' ', ''),
 			slug: faker.person.fullName().toLocaleLowerCase().replace(' ', '')

@@ -45,6 +45,14 @@ model Users {
   @@map("users")
 }
 
+model ResetPassword {
+  id    String @id @default(uuid())
+  email String
+  token String @unique @default(cuid())
+
+  @@map("reset_passwords")
+}
+
 model Courses {
   id          String   @id @default(uuid())
   title       String

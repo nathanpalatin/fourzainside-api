@@ -12,7 +12,10 @@ import {
 } from '../../@types/zod/lesson'
 
 import { getTokenHeaderSchema } from '../../@types/zod/user'
-import { getParamsCourseSchema } from '../../@types/zod/course'
+import {
+	getParamsCourseSchema,
+	getParamsCourseSlugSchema
+} from '../../@types/zod/course'
 
 import { makeCreateLessonUseCase } from '../../use-cases/factories/make-create-lesson-use-case'
 import { makeDeleteLessonUseCase } from '../../use-cases/factories/make-delete-lesson-use-case'
@@ -65,16 +68,16 @@ export async function lessonsRoutes(app: FastifyInstance) {
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
-		'/:courseId',
+		'/:slug',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { courseId } = getParamsCourseSchema.parse(request.params)
+			const { slug } = getParamsCourseSlugSchema.parse(request.params)
 
 			const getLessonsCourse = makeGetLessonsCourseUseCase()
 
-			const lessons = await getLessonsCourse.execute({ slug: courseId })
+			const lessons = await getLessonsCourse.execute({ slug })
 
 			return reply.status(200).send(lessons)
 		}
