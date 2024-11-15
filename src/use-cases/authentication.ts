@@ -3,6 +3,8 @@ import { compare } from 'bcrypt'
 
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
 import type { UsersRepository } from '../repositories/users-repository'
+import { BadRequestError } from '../routes/_errors/bad-request-error'
+import { UnauthorizedError } from '../routes/_errors/unauthorized-error'
 
 interface AuthenticateUseCaseRequest {
 	credential: string
@@ -23,10 +25,6 @@ export class AuthenticateUseCase {
 		let user = await this.usersRepository.findByEmail(credential)
 
 		if (!user) {
-			user = await this.usersRepository.findByCPF(credential)
-		}
-
-		if (!user) {
 			throw new InvalidCredentialsError()
 		}
 
@@ -34,6 +32,10 @@ export class AuthenticateUseCase {
 
 		if (!doesntPasswordMatches) {
 			throw new InvalidCredentialsError()
+		}
+
+		if (!user.emailVerified) {
+			throw new UnauthorizedError('Email not verified.')
 		}
 
 		return {

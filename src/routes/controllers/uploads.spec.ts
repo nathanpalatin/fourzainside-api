@@ -15,7 +15,7 @@ describe('Uploads (e2e)', () => {
 	})
 
 	it('should be able to upload a file', async () => {
-		const { token } = await createAndAuthenticateUser(app)
+		const { token } = await createAndAuthenticateUser(app, false, true)
 
 		const response = await request(app.server)
 			.post('/uploads')

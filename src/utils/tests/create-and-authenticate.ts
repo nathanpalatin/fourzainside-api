@@ -7,7 +7,8 @@ import { createSlug } from '../functions'
 
 export async function createAndAuthenticateUser(
 	app: FastifyInstance,
-	isAdmin = false
+	isAdmin = false,
+	emailVerified = false
 ) {
 	const email = faker.internet.email()
 	await prisma.users.create({
@@ -16,6 +17,7 @@ export async function createAndAuthenticateUser(
 			username: createSlug(faker.person.fullName()),
 			phone: faker.phone.number(),
 			email,
+			emailVerified,
 			password: await hash('123456', 1),
 			role: isAdmin ? 'MENTOR' : 'USER'
 		}

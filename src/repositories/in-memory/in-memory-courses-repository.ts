@@ -21,6 +21,7 @@ export class InMemoryCoursesRepository implements CoursesRepository {
 			id: randomUUID(),
 			tags: Array.isArray(data.tags) ? data.tags : [],
 			type: data.type,
+			banner: data.banner ?? '',
 			title: data.title,
 			slug: data.slug,
 			image: data.image,

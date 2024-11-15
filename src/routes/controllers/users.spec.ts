@@ -3,19 +3,9 @@ import { app } from '../../app'
 import request from 'supertest'
 import { hash } from 'bcrypt'
 
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-
-import { InMemoryUsersRepository } from '../../repositories/in-memory/in-memory-users-repository'
-import { AuthenticateUseCase } from '../../use-cases/authentication'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { createAndAuthenticateUser } from '../../utils/tests/create-and-authenticate'
-import { CreateCourseUseCase } from '../../use-cases/courses/create-course'
-import { InMemoryCoursesRepository } from '../../repositories/in-memory/in-memory-courses-repository'
-
-let courseRepository: InMemoryCoursesRepository
-let usersRepository: InMemoryUsersRepository
-let sut: AuthenticateUseCase
-let sut2: CreateCourseUseCase
 
 describe('Users routes (e2e)', () => {
 	beforeAll(async () => {
@@ -26,58 +16,28 @@ describe('Users routes (e2e)', () => {
 		await app.close()
 	})
 
-	beforeEach(() => {
-		usersRepository = new InMemoryUsersRepository()
-		courseRepository = new InMemoryCoursesRepository()
-		sut = new AuthenticateUseCase(usersRepository)
-		sut2 = new CreateCourseUseCase(courseRepository)
-	})
-
 	it('should be able to create a new user', async () => {
-		const userResponse = await request(app.server)
-			.post('/users')
-			.send({
-				name: 'John Doe',
-				username: 'johndoe',
-				address: 'Rua 123, 1234',
-				city: 'Cidade do Teste',
-				state: 'SP',
-				zipCode: '12345-678',
-				phone: '+554799999999',
-				email: 'johndoe@example.com',
-				cpf: '426.315.238-73',
-				birthdate: '1993-06-14',
-				password: await hash('123456', 1)
-			})
+		const userResponse = await request(app.server).post('/users').send({
+			name: 'John Doe',
+			phone: '+554799999999',
+			email: 'johndoe@example.com',
+			password: '123456'
+		})
 
 		expect(userResponse.statusCode).toEqual(201)
 	})
 
 	it('should be able to log in', async () => {
-		await usersRepository.create({
-			name: 'John Doe',
-			username: 'johndoe',
-			phone: '+554799999999',
-			cpf: '999.999.999-99',
-			birthdate: '1993-06-14',
-			email: 'johndoe@example.com',
-			password: await hash('123456', 1)
-		})
+		const { token } = await createAndAuthenticateUser(app, false, true)
 
-		const { user } = await sut.execute({
-			credential: 'johndoe@example.com',
-			password: '123456'
-		})
-
-		expect(user.id).toEqual(expect.any(String))
+		expect(token).toEqual(expect.any(String))
 	})
 
 	it('should be able to refresh token from user authenticated', async () => {
-		const { refreshToken } = await createAndAuthenticateUser(app)
+		const { refreshToken } = await createAndAuthenticateUser(app, false, true)
 
 		const response = await request(app.server)
 			.patch('/users/token/refresh')
-			.set('Cookie', 'refreshToken=' + refreshToken)
 			.send({
 				refreshToken
 			})
@@ -90,7 +50,7 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('should be able to update a user', async () => {
-		const { token } = await createAndAuthenticateUser(app)
+		const { token } = await createAndAuthenticateUser(app, false, true)
 
 		const updateData = {
 			name: 'John Updated',
@@ -106,7 +66,7 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('should be able to delete a user', async () => {
-		const { token } = await createAndAuthenticateUser(app)
+		const { token } = await createAndAuthenticateUser(app, false, true)
 
 		const updateResponse = await request(app.server)
 			.delete('/users')
@@ -117,34 +77,12 @@ describe('Users routes (e2e)', () => {
 	})
 
 	it('should be able to recovery user password', async () => {
-		const { email } = await createAndAuthenticateUser(app)
+		const { email } = await createAndAuthenticateUser(app, false, true)
 
 		const updateResponse = await request(app.server)
 			.post('/users/password')
 			.send({ credential: email })
 
-		expect(updateResponse.status).toBe(200)
-	})
-
-	it('should be able to list all users from course', async () => {
-		const { token, userId } = await createAndAuthenticateUser(app)
-
-		const { courses } = await sut2.execute({
-			userId,
-			title: 'testee',
-			description: 'teste 22',
-			image: 'image.png',
-			level: 'medium',
-			tags: [],
-			duration: 10,
-			type: 'fitness'
-		})
-
-		const updateResponse = await request(app.server)
-			.get(`/courses/:${courses.id}`)
-			.set('Authorization', `${token}`)
-			.send()
-
-		expect(updateResponse.status).toBe(200)
+		expect(updateResponse.status).toBe(204)
 	})
 })

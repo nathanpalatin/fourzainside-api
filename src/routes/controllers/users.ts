@@ -2,7 +2,7 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { FastifyInstance } from 'fastify'
 
-import { compare, hash } from 'bcrypt'
+import { hash } from 'bcrypt'
 
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 
@@ -24,8 +24,10 @@ import { makeGetUsersCourseUseCase } from '../../use-cases/factories/make-get-us
 import { prisma } from '../../lib/prisma'
 import { getParamsCourseSchema } from '../../@types/zod/course'
 import { makeAuthenticateUserUseCase } from '../../use-cases/factories/make-authenticate-use-case'
-import { createSlug, generateCode } from '../../utils/functions'
+import { createSlug } from '../../utils/functions'
 import { sendMail } from '../../lib/nodemailer'
+import { InvalidCredentialsError } from '../../use-cases/errors/invalid-credentials-error'
+import { UnauthorizedError } from '../_errors/unauthorized-error'
 
 interface QueryParams {
 	limit?: string
@@ -48,21 +50,11 @@ export async function usersRoutes(app: FastifyInstance) {
 				password
 			})
 
-			const code = generateCode()
-
-			await sendMail(
+			/* 	await sendMail(
 				email,
-				'Confirme seu cadastro conosco',
-				`Aqui está seu código de confirmação: ${code}`
-			)
-
-			await prisma.validationCode.create({
-				data: {
-					userId: user.id,
-					code,
-					expiresAt: new Date(Date.now() + 1000 * 60 * 5)
-				}
-			})
+				'[BOAS VINDAS] Bem vindo a nossa plataforma',
+				`Acesse o link para confirmar sua conta: <a href="http://localhost:3000/auth/sign-in?confirm=true">Clique aqui</a>`
+			) */
 
 			return reply
 				.status(201)
@@ -109,49 +101,50 @@ export async function usersRoutes(app: FastifyInstance) {
 		.withTypeProvider<ZodTypeProvider>()
 		.post('/login', async (request, reply) => {
 			const { credential, password } = createLoginSchemaBody.parse(request.body)
+			try {
+				const authUser = makeAuthenticateUserUseCase()
 
-			const authUser = makeAuthenticateUserUseCase()
+				const { user } = await authUser.execute({ credential, password })
 
-			const { user } = await authUser.execute({ credential, password })
+				const token = await reply.jwtSign(
+					{ userId: user.id, role: user.role },
+					{ expiresIn: '1h' }
+				)
 
-			if (!user) {
-				throw new BadRequestError('Invalid credentials.')
+				const refreshToken = await reply.jwtSign(
+					{ userId: user.id, role: user.role },
+					{ expiresIn: '7d' }
+				)
+
+				return reply
+					.setCookie('refreshToken', String(refreshToken), {
+						path: '/',
+						secure: true,
+						httpOnly: true,
+						sameSite: true
+					})
+					.status(200)
+					.send({
+						token,
+						refreshToken,
+						user: {
+							role: user.role,
+							id: user.id,
+							name: user.name,
+							avatar: user.avatar
+						}
+					})
+			} catch (error) {
+				if (error instanceof InvalidCredentialsError) {
+					return reply.status(401).send({ message: error.message })
+				}
+
+				if (error instanceof UnauthorizedError) {
+					return reply.status(401).send({ message: error.message })
+				}
+
+				throw error
 			}
-
-			const isValidPassword = await compare(password, user.password)
-
-			if (!isValidPassword) {
-				throw new BadRequestError('Invalid password.')
-			}
-
-			const token = await reply.jwtSign(
-				{ userId: user.id, role: user.role },
-				{ expiresIn: '1h' }
-			)
-
-			const refreshToken = await reply.jwtSign(
-				{ userId: user.id, role: user.role },
-				{ expiresIn: '7d' }
-			)
-
-			return reply
-				.setCookie('refreshToken', String(refreshToken), {
-					path: '/',
-					secure: true,
-					httpOnly: true,
-					sameSite: true
-				})
-				.status(200)
-				.send({
-					token,
-					refreshToken,
-					user: {
-						role: user.role,
-						id: user.id,
-						name: user.name,
-						avatar: user.avatar
-					}
-				})
 		})
 
 	app
@@ -257,8 +250,8 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			await sendMail(
 				credential,
-				'Redefinir sua senha',
-				`Acesse o link para redefinição de senha: <a href="http://localhost:3000/auth/reset-password/${reset.token}">Cliquei aqui</a>`
+				'[CONTA] Redefinir sua senha',
+				`Acesse o link para redefinição da sua senha: <a href="http://localhost:3000/auth/reset-password/${reset.token}">Cliquei aqui</a>`
 			)
 
 			reply.status(204).send()
@@ -278,7 +271,7 @@ export async function usersRoutes(app: FastifyInstance) {
 			})
 
 			if (!user) {
-				throw new BadRequestError('User token not found.')
+				throw new BadRequestError('User not found.')
 			}
 
 			await prisma.users.update({

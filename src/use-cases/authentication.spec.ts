@@ -3,6 +3,7 @@ import { expect, describe, it, beforeEach } from 'vitest'
 import { AuthenticateUseCase } from './authentication'
 import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users-repository'
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
+import { UnauthorizedError } from '../routes/_errors/unauthorized-error'
 
 let usersRepository: InMemoryUsersRepository
 let sut: AuthenticateUseCase
@@ -19,6 +20,7 @@ describe('Authenticate Use Case', () => {
 			username: 'johndoe',
 			email: 'johndoe@example.com',
 			cpf: '999.999.999-99',
+			emailVerified: true,
 			phone: '+5547999999999',
 			birthdate: '1993-06-14T00:00:00Z',
 			password: await hash('123456', 1)
@@ -32,13 +34,23 @@ describe('Authenticate Use Case', () => {
 		expect(user.id).toEqual(expect.any(String))
 	})
 
-	it('should not be able to authenticate with wrong email', async () => {
+	it('should not be able to authenticate with email not verified', async () => {
+		await usersRepository.create({
+			name: 'John Doe',
+			username: 'johndoe',
+			email: 'johndoe@example.com',
+			cpf: '999.999.999-99',
+			phone: '+5547999999999',
+			birthdate: '1993-06-14T00:00:00Z',
+			password: await hash('123456', 1)
+		})
+
 		await expect(() =>
 			sut.execute({
 				credential: 'johndoe@example.com',
 				password: '123456'
 			})
-		).rejects.toBeInstanceOf(InvalidCredentialsError)
+		).rejects.toBeInstanceOf(UnauthorizedError)
 	})
 
 	it('should not be able to authenticate with wrong email', async () => {
@@ -54,8 +66,8 @@ describe('Authenticate Use Case', () => {
 
 		await expect(() =>
 			sut.execute({
-				credential: 'johndoe@example.com',
-				password: '123123'
+				credential: 'johndoe2@example.com',
+				password: '123456'
 			})
 		).rejects.toBeInstanceOf(InvalidCredentialsError)
 	})

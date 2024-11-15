@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 
 import { Users, Prisma, type ValidationCode } from '@prisma/client'
 import type { UsersRepository } from '../users-repository'
+import { createSlug } from '../../utils/functions'
 
 export class InMemoryUsersRepository implements UsersRepository {
 	public items: Users[] = []
@@ -87,12 +88,12 @@ export class InMemoryUsersRepository implements UsersRepository {
 			state: data.state ?? null,
 			zipCode: data.zipCode ?? null,
 			occupation: data.occupation ?? null,
-			username: data.username,
+			username: createSlug(data.name),
 			birthdate: data.birthdate ?? '',
 			cpf: data.cpf ?? '',
 			avatar: null,
 			role: data.role ?? 'USER',
-			emailVerified: false,
+			emailVerified: data.emailVerified ?? false,
 			email: data.email,
 			phone: data.phone,
 			password: data.password,

@@ -12,17 +12,16 @@ describe('Delete account Use Case', () => {
 		usersRepository = new InMemoryUsersRepository()
 		sut = new DeleteAccountUseCase(usersRepository)
 	})
-
 	it('should be able to delete account', async () => {
 		const { id: userId } = await usersRepository.create({
 			name: 'John Doe',
 			username: 'jhondoe',
 			email: 'johndoe@example.com',
-			cpf: '999.999.999-99',
 			phone: '+5547999999999',
-			birthdate: '1993-06-14T00:00:00Z',
 			password: await hash('123456', 1)
 		})
+
+		console.log(userId)
 
 		await sut.execute({ userId })
 

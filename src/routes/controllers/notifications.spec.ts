@@ -17,7 +17,7 @@ describe('Notifications (e2e)', () => {
 	})
 
 	it('should be able to get user notifications', async () => {
-		const { token } = await createAndAuthenticateUser(app)
+		const { token } = await createAndAuthenticateUser(app, false, true)
 
 		const notificationResponse = await request(app.server)
 			.get('/notifications')

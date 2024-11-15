@@ -14,7 +14,7 @@ describe('Lessons (e2e)', () => {
 		await app.close()
 	})
 	it('should be able to create a lesson', async () => {
-		const { token } = await createAndAuthenticateUser(app, true)
+		const { token } = await createAndAuthenticateUser(app, true, true)
 
 		const courseResponse = await request(app.server)
 			.post('/courses')
@@ -44,7 +44,7 @@ describe('Lessons (e2e)', () => {
 	})
 
 	it('should be able to list all lessons from course', async () => {
-		const { token } = await createAndAuthenticateUser(app, true)
+		const { token } = await createAndAuthenticateUser(app, true, true)
 		const courseResponse = await request(app.server)
 			.post('/courses')
 			.set('Authorization', `${token}`)
