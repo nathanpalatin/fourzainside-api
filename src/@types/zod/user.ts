@@ -28,6 +28,10 @@ export const getUserCredentialPasswordSchema = z.object({
 	credential: z.string(),
 	password: z.string()
 })
+export const getUserCredentialValidadeSchema = z.object({
+	code: z.number(),
+	email: z.string()
+})
 
 export const getUserCredentialSchema = z.object({
 	credential: z.string()

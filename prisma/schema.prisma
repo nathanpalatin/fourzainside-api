@@ -40,13 +40,12 @@ model Users {
   courses           Courses[]
   progresses        Progress[]
   courseEnrollments CourseEnrollment[]
-  validationCode    ValidationCode[]
 
   @@map("users")
 }
 
 model ResetPassword {
-  id    String @id @default(uuid())
+  id    String @id @default(cuid())
   email String
   token String @unique @default(cuid())
 
@@ -187,12 +186,9 @@ model Materials {
 }
 
 model ValidationCode {
-  id        String   @id @default(uuid())
-  userId    String
-  code      Int
-  expiresAt DateTime
-
-  user Users @relation(fields: [userId], references: [id])
+  id    String @id @default(cuid())
+  email String
+  code  Int
 
   @@map("validation_code")
 }

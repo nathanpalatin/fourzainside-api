@@ -13,6 +13,7 @@ import {
 	getTokenHeaderSchema,
 	getUserCredentialPasswordSchema,
 	getUserCredentialSchema,
+	getUserCredentialValidadeSchema,
 	updateUserSchemaBody
 } from '../../@types/zod/user'
 
@@ -24,7 +25,7 @@ import { makeGetUsersCourseUseCase } from '../../use-cases/factories/make-get-us
 import { prisma } from '../../lib/prisma'
 import { getParamsCourseSchema } from '../../@types/zod/course'
 import { makeAuthenticateUserUseCase } from '../../use-cases/factories/make-authenticate-use-case'
-import { createSlug } from '../../utils/functions'
+import { createSlug, generateCode } from '../../utils/functions'
 import { sendMail } from '../../lib/nodemailer'
 import { InvalidCredentialsError } from '../../use-cases/errors/invalid-credentials-error'
 import { UnauthorizedError } from '../_errors/unauthorized-error'
@@ -50,11 +51,20 @@ export async function usersRoutes(app: FastifyInstance) {
 				password
 			})
 
-			/* 	await sendMail(
+			const codeGenerated = generateCode()
+
+			await prisma.validationCode.create({
+				data: {
+					code: codeGenerated,
+					email
+				}
+			})
+
+			await sendMail(
 				email,
 				'[BOAS VINDAS] Bem vindo a nossa plataforma',
-				`Acesse o link para confirmar sua conta: <a href="http://localhost:3000/auth/sign-in?confirm=true">Clique aqui</a>`
-			) */
+				`Acesse o link para confirmar sua conta: <h1 style={{ fontSize: '26px' }}>${codeGenerated}</h1>`
+			)
 
 			return reply
 				.status(201)
@@ -296,5 +306,47 @@ export async function usersRoutes(app: FastifyInstance) {
 			})
 
 			reply.status(204).send()
+		})
+
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.post('/validate-account', async (request, reply) => {
+			const { email, code } = getUserCredentialValidadeSchema.parse(
+				request.body
+			)
+
+			const user = await prisma.validationCode.findFirst({
+				where: {
+					email,
+					code
+				}
+			})
+
+			if (!user) {
+				throw new BadRequestError('Código inválido.')
+			}
+
+			await prisma.users.update({
+				where: {
+					email: user.email
+				},
+				data: {
+					emailVerified: true
+				}
+			})
+
+			await sendMail(
+				user.email,
+				'[BOAS VINDAS] Sua conta foi confirmada!',
+				`Agora voce pode desfrutar de todos os nossos recursos da plataforma, seja bem-vindo(a)!.`
+			)
+
+			await prisma.validationCode.delete({
+				where: {
+					id: user.id
+				}
+			})
+
+			reply.status(200).send({ message: 'Account confirmation successfully.' })
 		})
 }
