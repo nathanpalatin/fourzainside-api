@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const getTokenHeaderSchema = z.object({
 	userId: z.string(),
-	role: z.string()
+	role: z.string().optional().default('USER')
 })
 
 export const getParamsUserSchema = z.object({
@@ -37,6 +37,11 @@ export const getUserCredentialSchema = z.object({
 	credential: z.string()
 })
 
+export const bodyUserPasswordSchema = z.object({
+	password: z.string(),
+	newPassword: z.string()
+})
+
 export const updateUserSchemaBody = z.object({
 	name: z.string().optional(),
 	phone: z.string().optional(),
@@ -62,7 +67,7 @@ export const userProfileSchema = z.object({
 		id: z.string().uuid(),
 		role: z.enum(['ADMIN', 'USER', 'MENTOR']),
 		name: z.string(),
-		avatar: z.string().url().nullable()
+		avatar: z.string().nullable()
 	})
 })
 

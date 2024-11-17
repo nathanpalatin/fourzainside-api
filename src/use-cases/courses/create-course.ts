@@ -15,7 +15,6 @@ export class CreateCourseUseCase {
 		image,
 		level,
 		tags,
-		duration,
 		type,
 		userId
 	}: CourseUseCaseRequest): Promise<CourseUseCaseResponse> {
@@ -26,7 +25,6 @@ export class CreateCourseUseCase {
 			image,
 			tags,
 			level,
-			duration,
 			type,
 			userId,
 			createdAt: new Date(),

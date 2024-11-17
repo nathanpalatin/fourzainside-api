@@ -18,15 +18,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Notifications'],
-
-				summary: 'Get authenticated user notifications',
-				response: {
-					200: createNotificationsSchema
-				}
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
@@ -42,12 +34,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Notifications'],
-				summary: 'Send a new notification',
-				body: createNotificationSchema
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId: sendUserId } = getTokenHeaderSchema.parse(request.headers)
@@ -74,11 +61,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().patch(
 		'/:id',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Notifications'],
-				summary: 'Read a notification'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { id } = updateNotificationSchema.parse(request.params)

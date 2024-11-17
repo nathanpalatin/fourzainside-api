@@ -17,12 +17,20 @@ export class PrismaNotificationRepository implements NotificationsRepository {
 		const notification = await prisma.notifications.findMany({
 			where: {
 				userId
+			},
+			include: {
+				sendUser: {
+					select: {
+						name: true,
+						avatar: true
+					}
+				}
 			}
 		})
 		return notification
 	}
 
-	async create(data: Prisma.NotificationsCreateInput) {
+	async create(data: Prisma.NotificationsUncheckedCreateInput) {
 		const notification = await prisma.notifications.create({
 			data
 		})

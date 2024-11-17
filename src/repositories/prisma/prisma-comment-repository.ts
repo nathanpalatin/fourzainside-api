@@ -13,7 +13,7 @@ export class PrismaCommentRepository implements CommentsRepository {
 		})
 		return comment
 	}
-	async create(data: Prisma.CommentsCreateInput) {
+	async create(data: Prisma.CommentsUncheckedCreateInput) {
 		const comment = await prisma.comments.create({
 			data
 		})

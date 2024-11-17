@@ -2,11 +2,12 @@ import type { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 import { FastifyInstance } from 'fastify'
 
-import { hash } from 'bcrypt'
+import { compare, hash } from 'bcrypt'
 
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 
 import {
+	bodyUserPasswordSchema,
 	createLoginSchemaBody,
 	createUserSchemaBody,
 	getRefreshTokenSchema,
@@ -266,6 +267,49 @@ export async function usersRoutes(app: FastifyInstance) {
 
 			reply.status(204).send()
 		})
+
+	app.withTypeProvider<ZodTypeProvider>().patch(
+		'/change-password',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
+			const { password, newPassword } = bodyUserPasswordSchema.parse(
+				request.body
+			)
+
+			const user = await prisma.users.findFirst({
+				where: {
+					id: userId
+				}
+			})
+			if (!user) {
+				throw new BadRequestError('User not found.')
+			}
+
+			const isValidPassword = await compare(password, user?.password)
+
+			if (!isValidPassword) {
+				throw new BadRequestError('Actual password not matched.')
+			}
+
+			await prisma.users.update({
+				where: { id: userId },
+				data: {
+					password: await hash(newPassword, 6)
+				}
+			})
+
+			await sendMail(
+				user.email,
+				'[CONTA] Sua senha foi alterada',
+				`Sua senha foi alterada recentemente, se não foi você que fez essa ação, por favor, entre em contato imediatamente com nosso suporte.`
+			)
+
+			reply.status(204).send()
+		}
+	)
 
 	app
 		.withTypeProvider<ZodTypeProvider>()

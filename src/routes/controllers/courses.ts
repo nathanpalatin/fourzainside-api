@@ -1,9 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import {
-	getParamsUserSchema,
-	getTokenHeaderSchema
-} from '../../@types/zod/user'
+import { getTokenHeaderSchema } from '../../@types/zod/user'
 import {
 	createCourseSchemaBody,
 	getParamsCourseSchema,
@@ -63,11 +60,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Courses'],
-				summary: 'List all courses'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId, role } = getTokenHeaderSchema.parse(request.headers)
@@ -82,11 +75,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
 		'/c/:slug',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Courses'],
-				summary: 'Get one course'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { slug } = getParamsSlugCourseSchema.parse(request.params)
@@ -102,11 +91,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().delete(
 		'/:courseId',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Courses'],
-				summary: 'Delete a course'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { courseId } = getParamsCourseSchema.parse(request.params)
@@ -122,11 +107,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		'/enroll',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Courses'],
-				summary: 'Delete a course'
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)

@@ -35,11 +35,12 @@ model Users {
   role          Role     @default(USER)
   emailVerified Boolean  @default(false)
 
-  notifications     Notifications[]
   certificates      Certificates[]
   courses           Courses[]
   progresses        Progress[]
   courseEnrollments CourseEnrollment[]
+  notifications     Notifications[]    @relation("NotificationsUser")
+  sentNotifications Notifications[]    @relation("NotificationsSendUser")
 
   @@map("users")
 }
@@ -61,7 +62,6 @@ model Courses {
   banner      String?
   tags        String[]
   level       String   @default("easy")
-  duration    Int
   type        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -152,7 +152,8 @@ model Notifications {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     Users  @relation("NotificationsUser", fields: [userId], references: [id], onDelete: Cascade)
+  sendUser Users? @relation("NotificationsSendUser", fields: [sendUserId], references: [id], onDelete: Cascade)
 
   @@map("notifications")
 }
