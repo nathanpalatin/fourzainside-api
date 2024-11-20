@@ -6,7 +6,6 @@ import fastifyJwt from '@fastify/jwt'
 import multipart from '@fastify/multipart'
 
 import {
-	jsonSchemaTransform,
 	serializerCompiler,
 	validatorCompiler,
 	ZodTypeProvider
@@ -51,7 +50,11 @@ app.setErrorHandler(errorHandler)
 
 app.register(cookie)
 
-app.register(multipart)
+app.register(multipart, {
+	limits: {
+		fileSize: 10000
+	}
+})
 
 app.register(usersRoutes, {
 	prefix: 'users'

@@ -22,7 +22,7 @@ model Users {
   password      String
   cpf           String?  @unique
   birthdate     String?
-  gender        String   @default("Male")
+  gender        String?
   address       String?
   city          String?
   state         String?
@@ -192,4 +192,17 @@ model ValidationCode {
   code  Int
 
   @@map("validation_code")
+}
+
+model Payments {
+  id            String @id @default(uuid())
+  status        String @default("pending")
+  token         String
+  tokenExternal String
+  userId        String
+  courseId      String
+  paymentMethod String
+  amount        Float
+
+  @@map("payments")
 }
