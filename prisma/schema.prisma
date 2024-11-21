@@ -14,6 +14,11 @@ enum Role {
   USER
 }
 
+enum TypeUser {
+  PERSONAL
+  COMPANY
+}
+
 model Users {
   id            String   @id @default(uuid())
   name          String
@@ -205,4 +210,15 @@ model Payments {
   amount        Float
 
   @@map("payments")
+}
+
+model RequestSignUp {
+  id    String   @id @default(cuid())
+  name  String
+  email String
+  phone String
+  type  TypeUser @default(PERSONAL)
+  call  String?
+
+  @@map("request_signup")
 }

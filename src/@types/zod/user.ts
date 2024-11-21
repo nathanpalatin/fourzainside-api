@@ -33,6 +33,14 @@ export const getUserCredentialValidadeSchema = z.object({
 	email: z.string()
 })
 
+export const getUserRequestValidadeSchema = z.object({
+	name: z.string(),
+	email: z.string(),
+	phone: z.string(),
+	type: z.enum(['PERSONAL', 'COMPANY']),
+	call: z.string().optional()
+})
+
 export const getUserCredentialSchema = z.object({
 	credential: z.string()
 })

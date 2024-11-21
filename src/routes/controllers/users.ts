@@ -15,6 +15,7 @@ import {
 	getUserCredentialPasswordSchema,
 	getUserCredentialSchema,
 	getUserCredentialValidadeSchema,
+	getUserRequestValidadeSchema,
 	updateUserSchemaBody
 } from '../../@types/zod/user'
 
@@ -30,6 +31,7 @@ import { createSlug, generateCode } from '../../utils/functions'
 import { sendMail } from '../../lib/nodemailer'
 import { InvalidCredentialsError } from '../../use-cases/errors/invalid-credentials-error'
 import { UnauthorizedError } from '../_errors/unauthorized-error'
+import { env } from '../../env'
 
 interface QueryParams {
 	limit?: string
@@ -392,5 +394,42 @@ export async function usersRoutes(app: FastifyInstance) {
 			})
 
 			reply.status(200).send({ message: 'Account confirmation successfully.' })
+		})
+
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.post('/request', async (request, reply) => {
+			const { name, email, phone, type, call } =
+				getUserRequestValidadeSchema.parse(request.body)
+
+			await prisma.requestSignUp.create({
+				data: {
+					name,
+					email,
+					phone,
+					type,
+					call
+				}
+			})
+
+			await sendMail(
+				email,
+				'[SOLICITAÇAO DE ABERTURA | Vance] Recebemos seu pedido!',
+				`Olá, recebemos seu pedido de abertura de conta, em breve nossa equipe entrará em contato com voce por meio das informações fornecidas.`
+			)
+
+			await sendMail(
+				env.GMAIL_USER,
+				'[SOLICITAÇAO DE ABERTURA] Novo pedido de abertura de conta',
+				`${name}, solicitou uma abertura de conta na plataforma:<br>
+				<br>
+				Nome: ${name}<br>
+				WhatsApp: ${phone}<br>
+				Tipo de conta: ${type === 'PERSONAL' ? 'Física' : 'Jurídica'}<br>
+				Como gostaria de ser chamado: ${call ?? 'não informado'}
+				.`
+			)
+
+			reply.status(200).send({ message: 'Account request send successfully.' })
 		})
 }
