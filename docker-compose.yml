@@ -1,5 +1,5 @@
 services:
-  api-vance-pg:
+  database-vance:
     image: bitnami/postgresql:latest
     ports:
       - 5432:5432

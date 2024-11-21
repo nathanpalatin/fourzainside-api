@@ -22,16 +22,6 @@ import { uploadRoutes } from './routes/controllers/uploads'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
-app.route({
-	method: 'GET',
-	url: '/',
-	handler: () => {
-		return {
-			api: 'API Route Fourza Inside.'
-		}
-	}
-})
-
 app.register(fastifyJwt, {
 	secret: env.JWT_SECRET_KEY,
 	cookie: {

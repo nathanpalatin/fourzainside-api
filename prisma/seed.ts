@@ -5,6 +5,20 @@ import { hash } from 'bcrypt'
 const prisma = new PrismaClient()
 
 async function seed() {
+	await prisma.users.create({
+		data: {
+			name: 'Nathan Palatin',
+			username: 'nathanpalatin',
+			email: 'nath.palatin@gmail.com',
+			avatar: 'nathan.jpg',
+			emailVerified: true,
+			phone: '+5547999999999',
+			cpf: '999.999.999-99',
+			birthdate: '1993-06-14',
+			password: await hash('123456', 1)
+		}
+	})
+
 	const user = await prisma.users.create({
 		data: {
 			name: faker.person.fullName(),
@@ -22,26 +36,39 @@ async function seed() {
 		}
 	})
 
+	const mentor = await prisma.users.create({
+		data: {
+			name: 'Maia Giacomelli',
+			username: 'maia_giacomelli',
+			email: 'maia_giacomelli@hotmail.com',
+			avatar: 'maia.jpg',
+			emailVerified: true,
+			phone: '+5547999999991',
+			cpf: '999.999.999-91',
+			birthdate: '1995-02-20',
+			password: await hash('123456', 1)
+		}
+	})
+
 	const course = await prisma.courses.create({
 		data: {
-			title: faker.person.fullName(),
-			duration: 10,
-			type: 'application',
-			userId: user.id,
-			description: faker.person.fullName().toLocaleLowerCase().replace(' ', ''),
-			slug: faker.person.fullName().toLocaleLowerCase().replace(' ', ''),
+			title: 'Performa',
+			type: 'Saúde',
+			userId: mentor.id,
+			description: faker.lorem.words(200),
+			slug: 'performa',
 			image: faker.image.urlPicsumPhotos()
 		}
 	})
 
 	await prisma.lessons.create({
 		data: {
-			title: faker.person.fullName(),
-			duration: 5,
+			title: 'Piloto',
+			duration: 120,
 			video: 'https://www.youtube.com/watch?v=M11PBJbFApw',
 			courseId: course.id,
-			description: faker.person.fullName().toLocaleLowerCase().replace(' ', ''),
-			slug: faker.person.fullName().toLocaleLowerCase().replace(' ', '')
+			description: faker.lorem.sentence(200),
+			slug: 'piloto'
 		}
 	})
 
