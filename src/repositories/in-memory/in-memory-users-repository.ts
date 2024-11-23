@@ -41,8 +41,7 @@ export class InMemoryUsersRepository implements UsersRepository {
 		const code = {
 			id: randomUUID(),
 			code: data.code,
-			userId: data.userId,
-			expiresAt: new Date()
+			email: data.email
 		}
 		this.code.push(code)
 	}
@@ -85,9 +84,12 @@ export class InMemoryUsersRepository implements UsersRepository {
 			address: data.address ?? null,
 			gender: data.gender ?? 'male',
 			city: data.city ?? null,
-			state: data.state ?? null,
+			uf: data.uf ?? null,
+			number: data.number ?? null,
+			neighborhood: data.neighborhood ?? null,
+			complement: data.complement ?? null,
+			international: data.international ?? false,
 			zipCode: data.zipCode ?? null,
-			occupation: data.occupation ?? null,
 			username: createSlug(data.name),
 			birthdate: data.birthdate ?? '',
 			cpf: data.cpf ?? '',

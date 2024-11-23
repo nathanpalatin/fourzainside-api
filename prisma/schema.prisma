@@ -26,13 +26,16 @@ model Users {
   email         String   @unique
   password      String
   cpf           String?  @unique
+  international Boolean  @default(false)
   birthdate     String?
   gender        String?
   address       String?
+  number        String?
   city          String?
-  state         String?
+  complement    String?
+  neighborhood  String?
+  uf            String?
   zipCode       String?
-  occupation    String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   avatar        String?
@@ -46,8 +49,19 @@ model Users {
   courseEnrollments CourseEnrollment[]
   notifications     Notifications[]    @relation("NotificationsUser")
   sentNotifications Notifications[]    @relation("NotificationsSendUser")
+  socialLinks       SocialLinks[]
 
   @@map("users")
+}
+
+model SocialLinks {
+  id      String @id @default(cuid())
+  userId  String
+  network String
+  url     String
+  Users   Users? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("social_links")
 }
 
 model ResetPassword {
@@ -96,21 +110,23 @@ model CourseEnrollment {
 }
 
 model Lessons {
-  id             String      @id @default(uuid())
+  id             String   @id @default(uuid())
   title          String
   slug           String
   description    String
   duration       Int
   video          String
   cover          String?
-  classification Int         @default(0)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  transcription  String?
-  courseId       String
-  materials      Materials[]
-  comments       Comments[]
-  course         Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  classification Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  transcription String?
+  courseId      String
+
+  materials Materials[]
+  comments  Comments[]
+  course    Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   Progress Progress[]
 
@@ -200,25 +216,28 @@ model ValidationCode {
 }
 
 model Payments {
-  id            String @id @default(uuid())
-  status        String @default("pending")
+  id            String   @id @default(uuid())
+  status        String   @default("pending")
   token         String
   tokenExternal String
   userId        String
   courseId      String
   paymentMethod String
   amount        Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("payments")
 }
 
 model RequestSignUp {
-  id    String   @id @default(cuid())
-  name  String
-  email String
-  phone String
-  type  TypeUser @default(PERSONAL)
-  call  String?
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  type      TypeUser @default(PERSONAL)
+  call      String?
+  createdAt DateTime @default(now())
 
   @@map("request_signup")
 }

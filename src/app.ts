@@ -42,8 +42,11 @@ app.register(cookie)
 
 app.register(multipart, {
 	limits: {
-		fileSize: 10000
+		fileSize: 1 * 1024 * 1024 * 1024
 	}
+})
+app.addHook('onRequest', async (_request, reply) => {
+	reply.raw.setTimeout(5 * 60 * 1000)
 })
 
 app.register(usersRoutes, {

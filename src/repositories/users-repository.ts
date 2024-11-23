@@ -12,7 +12,7 @@ export interface UsersRepository {
 	findByPhone(phone: string): Promise<Users | null>
 
 	createCode(data: ValidationCode): Promise<void>
-	findCode(code: number, userId: string): Promise<ValidationCode | null>
+	findCode(code: number, email: string): Promise<ValidationCode | null>
 
 	create(data: Prisma.UsersUncheckedCreateInput): Promise<Users>
 	delete(id: string): Promise<Users | null>

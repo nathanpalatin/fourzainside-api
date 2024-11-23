@@ -62,15 +62,14 @@ export class PrismaUsersRepository implements UsersRepository {
 	async createCode(data: Prisma.ValidationCodeUncheckedCreateInput) {
 		await prisma.validationCode.create({
 			data: {
-				...data,
-				expiresAt: new Date(data.expiresAt)
+				...data
 			}
 		})
 	}
-	async findCode(code: number, userId: string): Promise<ValidationCode | null> {
+	async findCode(code: number, email: string): Promise<ValidationCode | null> {
 		const codeFind = await prisma.validationCode.findFirst({
 			where: {
-				userId,
+				email,
 				code
 			}
 		})

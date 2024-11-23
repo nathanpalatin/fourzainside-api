@@ -5,12 +5,14 @@ import { env } from '../../env'
 import { r2 } from '../../lib/cloudflare'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { console } from 'node:inspector'
+import { createSlug } from '../../utils/functions'
 
 export async function uploadRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post('/', async (request, reply) => {
 		const file = await request.file()
 		const uploadId = randomUUID()
-		const uniqueFilename = `${uploadId}-${file?.filename}`
+		const filePath = createSlug(file?.filename ?? 'file')
+		const uniqueFilename = `${uploadId}-${filePath}`
 		const chunks: Buffer[] = []
 
 		return new Promise<void>((resolve, reject) => {
