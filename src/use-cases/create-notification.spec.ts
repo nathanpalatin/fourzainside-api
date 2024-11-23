@@ -17,9 +17,8 @@ describe('Notification Use Case', () => {
 		const notification = await notificationRepository.create({
 			notificationText: 'Test',
 			notificationType: 'TRANSFER',
-			receiveUserId: randomUUID(),
-			sendUserId: randomUUID(),
-			user: {}
+			userId: randomUUID(),
+			sendUserId: randomUUID()
 		})
 
 		expect(notification.id).toEqual(expect.any(String))

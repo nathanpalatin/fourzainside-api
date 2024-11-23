@@ -11,16 +11,13 @@ export class CreateNotificationUseCase {
 		notificationType,
 		notificationText,
 		sendUserId,
-		receiveUserId
+		userId
 	}: NotificationUseCaseRequest): Promise<NotificationUseCaseResponse> {
 		const notification = await this.notificationRepository.create({
 			notificationType,
 			notificationText,
 			sendUserId,
-			user: {
-				connect: { id: sendUserId }
-			},
-			receiveUserId,
+			userId,
 			status: 'unread',
 			createdAt: new Date(),
 			updatedAt: new Date()

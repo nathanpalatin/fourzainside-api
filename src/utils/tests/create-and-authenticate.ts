@@ -31,7 +31,7 @@ export async function createAndAuthenticateUser(
 	const {
 		token,
 		refreshToken,
-		user: { userId, name }
+		user: { id, name }
 	} = authResponse.body
 
 	return {
@@ -39,6 +39,6 @@ export async function createAndAuthenticateUser(
 		refreshToken,
 		name,
 		email,
-		userId
+		userId: id
 	}
 }

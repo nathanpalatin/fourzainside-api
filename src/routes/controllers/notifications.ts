@@ -39,7 +39,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId: sendUserId } = getTokenHeaderSchema.parse(request.headers)
 
-			const { notificationType, receiveUserId, notificationText } =
+			const { notificationType, userId, notificationText } =
 				createNotificationSchema.parse(request.body)
 
 			const createNotification = makeCreateNotificationUseCase()
@@ -48,7 +48,7 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 				notificationType: notificationType,
 				notificationText: notificationText ?? '',
 				sendUserId,
-				receiveUserId
+				userId
 			})
 
 			return reply.status(200).send({

@@ -17,9 +17,8 @@ describe('Update Notification Use Case', () => {
 		const notification = await notificationRepository.create({
 			notificationText: 'Test',
 			notificationType: 'TRANSFER',
-			receiveUserId: randomUUID(),
-			sendUserId: randomUUID(),
-			user: {}
+			userId: randomUUID(),
+			sendUserId: randomUUID()
 		})
 
 		await sut.execute({ id: notification.id })

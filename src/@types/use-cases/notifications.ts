@@ -4,7 +4,7 @@ export interface NotificationUseCaseRequest {
 	notificationType: string
 	notificationText: string
 	sendUserId: string
-	receiveUserId: string
+	userId: string
 }
 
 export interface NotificationUpdateUseCaseRequest {

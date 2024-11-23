@@ -5,7 +5,7 @@ export const createNotificationsSchema = z.object({
 		z.object({
 			id: z.string().uuid(),
 			sendUserId: z.string(),
-			receiveUserId: z.string(),
+			userId: z.string(),
 			notificationText: z.string().nullable(),
 			status: z.string(),
 			notificationType: z.string(),
@@ -16,7 +16,7 @@ export const createNotificationsSchema = z.object({
 
 export const createNotificationSchema = z.object({
 	notificationType: z.string(),
-	receiveUserId: z.string().uuid(),
+	userId: z.string().uuid(),
 	notificationText: z.string().optional()
 })
 

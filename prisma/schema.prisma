@@ -168,7 +168,6 @@ model Notifications {
   notificationText String?
   sendUserId       String
   userId           String
-  receiveUserId    String
   status           String   @default("unread")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

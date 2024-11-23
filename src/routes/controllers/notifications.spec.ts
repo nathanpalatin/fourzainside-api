@@ -28,28 +28,29 @@ describe('Notifications (e2e)', () => {
 	})
 
 	it('should be able to send a notification', async () => {
-		const { token } = await createAndAuthenticateUser(app)
+		const { token } = await createAndAuthenticateUser(app, true, true)
+		const { userId } = await createAndAuthenticateUser(app, false, true)
 
 		const notificationResponse = await request(app.server)
 			.post('/notifications')
 			.set('Authorization', `${token}`)
 			.send({
 				notificationType: 'NEWS',
-				receiveUserId: randomUUID(),
+				userId,
 				notificationText: 'Check out the new feature!'
 			})
 		expect(notificationResponse.statusCode).toEqual(200)
 	})
 
 	it('should be able to read a notification', async () => {
-		const { token } = await createAndAuthenticateUser(app)
+		const { token, userId } = await createAndAuthenticateUser(app, false, true)
 
 		const notificationId = await request(app.server)
 			.post('/notifications')
 			.set('Authorization', `${token}`)
 			.send({
 				notificationType: 'NEWS',
-				receiveUserId: randomUUID(),
+				userId,
 				notificationText: 'Check out the new feature!'
 			})
 

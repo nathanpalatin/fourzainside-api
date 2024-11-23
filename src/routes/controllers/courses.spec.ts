@@ -15,10 +15,10 @@ describe('Courses (e2e)', () => {
 	})
 
 	it('should be able to list all courses from user', async () => {
-		const { token, userId } = await createAndAuthenticateUser(app, false, true)
+		const { token } = await createAndAuthenticateUser(app, false, true)
 
 		const coursesResponse = await request(app.server)
-			.get(`/courses/${userId}`)
+			.get(`/courses`)
 			.set('Authorization', `${token}`)
 			.send()
 

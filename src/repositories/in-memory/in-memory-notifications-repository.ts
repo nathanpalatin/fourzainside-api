@@ -27,13 +27,12 @@ export class InMemoryNotificationsRepository
 		return notifications
 	}
 
-	async create(data: Prisma.NotificationsCreateInput) {
+	async create(data: Prisma.NotificationsUncheckedCreateInput) {
 		const notification = {
 			id: randomUUID(),
 			notificationType: data.notificationType,
 			notificationText: data.notificationText ?? '',
 			sendUserId: data.sendUserId,
-			receiveUserId: data.receiveUserId,
 			status: data.status ?? 'unread',
 			createdAt: new Date(),
 			userId: data.sendUserId,
