@@ -11,16 +11,16 @@ export class CreateLessonUseCase {
 	async execute({
 		title,
 		description,
-		duration,
 		video,
+		moduleId,
 		courseId
 	}: LessonUseCaseRequest): Promise<CreateLessonUseCaseResponse> {
 		const lesson = await this.lessonRepository.create({
 			title,
 			slug: createSlug(title),
 			description,
-			duration,
 			video,
+			moduleId,
 			courseId,
 			createdAt: new Date(),
 			updatedAt: new Date()

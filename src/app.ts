@@ -19,6 +19,7 @@ import { notifcationsRoutes } from './routes/controllers/notifications'
 
 import { errorHandler } from './utils/error-handlers'
 import { uploadRoutes } from './routes/controllers/uploads'
+import { modulesRoutes } from './routes/controllers/modules'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -63,6 +64,10 @@ app.register(notifcationsRoutes, {
 
 app.register(coursesRoutes, {
 	prefix: 'courses'
+})
+
+app.register(modulesRoutes, {
+	prefix: 'modules'
 })
 
 app.register(lessonsRoutes, {

@@ -29,7 +29,7 @@ export async function lessonsRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { title, description, video, courseId, duration } =
+			const { title, description, video, courseId, moduleId } =
 				createLessonSchemaBody.parse(request.body)
 
 			const createLesson = makeCreateLessonUseCase()
@@ -37,8 +37,8 @@ export async function lessonsRoutes(app: FastifyInstance) {
 			const { lesson } = await createLesson.execute({
 				title,
 				description,
-				duration,
 				video,
+				moduleId,
 				courseId
 			})
 

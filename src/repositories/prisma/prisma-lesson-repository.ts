@@ -11,8 +11,8 @@ export class PrismaLessonRepository implements LessonsRepository {
 				slug
 			},
 			include: {
-				course: {
-					select: { title: true }
+				module: {
+					select: { slug: true }
 				}
 			}
 		})
@@ -54,7 +54,7 @@ export class PrismaLessonRepository implements LessonsRepository {
 			},
 
 			include: {
-				course: {
+				module: {
 					select: { id: true, slug: true }
 				}
 			}

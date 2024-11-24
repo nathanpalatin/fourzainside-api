@@ -25,8 +25,18 @@ describe('Lessons (e2e)', () => {
 				image: 'teste.png',
 				type: 'image/png',
 				level: 'advanced',
-				tags: ['JavaScript', 'programming'],
-				duration: 180
+				tags: ['JavaScript', 'programming']
+			})
+
+		const moduleResponse = await request(app.server)
+			.post('/modules')
+			.set('Authorization', `${token}`)
+			.send({
+				title: 'Introduction to JavaScript',
+				description: 'This course will teach you the basics of JavaScript.',
+				available: '7 dias',
+				visibility: true,
+				courseId: courseResponse.body.id
 			})
 
 		const lessonResponse = await request(app.server)
@@ -35,15 +45,15 @@ describe('Lessons (e2e)', () => {
 			.send({
 				title: 'Introduction to JavaScript',
 				description: 'This course will teach you the basics of JavaScript.',
-				duration: 180,
 				courseId: courseResponse.body.id,
+				moduleId: moduleResponse.body.id,
 				video: 'video.mp4'
 			})
 
 		expect(lessonResponse.statusCode).toEqual(201)
 	})
 
-	it('should be able to list all lessons from course', async () => {
+	it('should be able to list all lessons', async () => {
 		const { token } = await createAndAuthenticateUser(app, true, true)
 		const courseResponse = await request(app.server)
 			.post('/courses')
@@ -54,8 +64,7 @@ describe('Lessons (e2e)', () => {
 				image: 'teste.png',
 				type: 'image/png',
 				level: 'advanced',
-				tags: ['JavaScript', 'programming'],
-				duration: 180
+				tags: ['JavaScript', 'programming']
 			})
 		const createdLessonResponse = await request(app.server)
 			.post('/lessons')
@@ -63,7 +72,6 @@ describe('Lessons (e2e)', () => {
 			.send({
 				title: 'Introduction to JavaScript',
 				description: 'This course will teach you the basics of JavaScript.',
-				duration: 180,
 				courseId: courseResponse.body.id,
 				video: 'video.mp4'
 			})

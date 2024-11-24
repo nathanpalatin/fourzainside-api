@@ -3,7 +3,6 @@ import { z } from 'zod'
 export const createCourseSchemaBody = z.object({
 	title: z.string(),
 	description: z.string(),
-	duration: z.number(),
 	type: z.string(),
 	image: z.string(),
 	level: z.string(),
