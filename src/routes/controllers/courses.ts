@@ -42,7 +42,11 @@ export async function coursesRoutes(app: FastifyInstance) {
 
 			return reply
 				.status(201)
-				.send({ id: course.id, message: 'Course created successfully.' })
+				.send({
+					id: course.id,
+					slug: course.slug,
+					message: 'Course created successfully.'
+				})
 		}
 	)
 

@@ -90,7 +90,7 @@ describe('Lessons (e2e)', () => {
 			})
 
 		const lessonResponse = await request(app.server)
-			.get(`/lessons/${courseResponse.body.slug}/${moduleResponse.body.id}`)
+			.get(`/lessons/${courseResponse.body.slug}/${moduleResponse.body.slug}`)
 			.set('Authorization', `${token}`)
 			.send()
 

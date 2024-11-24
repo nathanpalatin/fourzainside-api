@@ -27,7 +27,11 @@ export async function modulesRoutes(app: FastifyInstance) {
 
 				return reply
 					.status(201)
-					.send({ id: module.id, message: 'Module created successfully.' })
+					.send({
+						id: module.id,
+						slug: module.slug,
+						message: 'Module created successfully.'
+					})
 			} catch (error) {
 				if (error instanceof BadRequestError) {
 					return reply.status(400).send({ message: error.message })
