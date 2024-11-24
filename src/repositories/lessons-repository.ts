@@ -5,5 +5,5 @@ export interface LessonsRepository {
 	findBySlug(slug: string): Promise<Lessons | null>
 	findMany(slug: string): Promise<Lessons[]>
 	create(data: Prisma.LessonsUncheckedCreateInput): Promise<Lessons>
-	delete(id: string): Promise<void>
+	delete(id: string): Promise<Lessons | null>
 }

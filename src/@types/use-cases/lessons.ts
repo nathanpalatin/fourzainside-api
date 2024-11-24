@@ -8,10 +8,6 @@ export interface LessonUseCaseRequest {
 	courseId: string
 }
 
-export interface LessonDeleteUseCaseRequest {
-	lessonId: string
-}
-
 export interface ListLessonsUseCaseRequest {
 	userId: string
 }
@@ -30,10 +26,6 @@ export interface LessonUseCaseResponse {
 
 export interface OneLessonUseCaseResponse {
 	lesson: Lessons
-}
-
-export interface LessonDeleteUseCaseResponse {
-	lesson: Lessons | null
 }
 
 export interface LessonUpdateUseCaseResponse {

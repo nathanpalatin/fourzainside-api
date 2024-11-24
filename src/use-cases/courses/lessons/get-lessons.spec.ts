@@ -6,8 +6,8 @@ import { GetLessonsCourseUseCase } from './get-lessons'
 import { InMemoryCoursesRepository } from '../../../repositories/in-memory/in-memory-courses-repository'
 import { InMemoryModulesRepository } from '../../../repositories/in-memory/in-memory-modules-repository'
 
-let courseRepository: InMemoryCoursesRepository
 let moduleRepository: InMemoryModulesRepository
+let courseRepository: InMemoryCoursesRepository
 let lessonRepository: InMemoryLessonsRepository
 let sut: GetLessonsCourseUseCase
 
@@ -17,8 +17,8 @@ describe('Get Lessons Use Case', () => {
 		lessonRepository = new InMemoryLessonsRepository()
 		courseRepository = new InMemoryCoursesRepository()
 		sut = new GetLessonsCourseUseCase(
-			moduleRepository,
 			courseRepository,
+			moduleRepository,
 			lessonRepository
 		)
 	})
@@ -53,7 +53,10 @@ describe('Get Lessons Use Case', () => {
 			description: 'Test'
 		})
 
-		const { lessons } = await sut.execute({ slug: course.slug })
+		const { lessons } = await sut.execute({
+			courseSlug: course.slug,
+			moduleSlug: module.slug
+		})
 
 		expect(lessons.length).toBeGreaterThanOrEqual(0)
 	})

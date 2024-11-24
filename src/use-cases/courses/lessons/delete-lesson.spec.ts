@@ -14,9 +14,19 @@ describe('Delete Lesson Use Case', () => {
 	})
 
 	it('should be able to delete a lesson', async () => {
-		const lessonId = randomUUID()
-		const { lesson } = await sut.execute({ lessonId })
+		const lessonCreated = await lessonRepository.create({
+			title: 'Teste',
+			video: 'video.mp4',
+			courseId: randomUUID(),
+			moduleId: randomUUID(),
+			slug: 'test',
+			description: 'Test'
+		})
 
-		expect(lesson).toBe(null)
+		await sut.execute({ lessonId: lessonCreated.id })
+
+		const lesson = await lessonRepository.findById(lessonCreated.id)
+
+		expect(lesson).toBeNull()
 	})
 })

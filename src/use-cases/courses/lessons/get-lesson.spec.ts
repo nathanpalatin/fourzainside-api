@@ -53,7 +53,11 @@ describe('Get Lesson Use Case', () => {
 			description: 'Test'
 		})
 
-		const { lesson } = await sut.execute({ slug: course.slug })
+		const { lesson } = await sut.execute({
+			courseSlug: course.slug,
+			moduleSlug: module.slug,
+			slug: lessonCreated.slug
+		})
 
 		expect(lesson.slug).toEqual(expect.any(String))
 	})
