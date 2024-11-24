@@ -36,7 +36,6 @@ export async function uploadRoutes(app: FastifyInstance) {
 					reply.status(200).send({ url: uniqueFilename })
 					resolve()
 				} catch (error) {
-					console.log('Upload failed')
 					reply.status(500).send({ error: 'Upload failed' })
 					reject(error)
 				}

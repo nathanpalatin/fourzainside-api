@@ -18,8 +18,8 @@ describe('Lesson Use Case', () => {
 			title: 'teste',
 			video: 'video.mp4',
 			courseId: randomUUID(),
-			description: 'testeeee',
-			duration: 10
+			moduleId: randomUUID(),
+			description: 'testeeee'
 		})
 
 		expect(lesson.id).toEqual(expect.any(String))

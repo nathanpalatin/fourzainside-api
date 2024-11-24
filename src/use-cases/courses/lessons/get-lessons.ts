@@ -1,23 +1,43 @@
-import type {
-	ListLessonsFromCourseUseCaseRequest,
-	ListLessonsUseCaseResponse
-} from '../../../@types/use-cases/lessons'
-import type { LessonsRepository } from '../../../repositories/lessons-repository'
+import type { Lessons } from '@prisma/client'
+
 import { BadRequestError } from '../../../routes/_errors/bad-request-error'
 
+import type { CoursesRepository } from '../../../repositories/courses-repository'
+import type { ModulesRepository } from '../../../repositories/modules-repository'
+import type { LessonsRepository } from '../../../repositories/lessons-repository'
+
+interface ListLessonsFromCourseUseCaseRequest {
+	courseSlug: string
+	moduleSlug: string
+}
+
+interface ListLessonsUseCaseResponse {
+	lessons: Lessons[]
+}
+
 export class GetLessonsCourseUseCase {
-	constructor(private lessonRepository: LessonsRepository) {}
+	constructor(
+		private courseRepository: CoursesRepository,
+		private moduleRepository: ModulesRepository,
+		private lessonRepository: LessonsRepository
+	) {}
 
 	async execute({
-		slug
+		courseSlug,
+		moduleSlug
 	}: ListLessonsFromCourseUseCaseRequest): Promise<ListLessonsUseCaseResponse> {
-		const lessons = await this.lessonRepository.findMany(slug)
+		const course = await this.courseRepository.findBySlug(courseSlug)
+		if (!course) {
+			throw new BadRequestError('Course not found.')
+		}
+		const module = await this.moduleRepository.findBySlug(moduleSlug)
 
-		if (!lessons) {
-			throw new BadRequestError('Lessons not found.')
+		if (!module) {
+			throw new BadRequestError('Module not found.')
 		}
-		return {
-			lessons
-		}
+
+		const lessons = await this.lessonRepository.findMany(module.slug)
+
+		return { lessons }
 	}
 }

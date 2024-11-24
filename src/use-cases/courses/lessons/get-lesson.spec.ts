@@ -2,28 +2,28 @@ import { expect, describe, it, beforeEach } from 'vitest'
 
 import { InMemoryLessonsRepository } from '../../../repositories/in-memory/in-memory-lessons-repository'
 import { randomUUID } from 'crypto'
-import { GetLessonsCourseUseCase } from './get-lessons'
+import { GetLessonUseCase } from './get-lesson'
 import { InMemoryCoursesRepository } from '../../../repositories/in-memory/in-memory-courses-repository'
 import { InMemoryModulesRepository } from '../../../repositories/in-memory/in-memory-modules-repository'
 
 let courseRepository: InMemoryCoursesRepository
 let moduleRepository: InMemoryModulesRepository
 let lessonRepository: InMemoryLessonsRepository
-let sut: GetLessonsCourseUseCase
+let sut: GetLessonUseCase
 
-describe('Get Lessons Use Case', () => {
+describe('Get Lesson Use Case', () => {
 	beforeEach(() => {
 		moduleRepository = new InMemoryModulesRepository()
 		lessonRepository = new InMemoryLessonsRepository()
 		courseRepository = new InMemoryCoursesRepository()
-		sut = new GetLessonsCourseUseCase(
-			moduleRepository,
+		sut = new GetLessonUseCase(
 			courseRepository,
+			moduleRepository,
 			lessonRepository
 		)
 	})
 
-	it('should be able to list all lessons from course', async () => {
+	it('should be able to get lesson', async () => {
 		const course = await courseRepository.create({
 			title: 'Teste',
 			slug: 'test',
@@ -44,7 +44,7 @@ describe('Get Lessons Use Case', () => {
 			description: 'Test'
 		})
 
-		await lessonRepository.create({
+		const lessonCreated = await lessonRepository.create({
 			title: 'Teste',
 			courseId: course.id,
 			video: 'video',
@@ -53,8 +53,8 @@ describe('Get Lessons Use Case', () => {
 			description: 'Test'
 		})
 
-		const { lessons } = await sut.execute({ slug: course.slug })
+		const { lesson } = await sut.execute({ slug: course.slug })
 
-		expect(lessons.length).toBeGreaterThanOrEqual(0)
+		expect(lesson.slug).toEqual(expect.any(String))
 	})
 })

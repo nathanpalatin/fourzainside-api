@@ -17,10 +17,10 @@ export class UpdateNotificationUseCase {
 			throw new BadRequestError('Notification not found.')
 		}
 
-		await this.notificationRepository.update(id)
+		const updatedNotification = await this.notificationRepository.update(id)
 
 		return {
-			notification
+			notification: updatedNotification
 		}
 	}
 }

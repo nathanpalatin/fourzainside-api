@@ -14,13 +14,15 @@ import {
 import { getTokenHeaderSchema } from '../../@types/zod/user'
 import { getParamsCourseSlugSchema } from '../../@types/zod/course'
 
+import { makeProgressUseCase } from '../../use-cases/factories/make-set-lesson-watched-use-case'
 import { makeCreateLessonUseCase } from '../../use-cases/factories/make-create-lesson-use-case'
 import { makeDeleteLessonUseCase } from '../../use-cases/factories/make-delete-lesson-use-case'
-import { makeProgressUseCase } from '../../use-cases/factories/make-set-lesson-watched-use-case'
-import { makeGetLessonsCourseUseCase } from '../../use-cases/factories/make-get-lesson-from-course'
-import { makeCreateCommentLessonCourseUseCase } from '../../use-cases/factories/make-create-comment-use-case'
-import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
 import { makeGetLessonCourseUseCase } from '../../use-cases/factories/make-get-lesson-use-case'
+import { makeGetLessonsCourseUseCase } from '../../use-cases/factories/make-get-lesson-from-course'
+import { makeGetCommentsLessonCourseUseCase } from '../../use-cases/factories/make-get-comments-from-lesson-use-case'
+import { makeCreateCommentLessonCourseUseCase } from '../../use-cases/factories/make-create-comment-use-case'
+
+import { BadRequestError } from '../_errors/bad-request-error'
 
 export async function lessonsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -32,51 +34,82 @@ export async function lessonsRoutes(app: FastifyInstance) {
 			const { title, description, video, courseId, moduleId } =
 				createLessonSchemaBody.parse(request.body)
 
-			const createLesson = makeCreateLessonUseCase()
+			try {
+				const createLesson = makeCreateLessonUseCase()
 
-			const { lesson } = await createLesson.execute({
-				title,
-				description,
-				video,
-				moduleId,
-				courseId
-			})
+				const { lesson } = await createLesson.execute({
+					title,
+					description,
+					video,
+					moduleId,
+					courseId
+				})
 
-			return reply
-				.status(201)
-				.send({ id: lesson.id, message: 'Lesson created successfully.' })
+				return reply
+					.status(201)
+					.send({ id: lesson.id, message: 'Lesson created successfully.' })
+			} catch (error) {
+				throw error
+			}
 		}
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
-		'/lesson/:slug',
+		'/lesson/:courseSlug/:moduleSlug/:slug',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { slug } = getParamsOneLessonSchema.parse(request.params)
+			const { courseSlug, moduleSlug, slug } = getParamsOneLessonSchema.parse(
+				request.params
+			)
 
-			const getLessonCourse = makeGetLessonCourseUseCase()
+			try {
+				const getLessonCourse = makeGetLessonCourseUseCase()
 
-			const lesson = await getLessonCourse.execute({ slug })
+				const lesson = await getLessonCourse.execute({
+					courseSlug,
+					moduleSlug,
+					slug
+				})
 
-			return reply.status(200).send(lesson)
+				return reply.status(200).send(lesson)
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
-		'/:slug',
+		'/:courseSlug/:moduleSlug',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { slug } = getParamsCourseSlugSchema.parse(request.params)
+			const { courseSlug, moduleSlug } = getParamsCourseSlugSchema.parse(
+				request.params
+			)
 
-			const getLessonsCourse = makeGetLessonsCourseUseCase()
+			try {
+				const getLessonsCourse = makeGetLessonsCourseUseCase()
 
-			const lessons = await getLessonsCourse.execute({ slug })
+				const lessons = await getLessonsCourse.execute({
+					courseSlug,
+					moduleSlug
+				})
 
-			return reply.status(200).send(lessons)
+				return reply.status(200).send(lessons)
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 
@@ -88,10 +121,18 @@ export async function lessonsRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { lessonId } = getParamsLessonSchema.parse(request.params)
 
-			const deleteLesson = makeDeleteLessonUseCase()
-			await deleteLesson.execute({ lessonId })
+			try {
+				const deleteLesson = makeDeleteLessonUseCase()
+				await deleteLesson.execute({ lessonId })
 
-			return reply.status(204).send()
+				return reply.status(204).send()
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 

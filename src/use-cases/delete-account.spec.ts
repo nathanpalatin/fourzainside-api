@@ -21,8 +21,6 @@ describe('Delete account Use Case', () => {
 			password: await hash('123456', 1)
 		})
 
-		console.log(userId)
-
 		await sut.execute({ userId })
 
 		const deletedUser = await usersRepository.findById(userId)

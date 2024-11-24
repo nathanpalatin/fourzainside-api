@@ -2,7 +2,6 @@ import { expect, describe, it, beforeEach } from 'vitest'
 import { randomUUID } from 'crypto'
 import { GetCourseByUserUseCase } from './get-courses-by-user'
 import { InMemoryCoursesRepository } from '../../repositories/in-memory/in-memory-courses-repository'
-import { InMemoryUsersRepository } from '../../repositories/in-memory/in-memory-users-repository'
 
 let coursesRepository: InMemoryCoursesRepository
 let sut: GetCourseByUserUseCase
@@ -15,7 +14,8 @@ describe('Get Courses by User Use Case', () => {
 
 	it('should be able to get all courses by user', async () => {
 		const courses = await sut.execute({
-			userId: randomUUID()
+			userId: randomUUID(),
+			role: 'user'
 		})
 
 		expect(courses).toEqual({

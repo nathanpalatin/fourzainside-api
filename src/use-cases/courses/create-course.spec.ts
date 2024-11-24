@@ -14,7 +14,7 @@ describe('Courses Use Case', () => {
 	})
 
 	it('should be able to create a course', async () => {
-		const { courses } = await sut.execute({
+		const { course } = await sut.execute({
 			title: 'teste',
 			description: 'testeeee',
 			level: 'medium',
@@ -24,6 +24,6 @@ describe('Courses Use Case', () => {
 			tags: ['tag1', 'tag2']
 		})
 
-		expect(courses.id).toEqual(expect.any(String))
+		expect(course.id).toEqual(expect.any(String))
 	})
 })

@@ -29,7 +29,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 
 			const createCourse = makeCreateCourseUseCase()
 
-			const { courses } = await createCourse.execute({
+			const { course } = await createCourse.execute({
 				title,
 				description,
 				image,
@@ -41,7 +41,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 
 			return reply
 				.status(201)
-				.send({ id: courses.id, message: 'Course created successfully.' })
+				.send({ id: course.id, message: 'Course created successfully.' })
 		}
 	)
 

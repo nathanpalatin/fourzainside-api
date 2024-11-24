@@ -66,18 +66,31 @@ describe('Lessons (e2e)', () => {
 				level: 'advanced',
 				tags: ['JavaScript', 'programming']
 			})
-		const createdLessonResponse = await request(app.server)
+
+		const moduleResponse = await request(app.server)
+			.post('/modules')
+			.set('Authorization', `${token}`)
+			.send({
+				title: 'Introduction to JavaScript',
+				description: 'This course will teach you the basics of JavaScript.',
+				available: '7 dias',
+				visibility: true,
+				courseId: courseResponse.body.id
+			})
+
+		await request(app.server)
 			.post('/lessons')
 			.set('Authorization', `${token}`)
 			.send({
 				title: 'Introduction to JavaScript',
 				description: 'This course will teach you the basics of JavaScript.',
+				moduleId: moduleResponse.body.id,
 				courseId: courseResponse.body.id,
 				video: 'video.mp4'
 			})
 
 		const lessonResponse = await request(app.server)
-			.get(`/lessons/${createdLessonResponse.body.id}`)
+			.get(`/lessons/${courseResponse.body.slug}/${moduleResponse.body.id}`)
 			.set('Authorization', `${token}`)
 			.send()
 

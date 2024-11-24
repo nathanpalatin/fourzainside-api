@@ -1,8 +1,10 @@
 import { compare } from 'bcrypt'
 import { expect, describe, it, beforeEach } from 'vitest'
-import { RegisterUseCase } from './register'
-import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users-repository'
+
 import { UserAlreadyExistsError } from './errors/user-already-exists-error'
+
+import { InMemoryUsersRepository } from '../repositories/in-memory/in-memory-users-repository'
+import { RegisterUseCase } from './register'
 
 let usersRepository: InMemoryUsersRepository
 let sut: RegisterUseCase
@@ -17,9 +19,7 @@ describe('Register Use Case', () => {
 		const { user } = await sut.execute({
 			name: 'John Doe',
 			username: 'johndoe',
-			cpf: '999.999.999-99',
 			phone: '+5547999999999',
-			birthdate: '1993-06-14T00:00:00Z',
 			email: 'johndoe@example.com',
 			password: '123456'
 		})
@@ -30,10 +30,8 @@ describe('Register Use Case', () => {
 	it('should hash user password upon registration', async () => {
 		const { user } = await sut.execute({
 			name: 'John Doe',
-			cpf: '999.999.999-99',
 			phone: '+5547999999999',
 			username: 'johndoe',
-			birthdate: '1993-06-14T00:00:00Z',
 			email: 'johndoe@example.com',
 			password: '123456'
 		})
@@ -48,10 +46,8 @@ describe('Register Use Case', () => {
 
 		await sut.execute({
 			name: 'John Doe',
-			cpf: '999.999.999-99',
 			username: 'johndoe',
 			phone: '+5547999999999',
-			birthdate: '1993-06-14T00:00:00Z',
 			email,
 			password: '123456'
 		})
@@ -60,9 +56,7 @@ describe('Register Use Case', () => {
 			sut.execute({
 				name: 'John Doe',
 				username: 'johndoe',
-				cpf: '999.999.999-99',
 				phone: '+5547999999999',
-				birthdate: '1993-06-14T00:00:00Z',
 				email,
 				password: '123456'
 			})

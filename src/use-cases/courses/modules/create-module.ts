@@ -6,9 +6,14 @@ import {
 } from '../../../@types/use-cases/modules'
 
 import type { ModulesRepository } from '../../../repositories/modules-repository'
+import { BadRequestError } from '../../../routes/_errors/bad-request-error'
+import type { CoursesRepository } from '../../../repositories/courses-repository'
 
-export class CreatModuleUseCase {
-	constructor(private moduleRepository: ModulesRepository) {}
+export class CreateModuleUseCase {
+	constructor(
+		private courseRepository: CoursesRepository,
+		private moduleRepository: ModulesRepository
+	) {}
 
 	async execute({
 		title,
@@ -17,6 +22,10 @@ export class CreatModuleUseCase {
 		visibility,
 		courseId
 	}: ModuleUseCaseRequest): Promise<ModuleUseCaseResponse> {
+		const courseExists = await this.courseRepository.findById(courseId)
+		if (!courseExists) {
+			throw new BadRequestError('Course not found')
+		}
 		const module = await this.moduleRepository.create({
 			title,
 			slug: createSlug(title),
@@ -25,6 +34,7 @@ export class CreatModuleUseCase {
 			visibility,
 			courseId
 		})
+
 		return { module }
 	}
 }

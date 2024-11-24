@@ -12,7 +12,6 @@ export class InMemoryModulesRepository implements ModulesRepository {
 	}
 	async findMany(courseId: string) {
 		const modules = this.items.filter(item => item.courseId === courseId)
-		if (!modules) return null
 		return modules
 	}
 	async findBySlug(slug: string) {

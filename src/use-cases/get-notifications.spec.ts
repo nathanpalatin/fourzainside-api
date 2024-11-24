@@ -13,6 +13,13 @@ describe('Get Notifications Use Case', () => {
 	})
 
 	it('should be able to get all notifications', async () => {
+		await notificationsRepository.create({
+			notificationText: 'Test',
+			notificationType: 'TRANSFER',
+			userId: randomUUID(),
+			sendUserId: randomUUID()
+		})
+
 		const { notifications } = await sut.execute({
 			userId: randomUUID()
 		})

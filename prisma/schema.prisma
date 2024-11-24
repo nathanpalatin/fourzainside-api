@@ -50,6 +50,7 @@ model Users {
   notifications     Notifications[]    @relation("NotificationsUser")
   sentNotifications Notifications[]    @relation("NotificationsSendUser")
   socialLinks       SocialLinks[]
+  payments          Payments[]
 
   @@map("users")
 }
@@ -79,7 +80,7 @@ model Courses {
   description String
   image       String
   tags        String[]
-  level       String   @default("easy")
+  level       String   @default("beginner")
   type        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -91,6 +92,7 @@ model Courses {
   progresses       Progress[]
   courseEnrollment CourseEnrollment[]
   modules          Modules[]
+  lessons          Lessons[]
 
   @@map("courses")
 }
@@ -105,7 +107,7 @@ model Modules {
   courseId    String
 
   lessons Lessons[]
-  course  Courses   @relation(fields: [courseId], references: [id])
+  course  Courses   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@map("modules")
 }
@@ -129,7 +131,8 @@ model Lessons {
   comments  Comments[]
   progress  Progress[]
 
-  module Modules @relation(fields: [moduleId], references: [id])
+  course Courses @relation(fields: [courseId], references: [id])
+  module Modules @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@map("lessons")
 }
@@ -239,6 +242,8 @@ model Payments {
   amount        Float
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }

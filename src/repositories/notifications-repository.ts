@@ -5,5 +5,5 @@ export interface NotificationsRepository {
 	findMany(userId: string): Promise<Notifications[]>
 
 	create(data: Prisma.NotificationsUncheckedCreateInput): Promise<Notifications>
-	update(id: string): Promise<Notifications | null>
+	update(id: string): Promise<Notifications>
 }

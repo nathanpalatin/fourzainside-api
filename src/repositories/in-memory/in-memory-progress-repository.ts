@@ -1,35 +1,22 @@
-import { Prisma, type Progress } from '@prisma/client'
-import { prisma } from '../../lib/prisma'
+import { Prisma, Progress } from '@prisma/client'
 import type { ProgressRepository } from '../progress-repository'
 
-export class PrismaProgressRepository implements ProgressRepository {
-	async findByIds(userId: string, lessonId: string) {
-		return prisma.progress.findFirst({
-			where: {
-				userId,
-				lessonId
-			}
-		})
-	}
+export class InMemoryProgressRepository implements ProgressRepository {
+	public items: Progress[] = []
 
-	async findMany(courseId: string) {
-		return prisma.progress.findMany({
-			where: {
-				courseId
-			}
-		})
+	async findByIds(userId: string, lessonId: string): Promise<Progress | null> {
+		throw new Error('Method not implemented.')
 	}
-
-	async create(data: Prisma.ProgressCreateManyInput) {
-		return prisma.progress.create({
-			data
-		})
+	findMany(courseId: string): Promise<Progress[]> {
+		throw new Error('Method not implemented.')
 	}
-
-	async update(id: string, data: Prisma.ProgressUpdateInput) {
-		return prisma.progress.update({
-			where: { id },
-			data
-		})
+	create(data: Prisma.ProgressCreateManyInput): Promise<Progress> {
+		throw new Error('Method not implemented.')
+	}
+	update(
+		id: string,
+		data: Prisma.ProgressUpdateInput
+	): Promise<Progress | null> {
+		throw new Error('Method not implemented.')
 	}
 }

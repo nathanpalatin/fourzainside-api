@@ -21,7 +21,6 @@ describe('Get Course Use Case', () => {
 			image: 'image-url',
 			userId: randomUUID(),
 			level: 'easy',
-			duration: 120,
 			description: 'Learn the basics of programming.'
 		})
 		const courses = await sut.execute({

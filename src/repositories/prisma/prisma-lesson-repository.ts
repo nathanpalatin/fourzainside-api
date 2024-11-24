@@ -47,12 +47,11 @@ export class PrismaLessonRepository implements LessonsRepository {
 		return lesson
 	}
 
-	async findMany(slug: string) {
+	async findMany() {
 		const lessons = await prisma.lessons.findMany({
 			orderBy: {
 				createdAt: 'desc'
 			},
-
 			include: {
 				module: {
 					select: { id: true, slug: true }
@@ -65,6 +64,7 @@ export class PrismaLessonRepository implements LessonsRepository {
 		if (!courseId) {
 			throw new Error('Course not found for the provided slug.')
 		}
+
 		const progresses = await prisma.progress.findMany({
 			where: {
 				courseId
@@ -87,11 +87,10 @@ export class PrismaLessonRepository implements LessonsRepository {
 	}
 
 	async delete(id: string) {
-		const lesson = await prisma.lessons.delete({
+		await prisma.lessons.delete({
 			where: {
 				id
 			}
 		})
-		return lesson
 	}
 }

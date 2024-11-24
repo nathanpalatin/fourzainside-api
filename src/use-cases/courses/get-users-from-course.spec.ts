@@ -1,7 +1,6 @@
 import { expect, describe, it, beforeEach } from 'vitest'
 import { randomUUID } from 'node:crypto'
 import { GetUsersCourseUseCase } from './get-users-from-course'
-import { InMemoryUsersRepository } from '../../repositories/in-memory/in-memory-users-repository'
 import { InMemoryCoursesRepository } from '../../repositories/in-memory/in-memory-courses-repository'
 import { InMemoryCourseEnrollmentsRepository } from '../../repositories/in-memory/in-memory-enrollments-repository'
 
@@ -26,14 +25,15 @@ describe('Get Course Use Case', () => {
 			image: 'image-url',
 			userId,
 			level: 'easy',
-			duration: 120,
 			description: 'Learn the basics of programming.'
 		})
 
 		await enrollmentRepository.enrollUserInCourse(userId, course.id)
 
 		const students = await sut.execute({
-			courseId: course.id
+			courseId: course.id,
+			take: 10,
+			skip: 0
 		})
 
 		expect(students).toEqual({

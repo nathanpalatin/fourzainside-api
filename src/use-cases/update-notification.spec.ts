@@ -1,7 +1,7 @@
+import { randomUUID } from 'crypto'
 import { expect, describe, it, beforeEach } from 'vitest'
 
 import { InMemoryNotificationsRepository } from '../repositories/in-memory/in-memory-notifications-repository'
-import { randomUUID } from 'crypto'
 import { UpdateNotificationUseCase } from './update-notification'
 
 let notificationRepository: InMemoryNotificationsRepository
@@ -14,20 +14,17 @@ describe('Update Notification Use Case', () => {
 	})
 
 	it('should be able to read a notification', async () => {
-		const notification = await notificationRepository.create({
+		const notificationCreated = await notificationRepository.create({
 			notificationText: 'Test',
 			notificationType: 'TRANSFER',
 			userId: randomUUID(),
 			sendUserId: randomUUID()
 		})
 
-		await sut.execute({ id: notification.id })
+		const { notification } = await sut.execute({
+			id: notificationCreated.id
+		})
 
-		const updatedNotification = await notificationRepository.findById(
-			notification.id
-		)
-
-		expect(updatedNotification).toBeTruthy()
-		expect(updatedNotification?.status).toBe('read')
+		expect(notification?.status).toBe('read')
 	})
 })

@@ -20,7 +20,7 @@ export interface ListCoursesUseCaseRequest {
 }
 
 export interface CourseUseCaseResponse {
-	courses: Courses
+	course: Courses
 }
 
 export interface DeleteCourseUseCaseResponse {

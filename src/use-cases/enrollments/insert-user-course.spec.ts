@@ -27,8 +27,7 @@ describe('Enrollment Use Case', () => {
 			userId: randomUUID(),
 			image: 'course.png',
 			type: 'Finance',
-			tags: ['tag1', 'tag2'],
-			duration: 10
+			tags: ['tag1', 'tag2']
 		})
 
 		const user = await userRepository.create({

@@ -26,8 +26,7 @@ describe('Modules (e2e)', () => {
 				image: 'teste.png',
 				type: 'image/png',
 				level: 'advanced',
-				tags: ['JavaScript', 'programming'],
-				duration: 180
+				tags: ['JavaScript', 'programming']
 			})
 
 		const moduleResponse = await request(app.server)

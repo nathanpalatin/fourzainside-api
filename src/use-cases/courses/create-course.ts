@@ -18,7 +18,7 @@ export class CreateCourseUseCase {
 		type,
 		userId
 	}: CourseUseCaseRequest): Promise<CourseUseCaseResponse> {
-		const courses = await this.courseRepository.create({
+		const course = await this.courseRepository.create({
 			title,
 			slug: createSlug(title),
 			description,
@@ -32,7 +32,7 @@ export class CreateCourseUseCase {
 		})
 
 		return {
-			courses
+			course
 		}
 	}
 }

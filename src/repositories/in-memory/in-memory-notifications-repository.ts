@@ -33,7 +33,7 @@ export class InMemoryNotificationsRepository
 			notificationType: data.notificationType,
 			notificationText: data.notificationText ?? '',
 			sendUserId: data.sendUserId,
-			status: data.status ?? 'unread',
+			status: 'unread',
 			createdAt: new Date(),
 			userId: data.sendUserId,
 			updatedAt: new Date()
@@ -47,15 +47,11 @@ export class InMemoryNotificationsRepository
 	async update(id: string) {
 		const notificationIndex = this.items.findIndex(item => item.id === id)
 
-		if (notificationIndex === -1) {
-			return null
-		}
-
 		this.items[notificationIndex] = {
 			...this.items[notificationIndex],
 			status: 'read'
 		}
 
-		return null
+		return this.items[notificationIndex]
 	}
 }
