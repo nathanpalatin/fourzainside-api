@@ -1,5 +1,3 @@
-import { env } from '../env'
-
 export function createSlug(title: string) {
 	return title
 		.toLocaleLowerCase()

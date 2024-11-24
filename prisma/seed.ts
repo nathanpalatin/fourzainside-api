@@ -69,7 +69,7 @@ async function seed() {
 			available: '2024-11-25',
 			visibility: true,
 			courseId: course.id,
-			description: faker.lorem.sentence(200),
+			description: faker.lorem.sentence(100),
 			slug: 'modulacao-intestinal'
 		}
 	})

@@ -4,7 +4,6 @@ import { ZodError } from 'zod'
 import { BadRequestError } from '../routes/_errors/bad-request-error'
 import { UnauthorizedError } from '../routes/_errors/unauthorized-error'
 import { ResourceNotFoundError } from '../use-cases/errors/resource-not-found-error'
-import { InvalidCredentialsError } from '../use-cases/errors/invalid-credentials-error'
 
 type FastifyErrorHandler = FastifyInstance['errorHandler']
 

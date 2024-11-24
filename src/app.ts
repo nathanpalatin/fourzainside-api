@@ -14,12 +14,12 @@ import {
 import { usersRoutes } from './routes/controllers/users'
 import { profileRoutes } from './routes/controllers/profile'
 import { coursesRoutes } from './routes/controllers/courses'
+import { modulesRoutes } from './routes/controllers/modules'
 import { lessonsRoutes } from './routes/controllers/lessons'
+import { uploadRoutes } from './routes/controllers/uploads'
 import { notifcationsRoutes } from './routes/controllers/notifications'
 
 import { errorHandler } from './utils/error-handlers'
-import { uploadRoutes } from './routes/controllers/uploads'
-import { modulesRoutes } from './routes/controllers/modules'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
 

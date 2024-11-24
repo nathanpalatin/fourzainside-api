@@ -1,4 +1,4 @@
-import { PrismaProgressRepository } from '../../repositories/in-memory/in-memory-progress-repository'
+import { PrismaProgressRepository } from '../../repositories/prisma/prisma-progress-repository'
 import { SetWatchedLessonUseCase } from '../courses/lessons/set-watched-lesson'
 
 export function makeProgressUseCase() {

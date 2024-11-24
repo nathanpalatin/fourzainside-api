@@ -1,5 +1,5 @@
-import nodemailer from 'nodemailer'
 import { env } from '../env'
+import nodemailer from 'nodemailer'
 
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
 
 export async function sendMail(to: string, subject: string, text: string) {
 	await transporter.sendMail({
-		from: `"Vance" <noreply@vance.com>`,
+		from: `"Vance" <noreply@thevance.com.br>`,
 		to,
 		subject,
 		text,
