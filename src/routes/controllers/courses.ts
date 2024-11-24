@@ -7,6 +7,7 @@ import {
 	getParamsCourseSchema,
 	getParamsSlugCourseSchema
 } from '../../@types/zod/course'
+
 import { makeCreateCourseUseCase } from '../../use-cases/factories/make-create-course-use-case'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
 import { makeGetCourseByUserUseCase } from '../../use-cases/factories/make-get-courses-by-user-use-case'
