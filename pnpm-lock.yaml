@@ -23,9 +23,6 @@ importers:
       '@prisma/client':
         specifier: 5.22.0
         version: 5.22.0(prisma@5.22.0)
-      '@types/socket.io':
-        specifier: 3.0.1
-        version: 3.0.1
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -1203,9 +1200,6 @@ packages:
 
   '@types/nodemailer@6.4.16':
     resolution: {integrity: sha512-uz6hN6Pp0upXMcilM61CoKyjT7sskBoOWpptkjjJp8jIMlTdc3xG01U7proKkXzruMS4hS0zqtHNkNPFB20rKQ==}
-
-  '@types/socket.io@3.0.1':
-    resolution: {integrity: sha512-XSma2FhVD78ymvoxYV4xGXrIH/0EKQ93rR+YR0Y+Kw1xbPzLDCip/UWSejZ08FpxYeYNci/PZPQS9anrvJRqMA==}
 
   '@types/superagent@8.1.9':
     resolution: {integrity: sha512-pTVjI73witn+9ILmoJdajHGW2jkSaOzhiFYF1Rd3EQ94kymLqB9PjD9ISg7WaALC7+dCHT0FGe9T2LktLq/3GQ==}
@@ -4688,14 +4682,6 @@ snapshots:
   '@types/nodemailer@6.4.16':
     dependencies:
       '@types/node': 20.17.6
-
-  '@types/socket.io@3.0.1':
-    dependencies:
-      socket.io: 4.8.1
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
 
   '@types/superagent@8.1.9':
     dependencies:

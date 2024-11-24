@@ -12,10 +12,7 @@ import {
 } from '../../@types/zod/lesson'
 
 import { getTokenHeaderSchema } from '../../@types/zod/user'
-import {
-	getParamsCourseSchema,
-	getParamsCourseSlugSchema
-} from '../../@types/zod/course'
+import { getParamsCourseSlugSchema } from '../../@types/zod/course'
 
 import { makeCreateLessonUseCase } from '../../use-cases/factories/make-create-lesson-use-case'
 import { makeDeleteLessonUseCase } from '../../use-cases/factories/make-delete-lesson-use-case'

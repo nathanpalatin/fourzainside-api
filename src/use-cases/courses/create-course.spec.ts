@@ -21,8 +21,7 @@ describe('Courses Use Case', () => {
 			userId: randomUUID(),
 			image: 'course.png',
 			type: 'Finance',
-			tags: ['tag1', 'tag2'],
-			duration: 10
+			tags: ['tag1', 'tag2']
 		})
 
 		expect(courses.id).toEqual(expect.any(String))

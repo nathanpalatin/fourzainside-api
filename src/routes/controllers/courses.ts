@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { getTokenHeaderSchema } from '../../@types/zod/user'
+
 import {
 	createCourseSchemaBody,
 	getParamsCourseSchema,
@@ -8,7 +9,6 @@ import {
 } from '../../@types/zod/course'
 import { makeCreateCourseUseCase } from '../../use-cases/factories/make-create-course-use-case'
 import { checkSessionIdExists } from '../../middlewares/auth-token'
-import { z } from 'zod'
 import { makeGetCourseByUserUseCase } from '../../use-cases/factories/make-get-courses-by-user-use-case'
 import { makeDeleteCourseUseCase } from '../../use-cases/factories/make-delete-course-use-case'
 import { makeGetCourseUseCase } from '../../use-cases/factories/make-get-one-course-use-case'
@@ -19,23 +19,12 @@ export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
 		'/',
 		{
-			preHandler: [checkSessionIdExists],
-			schema: {
-				tags: ['Courses'],
-				summary: 'Create a new course',
-				body: createCourseSchemaBody,
-				response: {
-					201: z.object({
-						id: z.string(),
-						message: z.string()
-					})
-				}
-			}
+			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const { title, description, tags, image, duration, type, level } =
+			const { title, description, tags, image, type, level } =
 				createCourseSchemaBody.parse(request.body)
 
 			const createCourse = makeCreateCourseUseCase()
@@ -46,7 +35,6 @@ export async function coursesRoutes(app: FastifyInstance) {
 				image,
 				level,
 				tags,
-				duration,
 				type,
 				userId
 			})

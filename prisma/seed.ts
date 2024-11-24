@@ -12,6 +12,7 @@ async function seed() {
 			email: 'nath.palatin@gmail.com',
 			avatar: 'nathan.jpg',
 			emailVerified: true,
+			role: 'ADMIN',
 			phone: '+5547999999999',
 			cpf: '999.999.999-99',
 			birthdate: '1993-06-14',
@@ -43,6 +44,7 @@ async function seed() {
 			email: 'maia_giacomelli@hotmail.com',
 			avatar: 'maia.jpg',
 			emailVerified: true,
+			role: 'MENTOR',
 			phone: '+5547999999991',
 			cpf: '999.999.999-91',
 			birthdate: '1995-02-20',
@@ -61,14 +63,25 @@ async function seed() {
 		}
 	})
 
-	await prisma.lessons.create({
+	const module = await prisma.modules.create({
 		data: {
-			title: 'Piloto',
-			duration: 120,
-			video: 'https://www.youtube.com/watch?v=M11PBJbFApw',
+			title: 'Modulação Intestinal',
+			available: '2024-11-25',
+			visibility: true,
 			courseId: course.id,
 			description: faker.lorem.sentence(200),
-			slug: 'piloto'
+			slug: 'modulacao-intestinal'
+		}
+	})
+
+	await prisma.lessons.create({
+		data: {
+			title: 'Orientações Gerais',
+			video: 'https://www.youtube.com/watch?v=M11PBJbFApw',
+			moduleId: module.id,
+			courseId: course.id,
+			description: faker.lorem.sentence(200),
+			slug: 'orientacoes-gerais'
 		}
 	})
 

@@ -1,4 +1,9 @@
 import type { ZodTypeProvider } from 'fastify-type-provider-zod'
+import { prisma } from '../../lib/prisma'
+import { env } from '../../env'
+import { sendMail } from '../../lib/nodemailer'
+
+import { createSlug, generateCode } from '../../utils/functions'
 
 import { FastifyInstance } from 'fastify'
 
@@ -24,14 +29,10 @@ import { UserAlreadyExistsError } from '../../use-cases/errors/user-already-exis
 import { BadRequestError } from '../_errors/bad-request-error'
 import { makeDeleteAccountUseCase } from '../../use-cases/factories/make-delete-account-use-case'
 import { makeGetUsersCourseUseCase } from '../../use-cases/factories/make-get-users-from-course'
-import { prisma } from '../../lib/prisma'
 import { getParamsCourseSchema } from '../../@types/zod/course'
 import { makeAuthenticateUserUseCase } from '../../use-cases/factories/make-authenticate-use-case'
-import { createSlug, generateCode } from '../../utils/functions'
-import { sendMail } from '../../lib/nodemailer'
 import { InvalidCredentialsError } from '../../use-cases/errors/invalid-credentials-error'
 import { UnauthorizedError } from '../_errors/unauthorized-error'
-import { env } from '../../env'
 
 interface QueryParams {
 	limit?: string

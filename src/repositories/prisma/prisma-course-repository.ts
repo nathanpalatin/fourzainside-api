@@ -35,10 +35,7 @@ export class PrismaCourseRepository implements CoursesRepository {
 
 	async create(data: Prisma.CoursesUncheckedCreateInput) {
 		const course = await prisma.courses.create({
-			data: {
-				...data,
-				tags: data.tags ?? []
-			}
+			data
 		})
 		return course
 	}

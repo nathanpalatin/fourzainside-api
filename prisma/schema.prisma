@@ -78,7 +78,6 @@ model Courses {
   slug        String
   description String
   image       String
-  banner      String?
   tags        String[]
   level       String   @default("easy")
   type        String
@@ -88,12 +87,51 @@ model Courses {
   userId String
   user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  lessons          Lessons[]
   certificates     Certificates[]
   progresses       Progress[]
   courseEnrollment CourseEnrollment[]
+  modules          Modules[]
 
   @@map("courses")
+}
+
+model Modules {
+  id          String  @id @default(uuid())
+  title       String
+  slug        String
+  description String
+  available   String
+  visibility  Boolean
+  courseId    String
+
+  lessons Lessons[]
+  course  Courses   @relation(fields: [courseId], references: [id])
+
+  @@map("modules")
+}
+
+model Lessons {
+  id          String  @id @default(uuid())
+  title       String
+  slug        String
+  description String
+  video       String
+  cover       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transcription String?
+
+  courseId  String
+  moduleId  String
+  materials Materials[]
+  comments  Comments[]
+  progress  Progress[]
+
+  module Modules @relation(fields: [moduleId], references: [id])
+
+  @@map("lessons")
 }
 
 model CourseEnrollment {
@@ -107,30 +145,6 @@ model CourseEnrollment {
 
   @@unique([userId, courseId])
   @@map("course_enrollments")
-}
-
-model Lessons {
-  id             String   @id @default(uuid())
-  title          String
-  slug           String
-  description    String
-  duration       Int
-  video          String
-  cover          String?
-  classification Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  transcription String?
-  courseId      String
-
-  materials Materials[]
-  comments  Comments[]
-  course    Courses     @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  Progress Progress[]
-
-  @@map("lessons")
 }
 
 model Progress {
