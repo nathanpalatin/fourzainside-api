@@ -78,7 +78,7 @@ model Courses {
   title       String
   slug        String
   description String
-  image       String
+  image       String?
   tags        String[]
   level       String   @default("beginner")
   type        String

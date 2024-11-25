@@ -12,7 +12,6 @@ export class CreateCourseUseCase {
 	async execute({
 		title,
 		description,
-		image,
 		level,
 		tags,
 		type,
@@ -22,7 +21,6 @@ export class CreateCourseUseCase {
 			title,
 			slug: createSlug(title),
 			description,
-			image,
 			tags,
 			level,
 			type,

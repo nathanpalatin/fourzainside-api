@@ -25,7 +25,7 @@ export async function coursesRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const { title, description, tags, image, type, level } =
+			const { title, description, tags, type, level } =
 				createCourseSchemaBody.parse(request.body)
 
 			const createCourse = makeCreateCourseUseCase()
@@ -33,20 +33,17 @@ export async function coursesRoutes(app: FastifyInstance) {
 			const { course } = await createCourse.execute({
 				title,
 				description,
-				image,
 				level,
 				tags,
 				type,
 				userId
 			})
 
-			return reply
-				.status(201)
-				.send({
-					id: course.id,
-					slug: course.slug,
-					message: 'Course created successfully.'
-				})
+			return reply.status(201).send({
+				id: course.id,
+				slug: course.slug,
+				message: 'Course created successfully.'
+			})
 		}
 	)
 

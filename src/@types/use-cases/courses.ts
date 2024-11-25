@@ -4,7 +4,6 @@ export interface CourseUseCaseRequest {
 	title: string
 	type: string
 	description: string
-	image: string
 	tags: string[]
 	level: string
 	userId: string

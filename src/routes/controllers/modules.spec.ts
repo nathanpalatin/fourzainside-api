@@ -23,7 +23,6 @@ describe('Modules (e2e)', () => {
 			.send({
 				title: 'Introduction to JavaScript',
 				description: 'This course will teach you the basics of JavaScript.',
-				image: 'teste.png',
 				type: 'image/png',
 				level: 'advanced',
 				tags: ['JavaScript', 'programming']

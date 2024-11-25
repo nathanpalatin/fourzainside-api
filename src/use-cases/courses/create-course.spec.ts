@@ -19,7 +19,6 @@ describe('Courses Use Case', () => {
 			description: 'testeeee',
 			level: 'medium',
 			userId: randomUUID(),
-			image: 'course.png',
 			type: 'Finance',
 			tags: ['tag1', 'tag2']
 		})

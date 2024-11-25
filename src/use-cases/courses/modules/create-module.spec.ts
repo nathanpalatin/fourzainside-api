@@ -21,7 +21,6 @@ describe('Module Use Case', () => {
 			title: 'teste',
 			slug: 'test',
 			type: '',
-			image: '',
 			description: '',
 			userId: randomUUID(),
 			level: 'medium'

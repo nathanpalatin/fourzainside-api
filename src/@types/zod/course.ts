@@ -4,7 +4,6 @@ export const createCourseSchemaBody = z.object({
 	title: z.string(),
 	description: z.string(),
 	type: z.string(),
-	image: z.string(),
 	level: z.string(),
 	tags: z.array(z.string().min(1).max(15))
 })

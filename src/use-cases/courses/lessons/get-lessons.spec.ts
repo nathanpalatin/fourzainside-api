@@ -27,7 +27,6 @@ describe('Get Lessons Use Case', () => {
 		const course = await courseRepository.create({
 			title: 'Teste',
 			slug: 'test',
-			image: '',
 			userId: randomUUID(),
 			type: 'online',
 			level: 'easy',
