@@ -15,6 +15,7 @@ import { makeDeleteCourseUseCase } from '../../use-cases/factories/make-delete-c
 import { makeGetCourseUseCase } from '../../use-cases/factories/make-get-one-course-use-case'
 import { makeEnrollUserCOurseUseCase } from '../../use-cases/factories/make-enroll-user-course-use-case'
 import { StudentAlreadyEnrolledError } from '../../use-cases/errors/student-already-enrolled'
+import { BadRequestError } from '../_errors/bad-request-error'
 
 export async function coursesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -28,22 +29,27 @@ export async function coursesRoutes(app: FastifyInstance) {
 			const { title, description, tags, type, level } =
 				createCourseSchemaBody.parse(request.body)
 
-			const createCourse = makeCreateCourseUseCase()
+			try {
+				const createCourse = makeCreateCourseUseCase()
+				const { course } = await createCourse.execute({
+					title,
+					description,
+					level,
+					tags,
+					type,
+					userId
+				})
 
-			const { course } = await createCourse.execute({
-				title,
-				description,
-				level,
-				tags,
-				type,
-				userId
-			})
-
-			return reply.status(201).send({
-				id: course.id,
-				slug: course.slug,
-				message: 'Course created successfully.'
-			})
+				return reply.status(201).send({
+					id: course.id,
+					slug: course.slug,
+					message: 'Course created successfully.'
+				})
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+			}
 		}
 	)
 
@@ -86,11 +92,19 @@ export async function coursesRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { courseId } = getParamsCourseSchema.parse(request.params)
 
-			const deleteCourseFromUser = makeDeleteCourseUseCase()
+			try {
+				const deleteCourseFromUser = makeDeleteCourseUseCase()
 
-			const courses = await deleteCourseFromUser.execute({ courseId })
+				await deleteCourseFromUser.execute({ courseId })
 
-			return reply.status(200).send(courses)
+				return reply.status(204).send()
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 

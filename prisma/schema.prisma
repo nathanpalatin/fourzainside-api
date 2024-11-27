@@ -84,6 +84,7 @@ model Courses {
   type        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  status      String   @default("pending")
 
   userId String
   user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)

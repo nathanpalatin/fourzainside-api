@@ -25,7 +25,8 @@ export class InMemoryCoursesRepository implements CoursesRepository {
 			title: data.title,
 			slug: data.slug,
 			userId: data.userId,
-			level: data.level ?? 'easy',
+			status: data.status ?? '',
+			level: data.level ?? 'beginner',
 			description: data.description,
 			createdAt: new Date(),
 			updatedAt: new Date()

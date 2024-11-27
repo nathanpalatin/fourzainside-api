@@ -5,7 +5,7 @@ import type {
 import type { CoursesRepository } from '../../repositories/courses-repository'
 import { BadRequestError } from '../../routes/_errors/bad-request-error'
 
-export class GetCourseByUserUseCase {
+export class GetCoursesByUserUseCase {
 	constructor(private courseRepository: CoursesRepository) {}
 
 	async execute({

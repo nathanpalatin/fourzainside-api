@@ -3,6 +3,7 @@ import type {
 	CourseUseCaseResponse
 } from '../../@types/use-cases/courses'
 import type { CoursesRepository } from '../../repositories/courses-repository'
+import { BadRequestError } from '../../routes/_errors/bad-request-error'
 
 import { createSlug } from '../../utils/functions'
 
@@ -28,6 +29,10 @@ export class CreateCourseUseCase {
 			createdAt: new Date(),
 			updatedAt: new Date()
 		})
+
+		if (!course) {
+			throw new BadRequestError('Failed to create course')
+		}
 
 		return {
 			course
