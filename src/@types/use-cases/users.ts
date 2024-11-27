@@ -11,3 +11,20 @@ export interface RegisterUseCaseRequest {
 export interface RegisterUseCaseResponse {
 	user: Users
 }
+
+export interface UpdateAccountUseCaseRequest {
+	userId: string
+	name?: string
+	phone?: string
+	cpf?: string
+	birthdate?: string
+	gender?: string
+	address?: string
+	zipCode?: string
+	complement?: string
+	international?: boolean
+	neighborhood?: string
+	number?: string
+	city?: string
+	uf?: string
+}

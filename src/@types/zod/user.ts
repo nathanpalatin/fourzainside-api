@@ -53,7 +53,16 @@ export const bodyUserPasswordSchema = z.object({
 export const updateUserSchemaBody = z.object({
 	name: z.string().optional(),
 	phone: z.string().optional(),
-	avatar: z.string().optional()
+	cpf: z.string().optional(),
+	uf: z.string().optional(),
+	city: z.string().optional(),
+	birthdate: z.string().optional(),
+	address: z.string().optional(),
+	gender: z.string().optional(),
+	zipCode: z.string().optional(),
+	complement: z.string().optional(),
+	international: z.boolean().optional(),
+	neighborhood: z.string().optional()
 })
 
 export const createLoginSchemaBody = z.object({

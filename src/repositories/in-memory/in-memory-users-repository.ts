@@ -108,21 +108,14 @@ export class InMemoryUsersRepository implements UsersRepository {
 		return user
 	}
 
-	async update(
-		id: string,
-		data: Partial<Prisma.UsersUncheckedUpdateManyInput>
-	) {
+	async update(id: string, data: Prisma.UsersUncheckedUpdateManyInput) {
 		const userIndex = this.items.findIndex(item => item.id === id)
-		if (userIndex === -1) {
-			return null
-		}
+
 		//@ts-ignore
 		this.items[userIndex] = {
 			...this.items[userIndex],
 			...data
 		}
-
-		return this.items[userIndex]
 	}
 
 	async delete(id: string) {

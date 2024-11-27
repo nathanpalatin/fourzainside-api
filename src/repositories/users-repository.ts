@@ -14,6 +14,7 @@ export interface UsersRepository {
 	createCode(data: ValidationCode): Promise<void>
 	findCode(code: number, email: string): Promise<ValidationCode | null>
 
+	update(id: string, data: Prisma.UsersUncheckedUpdateInput): Promise<void>
 	create(data: Prisma.UsersUncheckedCreateInput): Promise<Users>
 	delete(id: string): Promise<Users | null>
 }

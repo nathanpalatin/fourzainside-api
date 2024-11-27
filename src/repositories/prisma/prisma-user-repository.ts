@@ -83,6 +83,15 @@ export class PrismaUsersRepository implements UsersRepository {
 		return user
 	}
 
+	async update(id: string, data: Prisma.UsersUncheckedUpdateInput) {
+		await prisma.users.update({
+			where: {
+				id
+			},
+			data
+		})
+	}
+
 	async delete(id: string) {
 		const user = await prisma.users.delete({
 			where: {

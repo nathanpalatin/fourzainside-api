@@ -33,6 +33,7 @@ import { getParamsCourseSchema } from '../../@types/zod/course'
 import { makeAuthenticateUserUseCase } from '../../use-cases/factories/make-authenticate-use-case'
 import { InvalidCredentialsError } from '../../use-cases/errors/invalid-credentials-error'
 import { UnauthorizedError } from '../_errors/unauthorized-error'
+import { makeUpdateAccountUseCase } from '../../use-cases/factories/make-update-account-use-case'
 
 interface QueryParams {
 	limit?: string
@@ -88,26 +89,48 @@ export async function usersRoutes(app: FastifyInstance) {
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { userId: id } = getTokenHeaderSchema.parse(request.headers)
+			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const { name, phone } = updateUserSchemaBody.parse(request.body)
+			const {
+				name,
+				phone,
+				cpf,
+				birthdate,
+				gender,
+				address,
+				city,
+				uf,
+				zipCode,
+				complement,
+				neighborhood,
+				international
+			} = updateUserSchemaBody.parse(request.body)
 
 			try {
-				await prisma.users.update({
-					where: {
-						id
-					},
-					data: {
-						name,
-						updatedAt: new Date(),
-						phone
-					}
+				const updateAccount = makeUpdateAccountUseCase()
+				await updateAccount.execute({
+					userId,
+					name,
+					phone,
+					cpf,
+					gender,
+					birthdate,
+					address,
+					city,
+					uf,
+					zipCode,
+					complement,
+					neighborhood,
+					international
 				})
+				return reply.status(204).send()
 			} catch (error) {
-				throw new BadRequestError('Internal server error.')
-			}
+				if (error instanceof UserAlreadyExistsError) {
+					return reply.status(409).send({ message: error.message })
+				}
 
-			return reply.status(204).send({ message: 'User updated successfully!' })
+				throw error
+			}
 		}
 	)
 
