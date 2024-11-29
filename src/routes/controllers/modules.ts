@@ -43,16 +43,21 @@ export async function modulesRoutes(app: FastifyInstance) {
 	)
 
 	app.withTypeProvider<ZodTypeProvider>().get(
-		'/:courseId',
+		'/:courseIdOrSlug',
 		{
 			preHandler: [checkSessionIdExists]
 		},
 		async (request, reply) => {
-			const { courseId } = getParamsCourseSchema.parse(request.params)
+			const { courseIdOrSlug } = getParamsCourseSchema.parse(request.params)
 
 			try {
+				const isUuid = /^[0-9a-fA-F-]{36}$/.test(courseIdOrSlug)
+				const params = isUuid
+					? { courseId: courseIdOrSlug }
+					: { slug: courseIdOrSlug }
+
 				const getModulesCourse = makeGetModulesUseCase()
-				const modules = await getModulesCourse.execute({ courseId })
+				const modules = await getModulesCourse.execute(params)
 
 				return reply.status(200).send(modules)
 			} catch (error) {

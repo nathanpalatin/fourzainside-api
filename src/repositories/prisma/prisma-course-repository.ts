@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, type Courses } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
 

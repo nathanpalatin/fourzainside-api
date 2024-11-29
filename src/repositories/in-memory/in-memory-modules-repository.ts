@@ -1,9 +1,10 @@
-import type { Modules, Prisma } from '@prisma/client'
+import type { Courses, Modules, Prisma } from '@prisma/client'
 import type { ModulesRepository } from '../modules-repository'
 import { randomUUID } from 'node:crypto'
 
 export class InMemoryModulesRepository implements ModulesRepository {
 	public items: Modules[] = []
+	public course: Courses[] = []
 
 	async findById(id: string) {
 		const module = this.items.find(item => item.id === id)
@@ -14,11 +15,20 @@ export class InMemoryModulesRepository implements ModulesRepository {
 		const modules = this.items.filter(item => item.courseId === courseId)
 		return modules
 	}
+
+	async findManyBySlug(slug: string) {
+		const course = this.course.find(item => item.slug === slug)
+		if (!course) return null
+		const modules = this.items.filter(item => item.slug === course.slug)
+		return modules
+	}
+
 	async findBySlug(slug: string) {
 		const module = this.items.find(item => item.slug === slug)
 		if (!module) return null
 		return module
 	}
+
 	async create(data: Prisma.ModulesUncheckedCreateInput) {
 		const module = {
 			id: randomUUID(),

@@ -9,7 +9,7 @@ export const createCourseSchemaBody = z.object({
 })
 
 export const getParamsCourseSchema = z.object({
-	courseId: z.string()
+	courseIdOrSlug: z.string()
 })
 
 export const getParamsCourseSlugSchema = z.object({

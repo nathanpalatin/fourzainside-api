@@ -4,7 +4,8 @@ import { BadRequestError } from '../../../routes/_errors/bad-request-error'
 import type { CoursesRepository } from '../../../repositories/courses-repository'
 
 export interface ModuleUseCaseRequest {
-	courseId: string
+	courseId?: string
+	slug?: string
 }
 interface ModuleUseCaseResponse {
 	modules: Modules[] | null
@@ -17,13 +18,32 @@ export class GetModulesUseCase {
 	) {}
 
 	async execute({
-		courseId
+		courseId,
+		slug
 	}: ModuleUseCaseRequest): Promise<ModuleUseCaseResponse> {
-		const courseExists = await this.courseRepository.findById(courseId)
-		if (!courseExists) {
-			throw new BadRequestError('Course not found')
+		let courseExists = null
+
+		if (courseId) {
+			courseExists = await this.courseRepository.findById(courseId)
 		}
-		const modules = await this.moduleRepository.findMany(courseId)
+
+		if (!courseExists && slug) {
+			courseExists = await this.courseRepository.findBySlug(slug)
+		}
+
+		let modules: Modules[] | null = null
+
+		if (courseId) {
+			modules = await this.moduleRepository.findMany(courseId)
+		}
+
+		if (!courseId && slug) {
+			modules = await this.moduleRepository.findManyBySlug(slug)
+		}
+
+		if (!modules) {
+			throw new BadRequestError('No modules found for the given course')
+		}
 
 		return { modules }
 	}
