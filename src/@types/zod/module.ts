@@ -7,3 +7,7 @@ export const createModuleBodySchema = z.object({
 	visibility: z.boolean(),
 	courseId: z.string()
 })
+
+export const getParamsModuleSchema = z.object({
+	id: z.string()
+})
