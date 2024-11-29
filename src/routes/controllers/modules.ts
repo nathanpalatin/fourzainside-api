@@ -4,6 +4,8 @@ import { checkSessionIdExists } from '../../middlewares/auth-token'
 import { makeCreateModuleUseCase } from '../../use-cases/factories/make-create-module-use-case'
 import { createModuleBodySchema } from '../../@types/zod/module'
 import { BadRequestError } from '../_errors/bad-request-error'
+import { getParamsCourseSchema } from '../../@types/zod/course'
+import { makeGetModulesUseCase } from '../../use-cases/factories/make-get-modules-use-case'
 
 export async function modulesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -25,13 +27,34 @@ export async function modulesRoutes(app: FastifyInstance) {
 					visibility
 				})
 
-				return reply
-					.status(201)
-					.send({
-						id: module.id,
-						slug: module.slug,
-						message: 'Module created successfully.'
-					})
+				return reply.status(201).send({
+					id: module.id,
+					slug: module.slug,
+					message: 'Module created successfully.'
+				})
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().get(
+		'/:courseId',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const { courseId } = getParamsCourseSchema.parse(request.params)
+
+			try {
+				const getModulesCourse = makeGetModulesUseCase()
+				const modules = await getModulesCourse.execute({ courseId })
+
+				return reply.status(200).send(modules)
 			} catch (error) {
 				if (error instanceof BadRequestError) {
 					return reply.status(400).send({ message: error.message })

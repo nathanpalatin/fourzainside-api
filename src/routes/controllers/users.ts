@@ -243,11 +243,19 @@ export async function usersRoutes(app: FastifyInstance) {
 			const page = parseInt(request.query.page || '1', 10)
 			const skip = (page - 1) * take
 
-			const listUsers = makeGetUsersCourseUseCase()
+			try {
+				const listUsers = makeGetUsersCourseUseCase()
 
-			const students = await listUsers.execute({ courseId, take, skip })
+				const students = await listUsers.execute({ courseId, take, skip })
 
-			return reply.status(200).send(students)
+				return reply.status(200).send(students)
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 
@@ -258,9 +266,18 @@ export async function usersRoutes(app: FastifyInstance) {
 		},
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
-			const deleteUseCase = makeDeleteAccountUseCase()
-			deleteUseCase.execute({ userId })
-			reply.status(204).send()
+
+			try {
+				const deleteUseCase = makeDeleteAccountUseCase()
+				deleteUseCase.execute({ userId })
+				reply.status(204).send()
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 

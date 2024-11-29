@@ -1,6 +1,7 @@
 import { CourseEnrollment } from '@prisma/client'
 
 import type { CourseEnrollmentsRepository } from '../../repositories/enrollments-repository'
+import { BadRequestError } from '../../routes/_errors/bad-request-error'
 
 interface GetUserCourseUseCaseRequest {
 	courseId: string
@@ -25,6 +26,10 @@ export class GetUsersCourseUseCase {
 			take,
 			skip
 		)
+
+		if (!students) {
+			throw new BadRequestError('No students found.')
+		}
 
 		return {
 			students
