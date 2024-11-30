@@ -1,5 +1,4 @@
 import { Prisma, Modules } from '@prisma/client'
-
 export interface ModulesRepository {
 	findById(id: string): Promise<Modules | null>
 	findMany(courseId: string): Promise<Modules[] | null>

@@ -17,8 +17,7 @@ export class PrismaModuleRepository implements ModulesRepository {
 		const modules = await prisma.modules.findMany({
 			where: {
 				courseId
-			},
-			include: { course: true }
+			}
 		})
 		return modules
 	}

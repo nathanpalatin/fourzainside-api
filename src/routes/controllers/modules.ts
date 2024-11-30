@@ -16,6 +16,7 @@ import {
 	getParamsCourseSchema
 } from '../../@types/zod/course'
 import { makeDeleteModuleUseCase } from '../../use-cases/factories/make-delete-module-use-case'
+import { makeGetModuleUseCase } from '../../use-cases/factories/make-get-module-use-case'
 
 export async function modulesRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post(
@@ -42,6 +43,29 @@ export async function modulesRoutes(app: FastifyInstance) {
 					slug: module.slug,
 					message: 'Module created successfully.'
 				})
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
+		}
+	)
+
+	app.withTypeProvider<ZodTypeProvider>().get(
+		'/m/:id',
+		{
+			preHandler: [checkSessionIdExists]
+		},
+		async (request, reply) => {
+			const { id } = getParamsModuleSchema.parse(request.params)
+
+			try {
+				const getModulesCourse = makeGetModuleUseCase()
+				const module = await getModulesCourse.execute({ id })
+
+				return reply.status(200).send(module)
 			} catch (error) {
 				if (error instanceof BadRequestError) {
 					return reply.status(400).send({ message: error.message })

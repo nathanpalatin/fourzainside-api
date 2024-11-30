@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto'
 import { expect, describe, it, beforeEach } from 'vitest'
 
 import { InMemoryNotificationsRepository } from '../repositories/in-memory/in-memory-notifications-repository'
-import { randomUUID } from 'crypto'
 import { CreateNotificationUseCase } from './create-notification'
 
 let notificationRepository: InMemoryNotificationsRepository
@@ -14,7 +14,7 @@ describe('Notification Use Case', () => {
 	})
 
 	it('should be able to send a notification', async () => {
-		const notification = await notificationRepository.create({
+		const { notification } = await sut.execute({
 			notificationText: 'Test',
 			notificationType: 'TRANSFER',
 			userId: randomUUID(),

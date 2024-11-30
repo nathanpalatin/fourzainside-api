@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto'
-
 import { Prisma, type Courses } from '@prisma/client'
 import type { CoursesRepository } from '../courses-repository'
 

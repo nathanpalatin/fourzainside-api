@@ -1,6 +1,6 @@
+import { randomUUID } from 'node:crypto'
 import type { Courses, Modules, Prisma } from '@prisma/client'
 import type { ModulesRepository } from '../modules-repository'
-import { randomUUID } from 'node:crypto'
 
 export class InMemoryModulesRepository implements ModulesRepository {
 	public items: Modules[] = []

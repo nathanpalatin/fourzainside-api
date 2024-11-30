@@ -3,7 +3,6 @@ import { compare } from 'bcrypt'
 
 import { InvalidCredentialsError } from './errors/invalid-credentials-error'
 import type { UsersRepository } from '../repositories/users-repository'
-import { BadRequestError } from '../routes/_errors/bad-request-error'
 import { UnauthorizedError } from '../routes/_errors/unauthorized-error'
 
 interface AuthenticateUseCaseRequest {
