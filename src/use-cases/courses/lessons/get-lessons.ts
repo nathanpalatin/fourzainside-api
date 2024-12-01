@@ -5,6 +5,7 @@ import { BadRequestError } from '../../../routes/_errors/bad-request-error'
 import type { CoursesRepository } from '../../../repositories/courses-repository'
 import type { ModulesRepository } from '../../../repositories/modules-repository'
 import type { LessonsRepository } from '../../../repositories/lessons-repository'
+import type { LessonWithoutUpdatedAt } from '../../../repositories/prisma/prisma-lesson-repository'
 
 interface ListLessonsFromCourseUseCaseRequest {
 	courseSlug: string
@@ -12,7 +13,7 @@ interface ListLessonsFromCourseUseCaseRequest {
 }
 
 interface ListLessonsUseCaseResponse {
-	lessons: Lessons[]
+	lessons: LessonWithoutUpdatedAt[]
 }
 
 export class GetLessonsCourseUseCase {

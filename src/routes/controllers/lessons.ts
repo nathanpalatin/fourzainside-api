@@ -49,6 +49,9 @@ export async function lessonsRoutes(app: FastifyInstance) {
 					.status(201)
 					.send({ id: lesson.id, message: 'Lesson created successfully.' })
 			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
 				throw error
 			}
 		}
@@ -178,15 +181,26 @@ export async function lessonsRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const { lessonId, courseId } = updateProgressLessonSchema.parse(
+			const { lessonId, courseId, moduleId } = updateProgressLessonSchema.parse(
 				request.body
 			)
 
-			const progressUpdate = makeProgressUseCase()
+			try {
+				const progressUpdate = makeProgressUseCase()
 
-			await progressUpdate.execute({ userId, lessonId, courseId })
+				await progressUpdate.execute({ userId, lessonId, moduleId, courseId })
 
-			return reply.status(200).send({ message: 'Lesson updated successfully.' })
+				return reply
+					.status(200)
+					.send({ message: 'Lesson updated successfully.' })
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					console.log(error)
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 }

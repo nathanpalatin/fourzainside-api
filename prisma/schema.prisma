@@ -107,8 +107,10 @@ model Modules {
   visibility  Boolean
   courseId    String
 
-  lessons Lessons[]
-  course  Courses   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons  Lessons[]
+  progress Progress[]
+
+  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@map("modules")
 }
@@ -155,12 +157,14 @@ model Progress {
   id        String   @id @default(uuid())
   userId    String
   courseId  String
+  moduleId  String
   lessonId  String
   completed Boolean  @default(false)
   updatedAt DateTime @updatedAt
 
   user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module Modules @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   lesson Lessons @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([userId, lessonId])

@@ -39,13 +39,7 @@ export class InMemoryLessonsRepository implements LessonsRepository {
 	async delete(id: string) {
 		const lessonIndex = this.items.findIndex(item => item.id === id)
 
-		if (lessonIndex === -1) {
-			return null
-		}
-
-		const [deletedLesson] = this.items.splice(lessonIndex, 1)
-
-		return deletedLesson
+		this.items.splice(lessonIndex, 1)
 	}
 
 	async update(id: string, data: Prisma.LessonsUpdateInput) {

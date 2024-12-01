@@ -18,7 +18,7 @@ export class GetCommentsLessonUseCase {
 		const lessons = await this.lessonRepository.findById(lessonId)
 
 		if (!lessons) {
-			throw new BadRequestError('lesson not found')
+			throw new BadRequestError('Lesson not found')
 		}
 
 		const comments = await this.commentRepository.findMany(lessons.id)

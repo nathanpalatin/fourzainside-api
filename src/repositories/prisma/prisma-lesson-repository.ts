@@ -1,8 +1,21 @@
-import { Prisma, type Lessons } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
 
 import type { LessonsRepository } from '../lessons-repository'
+
+export type LessonWithoutUpdatedAt = {
+	id: string
+	title: string
+	slug: string
+	description: string
+	video: string
+	cover: string | null
+	createdAt: Date
+	transcription: string | null
+	courseId: string
+	moduleId: string
+}
 
 export class PrismaLessonRepository implements LessonsRepository {
 	async findBySlug(slug: string) {
@@ -47,15 +60,23 @@ export class PrismaLessonRepository implements LessonsRepository {
 		return lesson
 	}
 
-	async findMany() {
+	async findMany(): Promise<LessonWithoutUpdatedAt[]> {
 		const lessons = await prisma.lessons.findMany({
 			orderBy: {
 				createdAt: 'desc'
 			},
-			include: {
-				module: {
-					select: { id: true, slug: true }
-				}
+			select: {
+				id: true,
+				title: true,
+				slug: true,
+				description: true,
+				video: true,
+				cover: true,
+				createdAt: true,
+				updatedAt: false,
+				transcription: true,
+				courseId: true,
+				moduleId: true
 			}
 		})
 

@@ -39,6 +39,7 @@ export interface ListLessonsUseCaseResponse {
 export interface GetLessonUseCaseRequest {
 	courseId: string
 	userId: string
+	moduleId: string
 	lessonId: string
 }
 

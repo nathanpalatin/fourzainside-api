@@ -17,6 +17,13 @@ export class PrismaModuleRepository implements ModulesRepository {
 		const modules = await prisma.modules.findMany({
 			where: {
 				courseId
+			},
+			include: {
+				lessons: {
+					orderBy: {
+						createdAt: 'asc'
+					}
+				}
 			}
 		})
 		return modules
@@ -26,6 +33,13 @@ export class PrismaModuleRepository implements ModulesRepository {
 		const course = await prisma.courses.findFirst({
 			where: {
 				slug
+			},
+			include: {
+				lessons: {
+					orderBy: {
+						createdAt: 'asc'
+					}
+				}
 			}
 		})
 

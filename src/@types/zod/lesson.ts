@@ -19,6 +19,7 @@ export const getParamsOneLessonSchema = z.object({
 
 export const updateProgressLessonSchema = z.object({
 	lessonId: z.string(),
+	moduleId: z.string(),
 	courseId: z.string()
 })
 
