@@ -6,7 +6,7 @@ import type { CommentsRepository } from '../comments-repository'
 export class InMemoryCommentsRepository implements CommentsRepository {
 	public items: Comments[] = []
 
-	async create(data: Prisma.CommentsCreateInput) {
+	async create(data: Prisma.CommentsUncheckedCreateInput) {
 		const comment = {
 			...data,
 			id: randomUUID(),

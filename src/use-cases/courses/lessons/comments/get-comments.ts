@@ -15,13 +15,13 @@ export class GetCommentsLessonUseCase {
 	async execute({
 		lessonId
 	}: ListCommentsUseCaseRequest): Promise<ListCommentsUseCaseResponse> {
-		const lessons = await this.lessonRepository.findById(lessonId)
+		const lessonExists = await this.lessonRepository.findById(lessonId)
 
-		if (!lessons) {
+		if (!lessonExists) {
 			throw new BadRequestError('Lesson not found')
 		}
 
-		const comments = await this.commentRepository.findMany(lessons.id)
+		const comments = await this.commentRepository.findMany(lessonId)
 
 		return {
 			comments

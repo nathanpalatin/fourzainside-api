@@ -25,14 +25,10 @@ export class CreateCommentLessonUseCase {
 		}
 
 		const comment = await this.commentRepository.create({
+			lessonId,
 			content,
 			userId,
-			answer,
-			lesson: {
-				connect: {
-					id: lessonId
-				}
-			}
+			answer
 		})
 
 		return {
