@@ -120,7 +120,7 @@ model Lessons {
   title       String
   slug        String
   description String
-  video       String
+  video       String?
   cover       String?
 
   createdAt DateTime @default(now())

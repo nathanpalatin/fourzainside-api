@@ -2,7 +2,7 @@ import type { Comments, Lessons, Progress } from '@prisma/client'
 
 export interface LessonUseCaseRequest {
 	title: string
-	video: string
+	video?: string | null
 	description: string
 	moduleId: string
 	courseId: string
