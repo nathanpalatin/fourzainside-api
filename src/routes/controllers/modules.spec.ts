@@ -56,7 +56,7 @@ describe('Modules (e2e)', () => {
 				tags: ['JavaScript', 'programming']
 			})
 
-		await request(app.server)
+		const moduleResponse = await request(app.server)
 			.post('/modules')
 			.set('Authorization', `${token}`)
 			.send({
@@ -68,7 +68,7 @@ describe('Modules (e2e)', () => {
 			})
 
 		const getModulesResponse = await request(app.server)
-			.get(`/modules/m/${courseResponse.body.id}`)
+			.get(`/modules/m/${moduleResponse.body.id}`)
 			.set('Authorization', `${token}`)
 			.send()
 

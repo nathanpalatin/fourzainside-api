@@ -6,8 +6,13 @@ import { r2 } from '../../lib/cloudflare'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 import { console } from 'node:inspector'
 import { createSlug } from '../../utils/functions'
+import { fastifyCors } from '@fastify/cors'
 
 export async function uploadRoutes(app: FastifyInstance) {
+	await app.register(fastifyCors, {
+		origin: '*'
+	})
+
 	app.withTypeProvider<ZodTypeProvider>().post('/', async (request, reply) => {
 		const file = await request.file()
 		const uploadId = randomUUID()

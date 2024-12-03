@@ -18,7 +18,6 @@ import { modulesRoutes } from './routes/controllers/modules'
 import { lessonsRoutes } from './routes/controllers/lessons'
 import { uploadRoutes } from './routes/controllers/uploads'
 import { notifcationsRoutes } from './routes/controllers/notifications'
-
 import { errorHandler } from './utils/error-handlers'
 
 export const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -45,9 +44,6 @@ app.register(multipart, {
 	limits: {
 		fileSize: 1 * 1024 * 1024 * 1024
 	}
-})
-app.addHook('onRequest', async (_request, reply) => {
-	reply.raw.setTimeout(5 * 60 * 1000)
 })
 
 app.register(usersRoutes, {
