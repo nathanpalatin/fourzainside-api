@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, type Comments } from '@prisma/client'
 
 import { prisma } from '../../lib/prisma'
 
@@ -33,12 +33,23 @@ export class PrismaCommentRepository implements CommentsRepository {
 		return comments
 	}
 
+	async update(id: string, content: string) {
+		const comment = await prisma.comments.update({
+			where: {
+				id
+			},
+			data: {
+				content
+			}
+		})
+		return comment
+	}
+
 	async delete(id: string) {
-		const comment = await prisma.comments.delete({
+		await prisma.comments.delete({
 			where: {
 				id
 			}
 		})
-		return comment
 	}
 }

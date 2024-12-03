@@ -33,7 +33,6 @@ export async function lessonsRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { title, description, video, courseId, moduleId } =
 				createLessonSchemaBody.parse(request.body)
-
 			try {
 				const createLesson = makeCreateLessonUseCase()
 

@@ -5,7 +5,7 @@ export const createLessonSchemaBody = z.object({
 	description: z.string(),
 	moduleId: z.string(),
 	courseId: z.string(),
-	video: z.string()
+	video: z.string().optional()
 })
 export const getParamsLessonSchema = z.object({
 	lessonId: z.string()

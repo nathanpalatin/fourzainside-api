@@ -39,14 +39,18 @@ export class InMemoryCommentsRepository implements CommentsRepository {
 		return comments
 	}
 
+	async update(id: string, content: string) {
+		const userIndex = this.items.findIndex(item => item.id === id)
+
+		const newComment = (this.items[userIndex] = {
+			...this.items[userIndex],
+			content
+		})
+
+		return newComment
+	}
+
 	async delete(id: string) {
-		const comment = this.items.find(item => item.id === id)
-		if (!comment) {
-			return null
-		}
-
 		this.items = this.items.filter(item => item.id !== id)
-
-		return comment
 	}
 }

@@ -9,7 +9,7 @@ export type LessonWithoutUpdatedAt = {
 	title: string
 	slug: string
 	description: string
-	video: string
+	video: string | null
 	cover: string | null
 	createdAt: Date
 	transcription: string | null

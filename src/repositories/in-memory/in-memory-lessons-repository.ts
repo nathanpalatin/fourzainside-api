@@ -10,6 +10,7 @@ export class InMemoryLessonsRepository implements LessonsRepository {
 			...data,
 			id: randomUUID(),
 			cover: data.cover ?? '',
+			video: data.video || '',
 			transcription: data.transcription ?? '',
 			courseId: data.courseId ?? randomUUID(),
 			createdAt: new Date(),
