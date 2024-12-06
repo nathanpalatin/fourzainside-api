@@ -3,8 +3,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 import { app } from '../../app'
 
-import { randomUUID } from 'crypto'
-
 import { createAndAuthenticateUser } from '../../utils/tests/create-and-authenticate'
 
 describe('Notifications (e2e)', () => {

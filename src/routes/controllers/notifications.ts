@@ -6,13 +6,13 @@ import { getTokenHeaderSchema } from '../../@types/zod/user'
 
 import {
 	createNotificationSchema,
-	createNotificationsSchema,
 	updateNotificationSchema
 } from '../../@types/zod/notification'
 
 import { makeCreateNotificationUseCase } from '../../use-cases/factories/make-create-notification-use-case'
 import { makeUpdateNotificationUseCase } from '../../use-cases/factories/make-update-notification-use-case'
 import { makeGetNotificationsUseCase } from '../../use-cases/factories/make-get-notifications-use-case'
+import { BadRequestError } from '../_errors/bad-request-error'
 
 export async function notifcationsRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().get(
@@ -23,11 +23,19 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { userId } = getTokenHeaderSchema.parse(request.headers)
 
-			const notificationsList = makeGetNotificationsUseCase()
+			try {
+				const notificationsList = makeGetNotificationsUseCase()
 
-			const { notifications } = await notificationsList.execute({ userId })
+				const { notifications } = await notificationsList.execute({ userId })
 
-			return reply.status(200).send({ notifications })
+				return reply.status(200).send({ notifications })
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+
+				throw error
+			}
 		}
 	)
 
@@ -42,19 +50,26 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 			const { notificationType, userId, notificationText } =
 				createNotificationSchema.parse(request.body)
 
-			const createNotification = makeCreateNotificationUseCase()
+			try {
+				const createNotification = makeCreateNotificationUseCase()
 
-			const { notification } = await createNotification.execute({
-				notificationType: notificationType,
-				notificationText: notificationText ?? '',
-				sendUserId,
-				userId
-			})
+				const { notification } = await createNotification.execute({
+					notificationType: notificationType,
+					notificationText: notificationText ?? '',
+					sendUserId,
+					userId
+				})
 
-			return reply.status(200).send({
-				id: notification.id,
-				message: 'Notification sent successfully.'
-			})
+				return reply.status(201).send({
+					id: notification.id,
+					message: 'Notification sent successfully.'
+				})
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+				throw error
+			}
 		}
 	)
 
@@ -66,10 +81,17 @@ export async function notifcationsRoutes(app: FastifyInstance) {
 		async (request, reply) => {
 			const { id } = updateNotificationSchema.parse(request.params)
 
-			const updateNotification = makeUpdateNotificationUseCase()
-			await updateNotification.execute({ id })
+			try {
+				const updateNotification = makeUpdateNotificationUseCase()
+				await updateNotification.execute({ id })
 
-			reply.status(204).send()
+				reply.status(204).send()
+			} catch (error) {
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
+				throw error
+			}
 		}
 	)
 }

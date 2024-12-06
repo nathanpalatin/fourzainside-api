@@ -64,8 +64,16 @@ export class PrismaCourseEnrollmentsRepository
 			where: {
 				courseId
 			},
+
 			include: {
-				user: true
+				user: {
+					select: {
+						id: true,
+						name: true,
+						username: true,
+						avatar: true
+					}
+				}
 			},
 			take,
 			skip

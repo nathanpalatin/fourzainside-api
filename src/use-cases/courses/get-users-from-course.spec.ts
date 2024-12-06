@@ -36,8 +36,6 @@ describe('Get Course Use Case', () => {
 			skip: 1
 		})
 
-		console.log(students)
-
 		expect(students).toEqual({
 			students: expect.arrayContaining([
 				expect.objectContaining({
