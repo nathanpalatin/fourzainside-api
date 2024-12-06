@@ -38,8 +38,7 @@ describe('Courses (e2e)', () => {
 				image: 'teste.png',
 				type: 'image/png',
 				level: 'advanced',
-				tags: ['JavaScript', 'programming'],
-				duration: 180
+				tags: ['JavaScript', 'programming']
 			})
 
 		expect(courseResponse.statusCode).toEqual(201)

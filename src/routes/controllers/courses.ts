@@ -13,7 +13,7 @@ import { checkSessionIdExists } from '../../middlewares/auth-token'
 import { makeGetCourseByUserUseCase } from '../../use-cases/factories/make-get-courses-by-user-use-case'
 import { makeDeleteCourseUseCase } from '../../use-cases/factories/make-delete-course-use-case'
 import { makeGetCourseUseCase } from '../../use-cases/factories/make-get-one-course-use-case'
-import { makeEnrollUserCOurseUseCase } from '../../use-cases/factories/make-enroll-user-course-use-case'
+import { makeEnrollUserCourseUseCase } from '../../use-cases/factories/make-enroll-user-course-use-case'
 import { StudentAlreadyEnrolledError } from '../../use-cases/errors/student-already-enrolled'
 import { BadRequestError } from '../_errors/bad-request-error'
 
@@ -118,11 +118,14 @@ export async function coursesRoutes(app: FastifyInstance) {
 			const { courseId } = getParamsCourseSchema.parse(request.body)
 
 			try {
-				const enrollUser = makeEnrollUserCOurseUseCase()
+				const enrollUser = makeEnrollUserCourseUseCase()
 				await enrollUser.execute({
 					userId,
 					courseId
 				})
+				return reply
+					.status(200)
+					.send({ message: 'User enrolled in course successfully.' })
 			} catch (error) {
 				if (error instanceof StudentAlreadyEnrolledError) {
 					return reply.status(409).send({ message: error.message })
@@ -130,10 +133,6 @@ export async function coursesRoutes(app: FastifyInstance) {
 
 				throw error
 			}
-
-			return reply
-				.status(200)
-				.send({ message: 'User enrolled in course successfully.' })
 		}
 	)
 }

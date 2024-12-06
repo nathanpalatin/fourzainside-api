@@ -40,12 +40,6 @@ app.setErrorHandler(errorHandler)
 
 app.register(cookie)
 
-app.register(multipart, {
-	limits: {
-		fileSize: 1 * 1024 * 1024 * 1024
-	}
-})
-
 app.register(usersRoutes, {
 	prefix: 'users'
 })

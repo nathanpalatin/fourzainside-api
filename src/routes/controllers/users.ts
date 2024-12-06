@@ -250,6 +250,8 @@ export async function usersRoutes(app: FastifyInstance) {
 
 				return reply.status(200).send(students)
 			} catch (error) {
+				console.log('ruim:', error)
+
 				if (error instanceof BadRequestError) {
 					return reply.status(400).send({ message: error.message })
 				}

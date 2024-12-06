@@ -76,6 +76,37 @@ describe('Users routes (e2e)', () => {
 		expect(updateResponse.status).toBe(204)
 	})
 
+	it.only('should be able to list all users from course', async () => {
+		const { token } = await createAndAuthenticateUser(app, true, true)
+		const { userId: userId2 } = await createAndAuthenticateUser(app, true, true)
+		const courseResponse = await request(app.server)
+			.post('/courses')
+			.set('Authorization', `${token}`)
+			.send({
+				title: 'Introduction to JavaScript',
+				description: 'This course will teach you the basics of JavaScript.',
+				type: 'emagrecimento',
+				level: 'advanced',
+				tags: ['JavaScript', 'programming']
+			})
+
+		await request(app.server)
+			.post('/courses/enroll')
+			.set('Authorization', `${token}`)
+			.send({
+				courseId: courseResponse.body.id,
+				userId: userId2
+			})
+
+		const usersResponse = await request(app.server)
+			.get(`/users/${courseResponse.body.id}`)
+			.set('Authorization', `${token}`)
+			.send()
+
+		expect(usersResponse.statusCode).toEqual(200)
+		expect(usersResponse.body.students.length).toBeGreaterThan(0)
+	})
+
 	it('should be able to recovery user password', async () => {
 		const { email } = await createAndAuthenticateUser(app, false, true)
 

@@ -13,7 +13,7 @@ export interface CourseEnrollmentsRepository {
 	findCoursesByUser(userId: string): Promise<CourseEnrollment[]>
 	findUsersByCourse(
 		courseId: string,
-		take: number,
-		skip: number
+		take?: number,
+		skip?: number
 	): Promise<CourseEnrollment[]>
 }

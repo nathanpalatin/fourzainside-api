@@ -33,8 +33,10 @@ describe('Get Course Use Case', () => {
 		const students = await sut.execute({
 			courseId: course.id,
 			take: 10,
-			skip: 0
+			skip: 1
 		})
+
+		console.log(students)
 
 		expect(students).toEqual({
 			students: expect.arrayContaining([
