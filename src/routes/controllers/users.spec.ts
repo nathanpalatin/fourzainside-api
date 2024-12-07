@@ -76,7 +76,7 @@ describe('Users routes (e2e)', () => {
 		expect(updateResponse.status).toBe(204)
 	})
 
-	it.only('should be able to list all users from course', async () => {
+	it('should be able to list all users from course', async () => {
 		const { token } = await createAndAuthenticateUser(app, true, true)
 		const { userId: userId2 } = await createAndAuthenticateUser(app, true, true)
 		const courseResponse = await request(app.server)

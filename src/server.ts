@@ -7,7 +7,7 @@ app
 		host: '0.0.0.0'
 	})
 	.then(() => {
-		console.log(`✅ Server is running on http://localhost:${env.PORT}`)
+		console.log(`✅ Server is running!`)
 	})
 	.catch(err => {
 		console.error('❌ Error starting the server:', err)

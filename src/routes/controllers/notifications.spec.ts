@@ -37,7 +37,7 @@ describe('Notifications (e2e)', () => {
 				userId,
 				notificationText: 'Check out the new feature!'
 			})
-		expect(notificationResponse.statusCode).toEqual(200)
+		expect(notificationResponse.statusCode).toEqual(201)
 	})
 
 	it('should be able to read a notification', async () => {

@@ -8,5 +8,5 @@ export default defineConfig({
 	sourcemap: true,
 	clean: true,
 	external: ['mock-aws-s3', 'aws-sdk', 'nock', '#async_hooks'],
-	target: 'es2020'
+	target: 'es2022'
 })

@@ -20,7 +20,7 @@ describe('Lessons (e2e)', () => {
 			.post('/courses')
 			.set('Authorization', `${token}`)
 			.send({
-				title: 'Introduction to JavaScript',
+				title: 'JavaScript',
 				description: 'This course will teach you the basics of JavaScript.',
 				type: 'image/png',
 				level: 'advanced',
@@ -31,7 +31,7 @@ describe('Lessons (e2e)', () => {
 			.post('/modules')
 			.set('Authorization', `${token}`)
 			.send({
-				title: 'Introduction to JavaScript',
+				title: 'JavaScript Intro',
 				description: 'This course will teach you the basics of JavaScript.',
 				available: '7 dias',
 				visibility: true,

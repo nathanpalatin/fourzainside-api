@@ -19,12 +19,6 @@
   "plugins": [
     "@typescript-eslint/eslint-plugin"
   ],
-  "prettier/prettier": [
-    "error",
-    {
-      "endOfLine": "auto"
-    }
-  ],
   "root": true,
   "rules": {
     "simple-import-sort/imports": "error",
@@ -35,6 +29,12 @@
     "quotes": [
       "error",
       "single"
+    ],
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
     ],
     "semi": [
       "error",
