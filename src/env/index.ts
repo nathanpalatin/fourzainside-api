@@ -7,13 +7,10 @@ const envSchema = z.object({
 		.default('development'),
 	DATABASE_CLIENT: z.enum(['mysql', 'pg']).default('pg'),
 	DATABASE_URL: z.string().url(),
+	BLOB_READ_WRITE_TOKEN: z.string(),
 	JWT_SECRET_KEY: z.string(),
 	GMAIL_USER: z.string(),
 	GMAIL_APP_PASS: z.string(),
-	CLOUDFLARE_BUCKET_NAME: z.string(),
-	CLOUDFLARE_ACCOUNT_ID: z.string(),
-	CLOUDFLARE_ACCESS_KEY_ID: z.string(),
-	CLOUDFLARE_SECRET_ACCESS_KEY: z.string(),
 	PORT: z.coerce.number().default(3333)
 })
 

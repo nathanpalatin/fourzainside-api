@@ -1,51 +1,39 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3'
 import type { FastifyInstance } from 'fastify'
 import { randomUUID } from 'node:crypto'
-import { env } from '../../env'
-import { r2 } from '../../lib/cloudflare'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
-import { console } from 'node:inspector'
 import { createSlug } from '../../utils/functions'
+import { put } from '@vercel/blob'
 
 export async function uploadRoutes(app: FastifyInstance) {
 	app.withTypeProvider<ZodTypeProvider>().post('/', async (request, reply) => {
 		const file = await request.file()
+		if (!file) {
+			return reply.status(400).send({ error: 'No file uploaded' })
+		}
+
 		const uploadId = randomUUID()
-		const filePath = createSlug(file?.filename ?? 'file')
+		const filePath = createSlug(file.filename ?? 'file')
 		const uniqueFilename = `${uploadId}-${filePath}`
 		const chunks: Buffer[] = []
 
-		return new Promise<void>((resolve, reject) => {
-			file?.file.on('data', (chunk: Buffer) => {
-				chunks.push(chunk)
+		try {
+			await new Promise<void>((resolve, reject) => {
+				file.file.on('data', (chunk: Buffer) => chunks.push(chunk))
+				file.file.on('end', resolve)
+				file.file.on('error', reject)
 			})
 
-			file?.file.on('end', async () => {
-				const fileBuffer = Buffer.concat(chunks)
+			const fileBuffer = Buffer.concat(chunks)
 
-				try {
-					await r2.send(
-						new PutObjectCommand({
-							Bucket: env.CLOUDFLARE_BUCKET_NAME,
-							Key: uniqueFilename,
-							ContentType: file?.mimetype,
-							Body: fileBuffer
-						})
-					)
-
-					reply.status(200).send({ url: uniqueFilename })
-					resolve()
-				} catch (error) {
-					reply.status(500).send({ error: 'Upload failed' })
-					reject(error)
-				}
+			const { url } = await put(uniqueFilename, fileBuffer, {
+				access: 'public'
 			})
 
-			file?.file.on('error', err => {
-				console.error('Error reading file:', err)
-				reply.status(500).send({ error: 'Failed to read file' })
-				reject(err)
+			return reply.status(200).send({
+				url
 			})
-		})
+		} catch (error) {
+			return reply.status(500).send({ error: 'Upload failed' })
+		}
 	})
 }
