@@ -5,6 +5,7 @@ import { getTokenHeaderSchema } from '../../@types/zod/user'
 import {
 	createCourseSchemaBody,
 	getParamsCourseSchema,
+	getParamsEnrollUserSchema,
 	getParamsSlugCourseSchema
 } from '../../@types/zod/course'
 
@@ -108,14 +109,10 @@ export async function coursesRoutes(app: FastifyInstance) {
 		}
 	)
 
-	app.withTypeProvider<ZodTypeProvider>().post(
-		'/enroll',
-		{
-			preHandler: [checkSessionIdExists]
-		},
-		async (request, reply) => {
-			const { userId } = getTokenHeaderSchema.parse(request.headers)
-			const { courseId } = getParamsCourseSchema.parse(request.body)
+	app
+		.withTypeProvider<ZodTypeProvider>()
+		.post('/enroll', async (request, reply) => {
+			const { courseId, userId } = getParamsEnrollUserSchema.parse(request.body)
 
 			try {
 				const enrollUser = makeEnrollUserCourseUseCase()
@@ -127,12 +124,15 @@ export async function coursesRoutes(app: FastifyInstance) {
 					.status(200)
 					.send({ message: 'User enrolled in course successfully.' })
 			} catch (error) {
+				console.log('osdadasdas', error)
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
 				if (error instanceof StudentAlreadyEnrolledError) {
 					return reply.status(409).send({ message: error.message })
 				}
 
 				throw error
 			}
-		}
-	)
+		})
 }

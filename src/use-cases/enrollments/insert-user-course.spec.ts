@@ -15,7 +15,11 @@ describe('Enrollment Use Case', () => {
 		coursesRepository = new InMemoryCoursesRepository()
 		userRepository = new InMemoryUsersRepository()
 		enrollmentRepository = new InMemoryCourseEnrollmentsRepository()
-		sut = new EnrollUserUseCase(enrollmentRepository)
+		sut = new EnrollUserUseCase(
+			coursesRepository,
+			userRepository,
+			enrollmentRepository
+		)
 	})
 
 	it('should be able to enroll an user at course.', async () => {

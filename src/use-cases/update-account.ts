@@ -31,6 +31,14 @@ export class UpdateAccountUseCase {
 			}
 		}
 
+		if (cpf) {
+			const userWithSameCPF = await this.usersRepository.findByCPF(cpf)
+
+			if (userWithSameCPF) {
+				throw new UserAlreadyExistsError()
+			}
+		}
+
 		await this.usersRepository.update(userId, {
 			name,
 			cpf,

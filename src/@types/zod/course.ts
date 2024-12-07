@@ -12,6 +12,11 @@ export const getParamsCourseSchema = z.object({
 	courseId: z.string()
 })
 
+export const getParamsEnrollUserSchema = z.object({
+	courseId: z.string(),
+	userId: z.string()
+})
+
 export const getParamsCourseIdOrSlugSchema = z.object({
 	courseIdOrSlug: z.string()
 })
