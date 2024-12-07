@@ -1,4 +1,4 @@
-import { Prisma, type Progress } from '@prisma/client'
+import { Prisma, Progress } from '@prisma/client'
 
 export interface ProgressRepository {
 	findByIds(userId: string, lessonId: string): Promise<Progress | null>

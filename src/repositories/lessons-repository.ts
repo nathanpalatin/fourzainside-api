@@ -1,4 +1,4 @@
-import { Prisma, type Lessons } from '@prisma/client'
+import { Prisma, Lessons } from '@prisma/client'
 import type { LessonWithoutUpdatedAt } from './prisma/prisma-lesson-repository'
 
 export interface LessonsRepository {

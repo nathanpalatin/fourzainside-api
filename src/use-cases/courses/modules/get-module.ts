@@ -1,5 +1,5 @@
-import type { Modules } from '@prisma/client'
-import type { ModulesRepository } from '../../../repositories/modules-repository'
+import { Modules } from '@prisma/client'
+import { ModulesRepository } from '../../../repositories/modules-repository'
 import { BadRequestError } from '../../../routes/_errors/bad-request-error'
 
 export interface ModuleUseCaseRequest {

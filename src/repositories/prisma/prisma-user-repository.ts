@@ -1,4 +1,4 @@
-import { Prisma, type Users, type ValidationCode } from '@prisma/client'
+import { Prisma, ValidationCode } from '@prisma/client'
 
 import { UsersRepository } from '../users-repository'
 import { prisma } from '../../lib/prisma'

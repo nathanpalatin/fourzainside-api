@@ -1,4 +1,4 @@
-import { Prisma, type Notifications } from '@prisma/client'
+import { Prisma, Notifications } from '@prisma/client'
 
 export interface NotificationsRepository {
 	findById(id: string): Promise<Notifications | null>

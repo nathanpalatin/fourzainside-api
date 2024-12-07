@@ -1,4 +1,3 @@
-import { PrismaCourseRepository } from '../../repositories/prisma/prisma-course-repository'
 import { PrismaModuleRepository } from '../../repositories/prisma/prisma-module-repository'
 import { GetModuleUseCase } from '../courses/modules/get-module'
 

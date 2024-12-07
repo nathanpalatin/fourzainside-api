@@ -1,4 +1,4 @@
-import type { ModulesRepository } from '../../../repositories/modules-repository'
+import { ModulesRepository } from '../../../repositories/modules-repository'
 import { BadRequestError } from '../../../routes/_errors/bad-request-error'
 
 interface ModuleUseCaseRequest {

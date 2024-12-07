@@ -1,5 +1,5 @@
 import { CourseEnrollment } from '@prisma/client'
-import type { CourseEnrollmentsRepository } from '../enrollments-repository'
+import { CourseEnrollmentsRepository } from '../enrollments-repository'
 import { prisma } from '../../lib/prisma'
 
 export class PrismaCourseEnrollmentsRepository

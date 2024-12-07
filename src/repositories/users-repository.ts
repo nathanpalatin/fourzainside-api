@@ -1,4 +1,4 @@
-import { Prisma, Users, ValidationCode, type Ensigns } from '@prisma/client'
+import { Prisma, Users, ValidationCode, Ensigns } from '@prisma/client'
 
 export interface UsersRepository {
 	findById(id: string): Promise<Users | null>

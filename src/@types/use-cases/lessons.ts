@@ -8,10 +8,6 @@ export interface LessonUseCaseRequest {
 	courseId: string
 }
 
-export interface ListLessonsUseCaseRequest {
-	userId: string
-}
-
 export interface ListLessonsFromCourseUseCaseRequest {
 	slug: string
 }

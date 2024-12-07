@@ -1,4 +1,4 @@
-import { Prisma, type Comments } from '@prisma/client'
+import { Prisma, Comments } from '@prisma/client'
 
 export interface CommentsRepository {
 	findById(id: string): Promise<Comments | null>

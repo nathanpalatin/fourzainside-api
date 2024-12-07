@@ -185,6 +185,8 @@ model Ensigns {
 
   user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
   course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("ensigns")
 }
 
 model Certificates {
