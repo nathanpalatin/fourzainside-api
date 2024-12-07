@@ -16,7 +16,7 @@ export async function uploadRoutes(app: FastifyInstance) {
 		const chunks: Buffer[] = []
 
 		return new Promise<void>((resolve, reject) => {
-			file?.file.on('data', chunk => {
+			file?.file.on('data', (chunk: Buffer) => {
 				chunks.push(chunk)
 			})
 
