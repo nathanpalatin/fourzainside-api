@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { expect, describe, it, beforeEach } from 'vitest'
 
-import { InMemoryNotificationsRepository } from '../repositories/in-memory/in-memory-notifications-repository'
+import { InMemoryNotificationsRepository } from '../../repositories/in-memory/in-memory-notifications-repository'
 import { UpdateNotificationUseCase } from './update-notification'
 
 let notificationRepository: InMemoryNotificationsRepository

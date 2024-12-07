@@ -23,7 +23,7 @@ describe('Enrollment Use Case', () => {
 	})
 
 	it('should be able to enroll an user at course.', async () => {
-		await coursesRepository.create({
+		const course = await coursesRepository.create({
 			title: 'teste',
 			slug: '',
 			description: 'testeeee',
@@ -46,7 +46,7 @@ describe('Enrollment Use Case', () => {
 
 		const { enroll } = await sut.execute({
 			userId: user.id,
-			courseId: '123456'
+			courseId: course.id
 		})
 
 		if (!enroll) {

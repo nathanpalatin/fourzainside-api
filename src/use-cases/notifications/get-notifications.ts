@@ -1,7 +1,7 @@
 import { Notifications } from '@prisma/client'
 
-import { NotificationsRepository } from '../repositories/notifications-repository'
-import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { NotificationsRepository } from '../../repositories/notifications-repository'
+import { ResourceNotFoundError } from '../errors/resource-not-found-error'
 
 interface NotificationUseCaseRequest {
 	userId: string

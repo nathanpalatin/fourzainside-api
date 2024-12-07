@@ -1,10 +1,10 @@
 import type {
 	NotificationUseCaseRequest,
 	NotificationUseCaseResponse
-} from '../@types/use-cases/notifications'
-import type { NotificationsRepository } from '../repositories/notifications-repository'
-import type { UsersRepository } from '../repositories/users-repository'
-import { BadRequestError } from '../routes/_errors/bad-request-error'
+} from '../../@types/use-cases/notifications'
+import type { NotificationsRepository } from '../../repositories/notifications-repository'
+import type { UsersRepository } from '../../repositories/users-repository'
+import { BadRequestError } from '../../routes/_errors/bad-request-error'
 
 export class CreateNotificationUseCase {
 	constructor(

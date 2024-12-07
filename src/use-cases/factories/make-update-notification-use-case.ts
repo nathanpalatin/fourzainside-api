@@ -1,5 +1,5 @@
 import { PrismaNotificationRepository } from '../../repositories/prisma/prisma-notification-repository'
-import { UpdateNotificationUseCase } from '../update-notification'
+import { UpdateNotificationUseCase } from '../notifications/update-notification'
 
 export function makeUpdateNotificationUseCase() {
 	const notificationRepository = new PrismaNotificationRepository()

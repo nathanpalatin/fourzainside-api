@@ -1,9 +1,9 @@
-import { BadRequestError } from '../routes/_errors/bad-request-error'
+import { BadRequestError } from '../../routes/_errors/bad-request-error'
 import type {
 	NotificationUpdateUseCaseRequest,
 	NotificationUseCaseResponse
-} from '../@types/use-cases/notifications'
-import type { NotificationsRepository } from '../repositories/notifications-repository'
+} from '../../@types/use-cases/notifications'
+import type { NotificationsRepository } from '../../repositories/notifications-repository'
 
 export class UpdateNotificationUseCase {
 	constructor(private notificationRepository: NotificationsRepository) {}
