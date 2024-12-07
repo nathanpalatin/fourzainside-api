@@ -50,6 +50,16 @@ export class PrismaUsersRepository implements UsersRepository {
 		return user
 	}
 
+	async findManyEnsigns(userId: string) {
+		const ensigns = await prisma.ensigns.findMany({
+			where: {
+				userId
+			}
+		})
+
+		return ensigns
+	}
+
 	async findByEmail(email: string) {
 		const user = await prisma.users.findUnique({
 			where: {

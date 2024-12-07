@@ -27,4 +27,16 @@ describe('Profile (e2e)', () => {
 			})
 		)
 	})
+
+	it('should be able to get ensigns of this profile', async () => {
+		const { token, name } = await createAndAuthenticateUser(app, false, true)
+
+		const profileResponse = await request(app.server)
+			.get('/profile/ensigns')
+			.set('Authorization', `${token}`)
+			.send()
+
+		expect(profileResponse.statusCode).toEqual(200)
+		expect(profileResponse.body.ensigns).toBeGreaterThanOrEqual(0)
+	})
 })

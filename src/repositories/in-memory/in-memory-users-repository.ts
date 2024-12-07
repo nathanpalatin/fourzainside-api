@@ -1,11 +1,17 @@
 import { randomUUID } from 'node:crypto'
 
-import { Users, Prisma, type ValidationCode } from '@prisma/client'
+import {
+	Users,
+	Prisma,
+	type ValidationCode,
+	type Ensigns
+} from '@prisma/client'
 import type { UsersRepository } from '../users-repository'
 import { createSlug } from '../../utils/functions'
 
 export class InMemoryUsersRepository implements UsersRepository {
 	public items: Users[] = []
+	public itemsEnsigns: Ensigns[] = []
 	public code: ValidationCode[] = []
 
 	async findByPhone(phone: string) {
@@ -25,6 +31,14 @@ export class InMemoryUsersRepository implements UsersRepository {
 	): Promise<Users[]> {
 		const students = this.items.filter(course => course.id === courseId)
 		return students.slice(skip, skip + take)
+	}
+
+	async findManyEnsigns(userId: string) {
+		const ensigns = this.itemsEnsigns.filter(item => item.userId === userId)
+		if (!ensigns) {
+			return null
+		}
+		return ensigns
 	}
 
 	async findByCPF(cpf: string) {

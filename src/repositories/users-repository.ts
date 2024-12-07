@@ -1,4 +1,4 @@
-import { Prisma, Users, ValidationCode } from '@prisma/client'
+import { Prisma, Users, ValidationCode, type Ensigns } from '@prisma/client'
 
 export interface UsersRepository {
 	findById(id: string): Promise<Users | null>
@@ -7,6 +7,7 @@ export interface UsersRepository {
 		take: number,
 		skip: number
 	): Promise<Users[] | null>
+	findManyEnsigns(userId: string): Promise<Ensigns[] | null>
 	findByEmail(email: string): Promise<Users | null>
 	findByCPF(cpf: string): Promise<Users | null>
 	findByPhone(phone: string): Promise<Users | null>

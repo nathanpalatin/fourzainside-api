@@ -51,6 +51,7 @@ model Users {
   sentNotifications Notifications[]    @relation("NotificationsSendUser")
   socialLinks       SocialLinks[]
   payments          Payments[]
+  ensigns           Ensigns[]
 
   @@map("users")
 }
@@ -94,6 +95,7 @@ model Courses {
   courseEnrollment CourseEnrollment[]
   modules          Modules[]
   lessons          Lessons[]
+  ensigns          Ensigns[]
 
   @@map("courses")
 }
@@ -169,6 +171,20 @@ model Progress {
 
   @@unique([userId, lessonId])
   @@map("progress")
+}
+
+model Ensigns {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  message     String
+  description String
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   Users   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model Certificates {
