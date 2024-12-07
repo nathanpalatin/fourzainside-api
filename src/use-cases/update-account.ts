@@ -1,6 +1,8 @@
 import { type UpdateAccountUseCaseRequest } from '../@types/use-cases/users'
 
 import type { UsersRepository } from '../repositories/users-repository'
+import { BadRequestError } from '../routes/_errors/bad-request-error'
+import { isValidCPF } from '../utils/functions'
 
 import { UserAlreadyExistsError } from './errors/user-already-exists-error'
 
@@ -36,6 +38,10 @@ export class UpdateAccountUseCase {
 
 			if (userWithSameCPF) {
 				throw new UserAlreadyExistsError()
+			}
+
+			if (!isValidCPF(cpf)) {
+				throw new BadRequestError('CPF Inválido.')
 			}
 		}
 

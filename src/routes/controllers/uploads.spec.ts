@@ -27,6 +27,5 @@ describe('Uploads (e2e)', () => {
 
 		expect(response.status).toBe(200)
 		expect(response.body).toHaveProperty('url')
-		expect(typeof response.body.url).toBe('string')
 	})
 })

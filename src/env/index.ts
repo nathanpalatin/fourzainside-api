@@ -1,10 +1,5 @@
-import { config } from 'dotenv'
+import 'dotenv/config'
 import { z } from 'zod'
-
-config({
-	path: '.env',
-	override: true
-})
 
 const envSchema = z.object({
 	NODE_ENV: z

@@ -128,6 +128,9 @@ export async function usersRoutes(app: FastifyInstance) {
 				if (error instanceof UserAlreadyExistsError) {
 					return reply.status(409).send({ message: error.message })
 				}
+				if (error instanceof BadRequestError) {
+					return reply.status(400).send({ message: error.message })
+				}
 
 				throw error
 			}

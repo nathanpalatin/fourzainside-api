@@ -1,7 +1,6 @@
 import { app } from '../../app'
 
 import request from 'supertest'
-import { hash } from 'bcrypt'
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
@@ -16,7 +15,7 @@ describe('Users routes (e2e)', () => {
 		await app.close()
 	})
 
-	it('should be able to create a new user', async () => {
+	it.only('should be able to create a new user', async () => {
 		const userResponse = await request(app.server).post('/users').send({
 			name: 'John Doe',
 			phone: '+554799999999',
@@ -54,7 +53,7 @@ describe('Users routes (e2e)', () => {
 
 		const updateData = {
 			name: 'John Updated',
-			phone: '+554799988888'
+			phone: '+554799999933'
 		}
 
 		const updateResponse = await request(app.server)

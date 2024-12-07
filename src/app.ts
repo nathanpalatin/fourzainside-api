@@ -40,6 +40,8 @@ app.setErrorHandler(errorHandler)
 
 app.register(cookie)
 
+app.register(multipart)
+
 app.register(usersRoutes, {
 	prefix: 'users'
 })

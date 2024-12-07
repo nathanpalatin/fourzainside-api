@@ -1,13 +1,4 @@
-import { config } from 'dotenv'
-
-config({
-	path: '.env',
-	override: true
-})
-config({
-	path: '.env.test',
-	override: true
-})
+import 'dotenv/config'
 
 import { randomUUID } from 'node:crypto'
 import { execSync } from 'node:child_process'
